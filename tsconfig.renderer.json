@@ -1,0 +1,12 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+      "module": "es2022",               // NOT NodeNext
+      "moduleResolution": "bundler",    // This is now allowed
+      "paths": {
+        "#": ["./src/renderer/*"],
+      }
+    },
+    "include": ["src/**/*"]
+  }
+  

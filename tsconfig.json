@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "incremental": true,
+    "target": "es2022",
+    "module": "NodeNext",
+    "lib": ["dom", "es2022"],
+    "jsx": "react-jsx",
+    "strict": false,
+    "sourceMap": true,
+    "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "outDir": ".erb/dll",
+    "skipLibCheck": true,
+    "typeRoots": ["./node_modules/@types", "./src/renderer/types", "./src/renderer/global.d.ts", "./node_modules/@chakra-ui/react/dist/types"],
+    "paths": {
+      "#/*": ["./src/renderer/*"],
+    }
+  },
+  "exclude": ["test", "release/build", "release/app/dist", ".erb/dll"],
+  "include": ["src/renderer/global.d.ts", "src/**/*"]
+}
