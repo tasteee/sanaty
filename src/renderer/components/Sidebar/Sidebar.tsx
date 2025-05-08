@@ -2,20 +2,13 @@ import './Sidebar.css'
 import { useLocation } from 'wouter'
 import { Card, Heading, Separator, HStack, Text, Flex, Circle, CuteIcon, ProgressCircle } from '#/components'
 import { MenuItem } from './MenuItem'
-import { $sidebar } from '#/stores/sidebar.stoe'
 import { CollectionsSection } from './CollectionsSection'
 import { Button, Menu, Portal } from '#/components'
 import { $main } from '#/stores/main'
-import { $assets } from '#/stores/assets'
-
-const addFolder = async () => {
-  const allAssets = await window.electron.addFolder()
-  $assets.list.set(allAssets)
-  console.log('updated assets', allAssets.length, allAssets)
-}
+import { $folders } from '#/stores/folders'
 
 const handleAction = (event) => {
-  if (event.value === 'addFolder') return addFolder()
+  if (event.value === 'addFolder') return $folders.addFolder()
   if (event.value === 'settings') return console.log('TODO: Settings Modal')
   if (event.value === 'support') return console.log('TODO: support Modal')
 }
@@ -52,13 +45,6 @@ const SettingsMenu = () => {
   )
 }
 
-const useAssetsMenuItems = () => {
-  return [
-    { id: 'samples', label: 'Samples', route: '/browse/samples' },
-    { id: 'midi', label: 'MIDI', route: '/browse/midi' }
-  ]
-}
-
 export const Sidebar = () => {
   return (
     <Card.Root maxW="sm" height="98%" overflow="hidden" className="Sidebar">
@@ -67,10 +53,8 @@ export const Sidebar = () => {
           <Flex direction="column" gap="6" height="100%">
             <LogoSection />
             <Separator />
-
-            <AssetsSection />
+            <TopNavSection />
             <Separator />
-
             <CollectionsSection />
           </Flex>
         </Flex>
@@ -98,9 +82,11 @@ const LogoSection = () => {
   )
 }
 
-const AssetsSection = () => {
-  const assetsMenuItems = useAssetsMenuItems()
-  const activeMenuItemId = $sidebar.activeMenuItemId.use()
+const TopNavSection = () => {
+  const [location, setLocation] = useLocation()
+  const isHomeActive = location === '/' || location === '/index.html'
+  const isSamplesActive = location === '/samples'
+  const isMidiActive = location === '/midi'
 
   return (
     <Flex gap="3" direction="column" flex="0">
@@ -108,20 +94,10 @@ const AssetsSection = () => {
         Assets
       </Heading>
       <Flex gap="2" direction="column">
-        {assetsMenuItems.map((item) => (
-          <MenuItem key={item.id} {...item} isActive={item.id === activeMenuItemId} />
-        ))}
+        <MenuItem id="home" label="Home" isActive={isHomeActive} onClick={() => setLocation('/')} />
+        <MenuItem id="samples" label="Samples" isActive={isSamplesActive} onClick={() => setLocation('/samples')} />
+        <MenuItem id="midi" label="MIDI" isActive={isMidiActive} onClick={() => setLocation('/midi')} />
       </Flex>
-    </Flex>
-  )
-}
-
-const BottomSection = () => {
-  return (
-    <Flex gap="2" direction="column" justify="flex-end" flex="0">
-      <Text className="softLink">Account</Text>
-      <Text className="softLink">Settings</Text>
-      <Text className="softLink">Support</Text>
     </Flex>
   )
 }

@@ -1,29 +1,33 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
+// Define all API handlers for the renderer
 const electronHandler = {
-  // Folder management
   addFolder: () => ipcRenderer.invoke('addFolder'),
-  removeFolder: (folderId: string) => ipcRenderer.invoke('removeFolder', folderId),
+  removeFolder: (id) => ipcRenderer.invoke('removeFolder', id),
+  refreshFolder: (id) => ipcRenderer.invoke('refreshFolder', id),
+  getAllFolders: () => ipcRenderer.invoke('getAllFolders'),
+  getAllSamples: () => ipcRenderer.invoke('getAllSamples'),
+  getAllCollections: () => ipcRenderer.invoke('getAllCollections'),
+  addSampleToCollection: (id, sampleId) => ipcRenderer.invoke('addSampleToCollection', id, sampleId),
+  removeSampleFromCollection: (id, sampleId) => ipcRenderer.invoke('removeSampleFromCollection', id, sampleId),
+  getFolderSampleCount: (id) => ipcRenderer.invoke('getFolderSampleCount', id),
+  updateSample: (id, updates: Partial<SampleT>) => ipcRenderer.invoke('updateSample', id, updates),
+  updateCollection: (id, updates: Partial<SampleT>) => ipcRenderer.invoke('updateSample', id, updates),
+  searchAssets: (filters: any) => ipcRenderer.invoke('searchAssets', filters),
+  getCollectionAssets: (id: string) => ipcRenderer.invoke('getCollectionAssets', id),
 
-  // Asset management
-  toggleAssetLiked: (assetId: string) => ipcRenderer.invoke('toggleAssetLiked', assetId),
-  addTagToAsset: (assetId: string, tag: object) => ipcRenderer.invoke('addTagToAsset', assetId, tag),
-  removeTagFromAsset: (assetId: string, tagId: string) => ipcRenderer.invoke('removeTagFromAsset', assetId, tagId),
-  searchAssets: (filters: { name?: string; isLiked?: boolean; tagIds?: string[] }) =>
-    ipcRenderer.invoke('searchAssets', filters),
+  searchCollections: () => ipcRenderer.invoke('searchCollections'),
+  createCollection: (data: Partial<CollectionT>) => {
+    return ipcRenderer.invoke('createCollection', data)
+  },
 
-  // Collection management
-  createCollection: (name: string) => ipcRenderer.invoke('createCollection', name),
-  deleteCollection: (collectionId: string) => ipcRenderer.invoke('deleteCollection', collectionId),
-  updateCollectionName: (collectionId: string, newName: string) =>
-    ipcRenderer.invoke('updateCollectionName', collectionId, newName),
-  addAssetToCollection: (collectionId: string, assetId: string) =>
-    ipcRenderer.invoke('addAssetToCollection', collectionId, assetId),
-  removeAssetFromCollection: (collectionId: string, assetId: string) =>
-    ipcRenderer.invoke('removeAssetFromCollection', collectionId, assetId),
-
-  getAppData: () => ipcRenderer.invoke('getAppData')
+  deleteCollection: (collectionId: string) => {
+    return ipcRenderer.invoke('deleteCollection', collectionId)
+  }
 }
 
+// Expose the API to the renderer process
 contextBridge.exposeInMainWorld('electron', electronHandler)
+
+// Export the type for TypeScript usage in the renderer
 export type ElectronHandler = typeof electronHandler

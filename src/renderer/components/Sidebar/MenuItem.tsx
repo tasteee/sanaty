@@ -1,33 +1,36 @@
 import classes from 'clsx'
 import { useLocation } from 'wouter'
 import { $sidebar } from '#/stores/sidebar.stoe'
-import { Flex, HStack, Text, Circle } from '#/components'
+import { Flex, HStack, Text, Circle, CuteIcon } from '#/components'
 
-export const MenuItem = (props) => {
-  const [, setLocation] = useLocation()
-  const weight = props.isActive ? 'light' : 'light'
+type PropsT = {
+  id: string
+  className?: string
+  label: string
+  children?: any
+  style?: any
+  onClick?: any
+  iconName?: string
+  isActive?: boolean
+}
+
+export const MenuItem = (props: PropsT) => {
   const className = classes('MenuItem', props.isActive && 'isActive', props.className)
-
-  const onClick = () => {
-    $sidebar.activeMenuItemId.set(props.id)
-    setLocation(props.route)
-  }
 
   return (
     <Flex
       className={className}
       justify="space-between"
-      onClick={onClick}
+      onClick={props.onClick}
       position="relative"
       align="center"
       style={props.style}
     >
-      <Text fontWeight={weight}>{props.label}</Text>
+      <Flex gap="2">
+        {props.iconName && <CuteIcon id="aaa" name={props.iconName} color="#71717a" />}
+        <Text>{props.label}</Text>
+      </Flex>
       {props.children}
     </Flex>
   )
 }
-
-// const ActiveMenuItemIndicator = () => {
-//   return <Circle size="1" bg="#db2777" color="white" className="ActiveMenuItemIndicator" />
-// }

@@ -1,7 +1,7 @@
 import { datass } from 'datass'
 
 export const $user = datass.object<UserT>({
-  id: '12354',
+  _id: '12354',
   username: 'tasteink',
   email: 'taste@taste.ink',
   avatarUrl: '',

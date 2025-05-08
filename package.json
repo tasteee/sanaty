@@ -52,6 +52,11 @@
   "browserslist": [
     "extends browserslist-config-erb"
   ],
+  "overrides": {
+    "@siberiacancode/reactuse": {
+      "@types/react": "^19.0.0"
+    }
+  },
   "prettier": {
     "singleQuote": true,
     "overrides": [
@@ -104,19 +109,24 @@
     "@electron/notarize": "^3.0.0",
     "@emotion/react": "^11.14.0",
     "@iconify/react": "^5.2.1",
+    "@seald-io/nedb": "^4.1.1",
+    "@siberiacancode/reactuse": "^0.1.1",
     "await-of": "^3.1.1",
-    "classcat": "^5.0.5",
     "clsx": "^2.1.1",
     "datass": "1.1.0-beta.1",
-    "edit-json-file": "^1.8.1",
     "electron-debug": "^4.1.0",
     "electron-log": "^5.3.2",
+    "electron-store": "^10.0.1",
     "electron-updater": "^6.3.9",
     "essentia.js": "^0.1.3",
+    "glob": "^11.0.2",
+    "jexidb": "^1.1.0",
+    "lowdb": "^7.0.1",
     "next-themes": "^0.4.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
+    "sqlite3": "^5.1.7",
     "uuid": "^11.1.0",
     "wouter": "^3.6.0"
   },
@@ -127,11 +137,10 @@
     "@teamsupercell/typings-for-css-modules-loader": "^2.5.2",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
-    "@types/edit-json-file": "^1.7.3",
     "@types/jest": "^29.5.14",
     "@types/node": "22.13.10",
-    "@types/react": "^19.0.11",
-    "@types/react-dom": "^19.0.4",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "@types/react-test-renderer": "^19.0.0",
     "@types/webpack-bundle-analyzer": "^4.7.0",
     "@typescript-eslint/eslint-plugin": "^8.26.1",
@@ -183,11 +192,11 @@
     "tsconfig-paths-webpack-plugin": "^4.2.0",
     "typescript": "^5.8.2",
     "url-loader": "^4.1.1",
+    "webpack": "^5.9.0",
     "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^6.0.1",
     "webpack-dev-server": "^5.2.0",
-    "webpack-merge": "^6.0.1",
-    "webpack": "^5.9.0"
+    "webpack-merge": "^6.0.1"
   },
   "build": {
     "productName": "sanaty",

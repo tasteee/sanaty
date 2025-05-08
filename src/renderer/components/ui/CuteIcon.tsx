@@ -1,6 +1,9 @@
 import { Icon } from '@iconify/react'
+import clsx from 'clsx'
+import React from 'react'
 
 type PropsT = {
+  id?: string
   name?: string
   kind?: string
   size?: number
@@ -13,10 +16,10 @@ type PropsT = {
   activeColor?: string
   style?: React.CSSProperties
   customIcon?: string
-  onClick?: () => void
+  onClick?: any
 }
 
-export const CuteIcon = (props: PropsT) => {
+export const CuteIcon = React.memo((props: PropsT) => {
   const { customIcon, ...otherProps } = props
 
   const library = 'mingcute'
@@ -26,6 +29,17 @@ export const CuteIcon = (props: PropsT) => {
   const mingIcon = `${library}:${props.name}-${kind}`
   const icon = props.customIcon || mingIcon
   const color = props.isActive ? props.activeColor : props.color
+  const className = clsx('CuteIcon', props.className)
 
-  return <Icon {...otherProps} rotate={props.rotate} color={color} icon={icon} width={width} height={height} />
-}
+  return (
+    <Icon
+      {...otherProps}
+      className={className}
+      rotate={props.rotate}
+      color={color}
+      icon={icon}
+      width={width}
+      height={height}
+    />
+  )
+})

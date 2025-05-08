@@ -3,12 +3,12 @@ import { datass } from 'datass'
 const $list = datass.array([])
 
 const getAssetById = (id: string) => {
-  return $list.state.find((item) => item.id === id)
+  return $list.state.find((item) => item._id === id)
 }
 
 const updateAssetById = (id: string, updater) => {
   const newList = $list.state.map((item) => {
-    if (item.id !== id) return item
+    if (item._id !== id) return item
     return updater(item)
   })
 
@@ -16,7 +16,7 @@ const updateAssetById = (id: string, updater) => {
 }
 
 const useAsset = (id: string) => {
-  return $list.use.find((item) => item.id === id)
+  return $list.use.find((item) => item._id === id)
 }
 
 const setAssetLiked = (id: string, isLiked: boolean) => {

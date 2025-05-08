@@ -31,7 +31,7 @@ const $isLikedFilterActive = datass.boolean(false)
 const $tagCategoryFilter = datass.string('All')
 
 const getTagById = (id: string) => {
-  return TAGS.find((tag) => tag.id === id) as TagT
+  return TAGS.find((tag) => tag._id === id) as TagT
 }
 
 const setTagCategoryFilter = (value: string) => {
@@ -50,24 +50,26 @@ const useCategoryFilteredTags = () => {
   return getCategoryFilteredTags()
 }
 
-const useTagCloudTags = () => {
+const useActiveTags = () => {
   const activeTagIds = $tags.use()
+  const activeTags = TAGS.filter((tag) => activeTagIds.includes(tag._id))
+  return activeTags as TagT[]
+}
+
+const useInactiveTagCloudTags = () => {
+  $tags.use()
   const categoryTags = useCategoryFilteredTags()
-  const withoutActiveTags = categoryTags?.filter((tag) => !checkIsTagActive(tag.id)) as TagT[]
-  const activeTags = activeTagIds.map((tagId: string) => getTagById(tagId))
-  console.log({ activeTags, withoutActiveTags, categoryTags })
-  return [activeTags, withoutActiveTags]
+  const withoutActiveTags = categoryTags?.filter((tag) => !checkIsTagActive(tag._id)) as TagT[]
+  return withoutActiveTags
 }
 
 const removeTag = (id: string) => {
   const newTags = $tags.state.filter((tagId) => tagId !== id)
   $tags.set(newTags)
-  console.log('removeTag tag', id)
 }
 
 const addTag = (id: string) => {
   $tags.set.append(id)
-  console.log('added tag', id)
 }
 
 const checkIsTagActive = (id: string) => {
@@ -75,7 +77,6 @@ const checkIsTagActive = (id: string) => {
 }
 
 const toggleTag = (id: string) => {
-  console.log('toggling tag', id)
   const isTagActive = checkIsTagActive(id)
   if (isTagActive) removeTag(id)
   if (!isTagActive) addTag(id)
@@ -83,7 +84,7 @@ const toggleTag = (id: string) => {
 
 const getNonActiveTags = (tags: TagT[]) => {
   return tags.filter((tag) => {
-    return !checkIsTagActive(tag.id)
+    return !checkIsTagActive(tag._id)
   })
 }
 
@@ -138,7 +139,8 @@ export const $filters = {
   isLikedFilterActive: $isLikedFilterActive,
   sampleType: $sampleType,
   tagCategoryFilter: $tagCategoryFilter,
-  useTagCloudTags,
+  useTagCloudTags: useInactiveTagCloudTags,
+  useActiveTags,
   getCategoryFilteredTags,
   setTagCategoryFilter,
   setSampleType,

@@ -3,7 +3,6 @@ export type FolderT = {
   path: string
   name: string
   createdDate: number
-  updatedDate: number
 }
 
 export type TagT = {
@@ -11,51 +10,47 @@ export type TagT = {
   label: string
   category: string
   createdDate: number
-  updatedDate: number
 }
 
-export type BaseAssetT = {
+export type SampleT = {
   id: string
-  folderId: string
-  name: string
-  filePath: string
-  fileSize: number
+  name: string // 'foo_bar'
+  fileName: string // 'foo.bar.wav'
+  path: string // 'file://C://a/b/c/foo.bar.wav'
+  size: number // bytes
   isLiked: boolean
-  tagIds: string[]
-  createdDate: number
-  updatedDate: number
-  dateAdded: number
-  dateModified: number
-}
-
-export type SampleAssetT = BaseAssetT & {
-  fileType: string
-  extension: string
-  duration: number
+  isDisliked: boolean
+  tags: string[]
+  folderId: string
+  extension: string // 'wav', 'mp3', etc
+  duration: number // seconds
   bpm: number
   key: string
   scale: string
-  sampleType: 'loop' | 'oneShot'
+  kind: 'loop' | 'oneShot'
+  createdDate: number
 }
 
 export type CollectionT = {
   id: string
   name: string
-  assetIds: string[]
+  description: string
+  sampleIds: string[]
+  artworkPath: string
   createdDate: number
-  updatedDate: number
 }
 
 export type AssetSearchQueryT = {
   text?: string
-  tagIds?: string[]
+  tags?: string[]
   collectionId?: string
   isLiked?: boolean
-
-  // searchValue: string
+  searchValue: string
   key: string
   scale: string
   bpmRange: [number, number]
   lengthRange: [number, number]
-  sampleType: string
+  kind: string
+  sortBy: string
+  sortOrder: string
 }

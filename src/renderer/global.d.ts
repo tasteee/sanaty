@@ -1,65 +1,46 @@
-type CategoryT = 'instrument' | 'genre' | 'descriptor'
-type ScaleT = 'Major' | 'Minor' | 'Dorian' | 'Phrygian' | 'Lydian' | 'Mixolydian' | 'Locrian'
-type KeyT = 'C' | 'C#' | 'D' | 'D#' | 'E' | 'F' | 'F#' | 'G' | 'G#' | 'A' | 'A#' | 'B'
-type SampleTypeT = 'shot' | 'loop'
-
-type DirectoryStateT = {
-  folders: FolderT[]
-  assets: SampleT[]
-  collections: CollectionT[]
-  settings: { [key: string]: any }
-}
-
 type FolderT = {
-  id: string
-  path: string
+  _id: string // uuidv4
+  path: string // C://foo/bar/baz
+  name: string // baz
+  createdDate: number // Date.now()
+}
+
+type SampleT = {
+  _id: string // uuidv4
   name: string
-  isIndexing: boolean
-  dateAdded: number
-}
-
-type BaseModelT = {
-  id: string
-  createdDate: number
-  updatedDate: number
-}
-
-type UserT = BaseModelT & {
-  username: string
-  email: string
-  avatarUrl: string | null
-  description: string | null
-  favoritedAssets: string[]
-  collections: string[]
-  packs: string[]
-}
-
-type TagT = BaseModelT & {
-  id: string
-  label: string
-  category: CategoryT
-}
-
-type SampleT = BaseModelT & {
-  name: string
-  user: string
-  pack: string
-  type: SampleTypeT
-  audioUrl: string
-  length: number
-  key: KeyT | null
-  scale: ScaleT | null
-  bpm: number | null
+  fileName: string
+  filePath: string
+  fileSize: number
+  fileExtension: string
+  folderId: string // Reference to FolderT._id
+  duration: number
+  bpm: number
+  key: string
+  scale: string
+  sampleType: string
   tags: string[]
+  createdDate: number
 }
 
-// Collection model (user-created collections of assets)
-type CollectionT = BaseModelT & {
+type CollectionT = {
+  _id: string
   name: string
   description: string
-  artworkUrl: string | null
-  isPublic: boolean
-  userId: string
-  assetIds: string[]
-  tagIds: string[]
+  artworkPath: string
+  sampleIds: string[]
+  createdDate: number
+}
+
+// NOT A DATABASE DATA TYPE.
+// THESE ARE STATIC AND LOADED AT RUNTIME.
+// SampleT.tags is an array of TagT _ids.
+// Those _ids are used to look up tag data
+// objects in the UI for rendering them
+// as different colors and such based
+// on their categories.
+type TagT = {
+  _id: string // 'future-bass'
+  label: string // 'future bass'
+  category: string // 'genre' | 'instrument' | 'descriptor'
+  createdDate: number // Date.now()
 }
