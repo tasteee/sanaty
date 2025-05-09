@@ -11,8 +11,9 @@ type PropsT = {
 
 export const SelectInput = (props: PropsT) => {
   const onChange = (event: any) => {
-    const item = props.collection.items.find((item: any) => item.value === event.value[0])
-    props.onChange(item, event.value[0])
+    const value = event.value[0]
+    const item = props.collection.items.find((item: any) => item.value === value)
+    props.onChange(item, value)
   }
 
   return (

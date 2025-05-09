@@ -5,7 +5,6 @@ import { $collections } from '#/stores/collections'
 import { datass } from 'datass'
 import { CreateCollectionDialog } from './CreateCollectionDialog'
 import { useLocation } from 'wouter'
-import { $sidebar } from '#/stores/sidebar.stoe'
 
 export const CollectionsSection = () => {
   const [location, setLocation] = useLocation()

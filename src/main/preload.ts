@@ -13,8 +13,10 @@ const electronHandler = {
   getFolderSampleCount: (id) => ipcRenderer.invoke('getFolderSampleCount', id),
   updateSample: (id, updates: Partial<SampleT>) => ipcRenderer.invoke('updateSample', id, updates),
   updateCollection: (id, updates: Partial<SampleT>) => ipcRenderer.invoke('updateSample', id, updates),
-  searchAssets: (filters: any) => ipcRenderer.invoke('searchAssets', filters),
+  searchSamples: (filters: any) => ipcRenderer.invoke('searchSamples', filters),
   getCollectionAssets: (id: string) => ipcRenderer.invoke('getCollectionAssets', id),
+
+  toggleAssetLiked: (id: string) => ipcRenderer.invoke('toggleAssetLiked', id),
 
   searchCollections: () => ipcRenderer.invoke('searchCollections'),
   createCollection: (data: Partial<CollectionT>) => {

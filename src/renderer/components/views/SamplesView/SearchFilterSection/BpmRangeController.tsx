@@ -1,33 +1,32 @@
 import './BpmRangeController.css'
-import { $filters } from '#/stores/search.store'
 import { Flex, InputGroup, Input } from '#/components'
 import React from 'react'
+import { $samplesViewStore } from '../samplesView.store'
 
 export const BpmRangeController = () => {
   const minBpmRef = React.useRef(null)
   const maxBpmRef = React.useRef(null)
-  const bpmRange = $filters.bpmRange.use()
-  const minBpmValue = bpmRange[0]
-  const maxBpmValue = bpmRange[1]
+  const minBpmValue = $samplesViewStore.filters.use((state) => state.bpmMin)
+  const maxBpmValue = $samplesViewStore.filters.use((state) => state.bpmMax)
 
   const onMinBpmBlur = () => {
-    $filters.setMinBpm(minBpmValue)
+    $samplesViewStore.setMinBpm(minBpmValue)
   }
 
   const onMaxBpmBlur = () => {
-    $filters.setMaxBpm(maxBpmValue)
+    $samplesViewStore.setMaxBpm(maxBpmValue)
   }
 
   const onMinBpmChange = (event) => {
     const numberValue = parseInt(event.target.value)
     const clampedValue = Math.max(numberValue, 0)
-    $filters.bpmRange.set([clampedValue, maxBpmValue])
+    $samplesViewStore.filters.set({ bpmMin: clampedValue })
   }
 
   const onMaxBpmChange = (event) => {
     const numberValue = parseInt(event.target.value)
     const clampedValue = Math.min(numberValue, 300)
-    $filters.bpmRange.set([minBpmValue, clampedValue])
+    $samplesViewStore.filters.set({ bpmMax: clampedValue })
   }
 
   return (

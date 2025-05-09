@@ -1,18 +1,17 @@
 import { Flex, Text, Button } from '#/components'
 import { SortOrderSelector } from './SortOrderSelector'
 import { SortBySelector } from './SortBySelector'
-import { $assets } from '#/stores/assets'
-import { $main } from '#/stores/main'
+import { $samplesViewStore } from '../samplesView.store'
 
 export const SortOptionsRow = () => {
-  const isTagCloudShown = $main.isTagCloudShown.use()
+  const isTagCloudShown = $samplesViewStore.isTagCloudShown.use()
   const toggleTagCloudText = isTagCloudShown ? 'Hide' : 'Show'
 
   return (
     <Flex justify="space-between" align="center" padding="4px">
       <Flex gap="8" align="center">
         <SearchResultCount />
-        <Text color="gray.500" textStyle="sm" onClick={() => $main.isTagCloudShown.set.toggle()} className="clickableText">
+        <Text color="gray.500" textStyle="sm" onClick={$samplesViewStore.toggleTagCloudVisibility} className="clickableText">
           {toggleTagCloudText} tag cloud
         </Text>
       </Flex>
@@ -25,6 +24,6 @@ export const SortOptionsRow = () => {
 }
 
 const SearchResultCount = () => {
-  const assetCount = $assets.list.use((list) => list.length)
+  const assetCount = $samplesViewStore.results.use((list) => list.length)
   return <Text color="gray.500">{assetCount} results</Text>
 }

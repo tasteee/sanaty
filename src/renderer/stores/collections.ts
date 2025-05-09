@@ -43,3 +43,5 @@ export const $collections = {
   addSampleToCollection,
   removeSampleFromCollection
 }
+
+globalThis.$collections = $collections

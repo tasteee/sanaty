@@ -15,9 +15,7 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 import { FaPlay, FaPause, FaStepForward, FaStepBackward, FaVolumeUp, FaVolumeMute } from 'react-icons/fa'
-import { $samples } from '#/stores/samples'
-import { TagCloudTag } from '../SearchFilterSection/SearchFilterSection'
-import { $tags } from '#/stores/tags'
+import { $samplesViewStore } from '../samplesView.store'
 
 // Custom hook for handling audio playback
 const useAudioPlayer = (sample: SampleT | null) => {
@@ -111,7 +109,7 @@ const useActiveSampleId = () => {
 }
 
 export const PlaybackBar = () => {
-  const activeSample = $samples.activeSample.use()
+  const activeSample = $samplesViewStore.activeSample.use()
   const player = useAudioPlayer(activeSample)
   if (!activeSample) return
 
@@ -147,9 +145,6 @@ export const PlaybackBar = () => {
               </Text>
 
               <Flex gap="2">
-                {activeSample.tags.map((tagId) => (
-                  <TagById key={tagId} id={tagId} />
-                ))}
                 <Badge colorScheme="purple" borderRadius="full" px="2" fontSize="xs">
                   {activeSample.bpm} BPM
                 </Badge>
@@ -249,9 +244,4 @@ export const PlaybackBar = () => {
       </Card.Body>
     </Card>
   )
-}
-
-const TagById = (props) => {
-  const tag = $tags.getTag(props._id)
-  return <TagCloudTag {...tag} />
 }

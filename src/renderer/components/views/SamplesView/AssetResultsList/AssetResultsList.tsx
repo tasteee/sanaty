@@ -2,14 +2,14 @@ import React from 'react'
 import { datass } from 'datass'
 import { Box, Flex, Portal, IconButton, Text, Tag, Menu, CuteIcon, Popover } from '#/components'
 import { Card } from '#/components'
-import { $samples } from '#/stores/samples'
 import { useActiveElement } from '@siberiacancode/reactuse'
 import { SortOptionsRow } from '../SearchFilterSection/SortOptionsRow'
-import { $filters } from '#/stores'
 import { AssetRowOptionsMenu } from './AssetRowOptionsMenu'
-import { SanatyTag } from '../ui/SanatyTag'
+import { SanatyTag } from '../../../ui/SanatyTag'
 
 import { useUnmount } from '@siberiacancode/reactuse'
+import { AssetTagsOverview } from '../../../AssetTagsOverview'
+import { $samplesViewStore } from '../samplesView.store'
 
 const $sampleResults = datass.array([])
 const $activeRowIndex = datass.number(-1)
@@ -21,7 +21,7 @@ const handleArrowKeys = (event: KeyboardEvent) => {
   const previousIndex = $activeRowIndex.state - 1
   const nextIndex = $activeRowIndex.state + 1
 
-  const maxIndex = $samples.list.state.length - 1
+  const maxIndex = $samplesViewStore.results.state.length - 1
   const minIndex = 0
 
   const finalPreviousIndex = Math.max(minIndex, previousIndex)
@@ -50,10 +50,6 @@ export const SampleResultsList = () => {
     if (ref.current === activeElement) window.addEventListener('keydown', handleArrowKeys)
     if (ref.current !== activeElement) window.removeEventListener('keydown', handleArrowKeys)
   }, [ref.current, activeElement])
-
-  React.useEffect(() => {
-    $samples.getSomeSamples()
-  }, [])
 
   return (
     <Flex direction="column" flex="1" overflow="hidden" pb="24px" ref={ref} tabIndex="0">
@@ -112,26 +108,17 @@ const AssetRowLeftBox = (props) => {
   )
 }
 
-const BG_GRADIENT = 'linear-gradient(to right, #18181b, transparent)'
-
-const nikedIcon = <CuteIcon customIcon="bxs:heart" color="#ec4899" style={{ scale: 1.25 }} />
-const notLikedIcon = <CuteIcon customIcon="bx:heart" color="#71717a" style={{ scale: 1.1 }} />
+const ACTIVE_BG_GRADIENT = 'linear-gradient(to right, #18181b, transparent)'
 
 export const AssetRow = React.memo((props: AssetRowPropsT) => {
-  const sample = $samples.useSample(props.id)
+  const sample = $samplesViewStore.useAssetResult(props.id)
   const beforeStyles = props.isActive ? activeStyles : {}
-  const bgGradient = props.isActive ? BG_GRADIENT : ''
-  const heartIcon = sample.isLiked ? nikedIcon : notLikedIcon
+  const bgGradient = props.isActive ? ACTIVE_BG_GRADIENT : ''
 
   React.useEffect(() => {
     if (!props.isActive) return
-    $samples.activeSample.set(sample)
+    $samplesViewStore.activeSample.set(sample)
   }, [props.isActive])
-
-  const toggleAssetLiked = (event) => {
-    event.stopPropagation()
-    $samples.toggleSampleLiked(props.id)
-  }
 
   const activateAssetRow = (event) => {
     const isInsideHoverCard = event.target.closest('.hoverCardContent') !== null
@@ -156,70 +143,110 @@ export const AssetRow = React.memo((props: AssetRowPropsT) => {
     >
       <Card.Body zIndex={1} position="relative" bgGradient={bgGradient}>
         <Flex align="center" gap="4">
-          {props.isActive && <AssetRowPlaybackController />}
-          {!props.isActive && <AssetRowLeftBox />}
-
-          <Flex direction="column" flex="1" justify="center">
-            <Flex gap="4" align="center">
-              <Text fontWeight="bold">{sample.name}</Text>
-              <Flex fontSize="sm" color="gray.500" gap="4">
-                <Flex gap="1">
-                  <Text>{sample.key}</Text>
-                  <Text>{sample.scale}</Text>
-                </Flex>
-                <Text>{sample.bpm} BPM</Text>
-                <Text>{sample.duration}s</Text>
-              </Flex>
-            </Flex>
-            <Flex mt="1" gap="1">
-              <Tag.Root size="md" colorPalette="gray">
-                <Tag.Label>808</Tag.Label>
-              </Tag.Root>
-
-              <Tag.Root size="md" colorPalette="gray">
-                <Tag.Label>Acoustic</Tag.Label>
-              </Tag.Root>
-
-              <Tag.Root size="md" colorPalette="gray">
-                <Tag.Label>Loop</Tag.Label>
-              </Tag.Root>
-            </Flex>
-          </Flex>
-
-          <Flex gap="2" align="flex-end" ml="2">
-            <IconButton onMouseUp={toggleAssetLiked} variant="plain">
-              {heartIcon}
-            </IconButton>
-
-            {/* <Menu.Root>
-              <Menu.Trigger>
-                <IconButton variant="outline">
-                  <CuteIcon name="more-3" />
-                </IconButton>
-              </Menu.Trigger>
-              <Portal>
-                <Menu.Positioner>
-                  <Menu.Content>
-                    <Menu.Item value="settings" onClick={handleSettingsClick}>
-                      Settings
-                    </Menu.Item>
-                    <Menu.Item value="support">Support</Menu.Item>
-                    <Menu.Item value="addFolder">Add Folder</Menu.Item>
-                  </Menu.Content>
-                </Menu.Positioner>
-              </Portal>
-            </Menu.Root> */}
-            <AssetRowOptionsMenu />
-          </Flex>
+          <LeftColumn {...sample} />
+          <MiddleColumn {...sample} />
+          <RightColumn {...sample} />
         </Flex>
       </Card.Body>
     </Card.Root>
   )
 })
 
+const MiddleColumn = (props) => {
+  return (
+    <Flex direction="column" flex="1" gap="1" justify="center" className="middleColumn">
+      <Flex gap="4" align="center" cassName="topRow">
+        <AssetName name={props.name} />
+        <Flex fontSize="sm" color="gray.500" gap="4">
+          <AssetKeyScale key={props.key} scale={props.scale} />
+          <AssetBpm bpm={props.bpm} />
+          <AssetDuration duration={props.duration} />
+        </Flex>
+      </Flex>
+      <Flex gap="1" className="bottomRow">
+        <AssetTagsOverview tags={props.tags} />
+      </Flex>
+    </Flex>
+  )
+}
+
+const RightColumn = (props) => {
+  return (
+    <Flex gap="2" align="flex-end" ml="2">
+      <AssetLikeToggler id={props._id} isLiked={props.isLiked} />
+      <AssetRowOptionsMenu />
+    </Flex>
+  )
+}
+
+const AssetLikeToggler = (props) => {
+  const iconName = props.isLiked ? 'bxs:heart' : 'bx:heart'
+  const color = props.isLiked ? '#ec4899' : '#71717a'
+  const scale = props.isLiked ? 1.25 : 1.1
+  const style = { scale }
+
+  const handleClick = (event) => {
+    event.stopPropagation()
+    $samplesViewStore.toggleSampleLiked(props.id)
+  }
+
+  return (
+    <IconButton onMouseUp={handleClick} variant="plain">
+      <CuteIcon customIcon={iconName} color={color} style={style} />
+    </IconButton>
+  )
+}
+
+export const AssetLikedFilterSwitch = (props) => {
+  const iconName = props.isLiked ? 'bxs:heart' : 'bx:heart'
+  const color = props.isLiked ? '#ec4899' : '#71717a'
+  const scale = props.isLiked ? 1.25 : 1.1
+  const style = { scale }
+
+  const handleClick = (event) => {
+    event.stopPropagation()
+  }
+
+  return (
+    <IconButton onMouseUp={handleClick} variant="outline">
+      <CuteIcon customIcon={iconName} color={color} style={style} />
+    </IconButton>
+  )
+}
+
+const LeftColumn = (props) => {
+  return (
+    <Flex className="leftColumn">
+      {props.isActive && <AssetRowPlaybackController />}
+      {!props.isActive && <AssetRowLeftBox />}
+    </Flex>
+  )
+}
+
+const AssetName = (props) => {
+  return <Text fontWeight="bold">{props.name}</Text>
+}
+
+const AssetKeyScale = (props) => {
+  return (
+    <Flex gap="1">
+      <Text>{props.key}</Text>
+      <Text>{props.scale}</Text>
+    </Flex>
+  )
+}
+
+const AssetBpm = (props) => {
+  return <Text>{props.bpm}bpm</Text>
+}
+
+const AssetDuration = (props) => {
+  return <Text>{props.duration}s</Text>
+}
+
 export const AssetRowTag = (props) => {
   const handleClick = () => {
-    $filters.toggleTag(props.id)
+    $samplesViewStore.toggleFilterTag(props.id)
   }
 
   return (

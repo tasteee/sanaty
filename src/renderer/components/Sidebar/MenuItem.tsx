@@ -1,6 +1,4 @@
 import classes from 'clsx'
-import { useLocation } from 'wouter'
-import { $sidebar } from '#/stores/sidebar.stoe'
 import { Flex, HStack, Text, Circle, CuteIcon } from '#/components'
 
 type PropsT = {

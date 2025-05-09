@@ -2,8 +2,7 @@ import { useToggle } from '@siberiacancode/reactuse'
 import './AssetResultsList.css'
 import { Box, Flex, Portal, IconButton, Text, Tag, Menu, CuteIcon, Popover } from '#/components'
 import { HoverCard } from '#/components'
-
-const BOTTOM_END_PLACEMENT = { placement: 'bottom-end' }
+import { PLACEMENTS } from '#/constants'
 
 export const AssetRowOptionsMenu = (props) => {
   const [isOpen, toggleOpen] = useToggle()
@@ -16,7 +15,7 @@ export const AssetRowOptionsMenu = (props) => {
   }
 
   return (
-    <HoverCard.Root positioning={BOTTOM_END_PLACEMENT} onOpenChange={handleOpenChange} openDelay={300}>
+    <HoverCard.Root positioning={PLACEMENTS.BOTTOM_END} onOpenChange={handleOpenChange} openDelay={300}>
       <HoverCard.Trigger asChild>
         <IconButton variant="outline">
           <CuteIcon name="more-3" />

@@ -1,20 +1,21 @@
-import { $filters } from '#/stores/search.store'
 import { createListCollection } from '#/components'
 import { SAMPLE_TYPES } from '#/constants/sampleTypes'
 import { SelectInput } from '#/components/ui/SelectInput'
+import { $samplesViewStore } from '../samplesView.store'
 
 const sampleTypesCollection = createListCollection({
   items: SAMPLE_TYPES
 })
 
 export const SampleTypeController = () => {
-  const sampleType = $filters.sampleType.use()
+  const sampleType = $samplesViewStore.filters.use((state) => state.sampleType)
+  const setSampleType = (_, value: string) => $samplesViewStore.filters.set({ sampleType: value })
 
   return (
     <SelectInput
       placeholder="Sample Type"
-      value={sampleType.value}
-      onChange={$filters.setSampleType}
+      value={sampleType}
+      onChange={setSampleType}
       collection={sampleTypesCollection}
       width="160px"
     />

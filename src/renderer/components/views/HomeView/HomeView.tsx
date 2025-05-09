@@ -3,13 +3,24 @@ import React from 'react'
 import { Flex, Text, Card, Button, Image, HoverTip, Grid } from '#/components'
 import { useElementSize } from '@siberiacancode/reactuse'
 import { $folders } from '#/stores/folders'
+import { useBreakpoints } from '@siberiacancode/reactuse'
+
+const COL_MAP = {
+  desktop: 3,
+  laptop: 2,
+  tablet: 1,
+  mobile: 1
+}
 
 export const HomeView = () => {
   const folders = $folders.list.use()
+  const breakpoints = useBreakpoints({ mobile: 0, tablet: 640, laptop: 1024, desktop: 1280 })
+  const active = breakpoints.active()
+  const templateColumns = `repeat(${COL_MAP[active]}, 1fr)`
 
   return (
     <ViewBox id="HomeView">
-      <Grid templateColumns="repeat(3, 1fr)" gap="6">
+      <Grid templateColumns={templateColumns} gap="6">
         {folders.map((folder) => (
           <FolderCard key={folder._id} {...folder} />
         ))}
@@ -47,7 +58,7 @@ const FolderCard = (props) => {
               {props.path}
             </Text>
           </FolderPathHoverTip>
-          <Text>{assetCount} assets</Text>
+          <Text>{props.sampleCount} assets</Text>
         </Flex>
       </Card.Body>
       <Card.Footer justifyContent="flex-end">

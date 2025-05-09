@@ -44,3 +44,5 @@ export const $folders = {
   getFolderSampleCount,
   useFolder
 }
+
+globalThis.$folders = $folders

@@ -1,20 +1,21 @@
 import { createListCollection } from '#/components'
-import { $sort } from '#/stores/search.store'
 import { SelectInput } from '#/components/ui/SelectInput'
 import { SORT_ORDER_OPTIONS } from '#/constants/sortOptions'
+import { $samplesViewStore } from '../samplesView.store'
 
 const sortOrderCollection = createListCollection({
   items: SORT_ORDER_OPTIONS
 })
 
 export const SortOrderSelector = () => {
-  const sortOrder = $sort.order.use()
+  const sortOrder = $samplesViewStore.filters.use((state) => state.sortOrder)
+  const onChange = (_, value) => $samplesViewStore.filters.set({ sortOrder: value })
 
   return (
     <SelectInput
       placeholder="Sort Order"
-      value={sortOrder.value}
-      onChange={$sort.setSortOrderOption}
+      value={sortOrder}
+      onChange={onChange}
       collection={sortOrderCollection}
       width="180px"
     />
