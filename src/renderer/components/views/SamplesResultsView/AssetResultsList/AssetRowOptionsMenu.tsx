@@ -9,7 +9,6 @@ export const AssetRowOptionsMenu = (props) => {
   const handleOpenChange = (event) => toggleOpen(event.open)
 
   const handleSettingsClick = (event) => {
-    console.log(event)
     event.stopPropagation()
     toggleOpen(false)
   }

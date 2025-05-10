@@ -102,7 +102,6 @@ export const AssetRow = (props: AssetRowPropsT) => {
 
   const activateAssetRow = (event) => {
     const isInsideHoverCard = event.target.closest('.hoverCardContent') !== null
-    console.log('activateeee', props.id)
     if (isInsideHoverCard) return
     $samplesViewStore.activeSample.set(sample)
     $samplesViewStore.activeAssetIndex.set(props.index)
@@ -156,17 +155,18 @@ const MiddleColumn = (props) => {
 }
 
 import { Clipboard } from '@chakra-ui/react'
+import { $collections } from '#/stores/collections'
 
 const RightColumn = (props) => {
   const onClick = (event) => {
     event.stopPropagation()
-    console.log('clickeddd')
   }
 
   return (
     <Flex gap="2" align="flex-end" ml="2">
       <AssetLikeToggler {...props} />
-      <Clipboard.Root value="https://chakra-ui.com" onMouseUp={onClick}>
+      <AddToCollectionButton {...props} />
+      <Clipboard.Root value="TODO" onMouseUp={onClick}>
         <Clipboard.Trigger asChild>
           <IconButton variant="plain" size="xs">
             <Clipboard.Indicator style={{ scale: 1.25, position: 'relative', bottom: 4 }} />
@@ -178,6 +178,27 @@ const RightColumn = (props) => {
   )
 }
 
+const AddToCollectionButton = (props) => {
+  const addToCollectionState = $samplesViewStore.addToCollectionStore.use()
+  const isThisAssetBeingAdded = addToCollectionState.sampleId === props.id
+  const color = isThisAssetBeingAdded ? 'blue.500' : 'gray.400'
+  // const iconName = isAddingAssetToCollection ? 'bxs:heart' : 'bx:heart'
+  // const color = isAddingAssetToCollection ? '#ec4899' : '#71717a'
+  // const scale = isAddingAssetToCollection ? 1.25 : 1.1
+  // const style = { scale }
+
+  const handleClick = (event) => {
+    event.stopPropagation()
+    $samplesViewStore.toggleAddToCollectionMode(props.id)
+  }
+
+  return (
+    <IconButton onMouseUp={handleClick} variant="plain">
+      <CuteIcon name="add-square" color={color} />
+    </IconButton>
+  )
+}
+
 const AssetLikeToggler = (props) => {
   const iconName = props.isLiked ? 'bxs:heart' : 'bx:heart'
   const color = props.isLiked ? '#ec4899' : '#71717a'
@@ -186,7 +207,6 @@ const AssetLikeToggler = (props) => {
 
   const handleClick = (event) => {
     event.stopPropagation()
-    console.log('liking ', props.name)
     $likes.toggleLike(props.id)
   }
 

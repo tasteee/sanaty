@@ -1,9 +1,8 @@
-import { INITIAL_ITEMS_PER_PAGE_OPTION, ITEMS_PER_PAGE_OPTIONS_MAP } from '#/constants/sortOptions'
+import { INITIAL_ITEMS_PER_PAGE_OPTION } from '#/constants/sortOptions'
 import { parseToNumber } from '#/modules/number'
 import { datass } from 'datass'
 
 const $isTagCloudShown = datass.boolean(true)
-const $isAddingAssetToCollection = datass.boolean(false)
 const $activeAssetIndex = datass.number(-1)
 const $isPlayingSound = datass.boolean(false)
 const $activeTagCloudCategory = datass.string('All')
@@ -84,6 +83,7 @@ const setMaxDuration = (value: string | number) => {
 
 async function submitSearch() {
   const filters = $filters.state
+  console.log('submitting search...')
 
   const results = await window.electron.searchSamples({
     searchValue: filters.searchValue,
@@ -123,16 +123,30 @@ const useIsSampleActive = (id) => {
   return activeSample ? (activeSample._id || activeSample.id) === id : false
 }
 
+const $addToCollectionStore = datass.object({
+  isActive: false,
+  sampleId: ''
+})
+
+const toggleAddToCollectionMode = (selectedSampleId: string = '') => {
+  const isNowActive = !$addToCollectionStore.state.isActive
+  const sampleId = isNowActive ? selectedSampleId : ''
+  $addToCollectionStore.set({ isActive: isNowActive, sampleId })
+}
+
 export const $samplesViewStore = {
   filters: $filters,
   results: $results,
   activeSample: $activeSample,
   activeTagCloudCategory: $activeTagCloudCategory,
   isTagCloudShown: $isTagCloudShown,
-  isAddingAssetToCollection: $isAddingAssetToCollection,
+  // isAddingAssetToCollection: $isAddingAssetToCollection,
   activeAssetIndex: $activeAssetIndex,
   isPlayingSound: $isPlayingSound,
   currentPageResults: $currentPageResults,
+  // sampleIdBeingAddedToCollection: $sampleIdBeingAddedToCollection,
+  addToCollectionStore: $addToCollectionStore,
+  toggleAddToCollectionMode,
   useAssetResult,
   useIsSampleActive,
   toggleTagCloudVisibility,

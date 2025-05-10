@@ -8,7 +8,6 @@ export const Paginator = () => {
   const itemsCount = $samplesViewStore.results.use((list) => list.length)
 
   const onPageChange = (event) => {
-    console.log('going to page... ', event.page)
     $pagination.goToPage(event.page)
   }
 

@@ -1,7 +1,7 @@
 import { useRoute } from 'wouter'
 import { $samplesViewStore } from './samplesView.store'
-import { SampleResultsList } from '#/components/views/SamplesView/AssetResultsList/AssetResultsList'
-import { SearchFilterSection } from '#/components/views/SamplesView/SearchFilterSection'
+import { SampleResultsList } from '#/components/views/SamplesResultsView/AssetResultsList/AssetResultsList'
+import { SearchFilterSection } from '#/components/views/SamplesResultsView/SearchFilterSection'
 import { ViewBox } from '#/components/ui/ViewBox'
 import { useMount, useUnmount } from '@siberiacancode/reactuse'
 
@@ -10,7 +10,7 @@ import { useMount, useUnmount } from '@siberiacancode/reactuse'
 // Resets filters/results on unmount.
 // Refetches results on mount.
 
-export const SamplesView = (props) => {
+export const SamplesResultsView = (props) => {
   return (
     <ViewBox id={props.id} className="SamplesView">
       {props.children}

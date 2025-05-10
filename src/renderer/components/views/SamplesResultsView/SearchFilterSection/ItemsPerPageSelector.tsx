@@ -19,7 +19,6 @@ export const ItemsPerPageSelector = () => {
   const itemsPerPage = $pagination.itemsPerPage.use()
   // const option = $pagination.itemsPerPageOption.use()
   const onChange = (_, value) => $pagination.setItemsPerPage(value)
-  console.log({ itemsPerPage })
 
   return (
     <SelectInput

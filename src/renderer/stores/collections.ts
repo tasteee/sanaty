@@ -36,8 +36,8 @@ const removeSampleFromCollection = async (collectionId: string, assetId: string)
 }
 
 const useCollection = (id: string) => {
-  const collection = $list.use((items) => items.find((item) => item._id === id))
-  return collection
+  const allCollections = $list.use()
+  return allCollections.find((collection) => collection.id === id)
 }
 
 export const $collections = {

@@ -8,7 +8,10 @@ type PropsT = {
   children?: any
   style?: any
   onClick?: any
+  customIconName?: string
   iconName?: string
+  iconColor?: any
+  iconStyle?: any
   isActive?: boolean
 }
 
@@ -26,7 +29,14 @@ export const MenuItem = (props: PropsT) => {
       style={style}
     >
       <Flex gap="2" align="center">
-        {props.iconName && <CuteIcon id="aaa" name={props.iconName} color="#71717a" />}
+        {props.iconName && (
+          <CuteIcon
+            name={props.iconName}
+            customIcon={props.customIconName}
+            color={props.iconColor || '#71717a'}
+            style={props.iconStyle}
+          />
+        )}
         <Text maxWidth="170px" truncate>
           {props.label}
         </Text>

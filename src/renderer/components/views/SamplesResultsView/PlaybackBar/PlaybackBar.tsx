@@ -113,8 +113,6 @@ export const PlaybackBar = () => {
   const player = useAudioPlayer(activeSample)
   if (!activeSample) return
 
-  console.log({ activeSample })
-
   return (
     <Card className="PlaybackBar" width="full">
       <Card.Body className="PlaybackBarBody" padding="4" gap="2">

@@ -16,9 +16,10 @@ import { useState, useEffect } from 'react'
 import { toaster } from '#/components/ui/toaster'
 import { CuteIcon } from '../ui/CuteIcon'
 import { $collections } from '#/stores/collections'
+import { createOverlay } from '@chakra-ui/react'
 
-export const EditCollectionDialog = ({ id, handleClose }) => {
-  const collection = $collections.useCollection(id)
+export const EditCollectionDialog = (props) => {
+  const collection = $collections.useCollection(props.collectionId)
   const [isOpen, setIsOpen] = useState(true)
   const [name, setName] = useState(collection?.name || '')
   const [description, setDesc] = useState(collection?.description || '')
@@ -28,7 +29,7 @@ export const EditCollectionDialog = ({ id, handleClose }) => {
 
   const close = () => {
     setIsOpen(false)
-    handleClose?.()
+    props.handleClose?.()
   }
 
   const handleFileChange = (event) => {
@@ -47,11 +48,13 @@ export const EditCollectionDialog = ({ id, handleClose }) => {
   }
 
   const handleSave = async () => {
-    const { result, error } = await $collections.updateCollection(id, {
+    const { error } = await $collections.updateCollection(props.collectionId, {
       name,
       description,
       artworkPath: imageSrc
     })
+
+    // TODO: Handle error???
 
     if (error) {
       toaster.create({
@@ -62,10 +65,8 @@ export const EditCollectionDialog = ({ id, handleClose }) => {
       })
 
       debugger
-      return
+      return close()
     }
-
-    console.log('edit collection result: ', result)
 
     toaster.create({
       type: 'success',
@@ -74,7 +75,7 @@ export const EditCollectionDialog = ({ id, handleClose }) => {
       isClosable: true
     })
 
-    handleClose?.()
+    close()
   }
 
   return (
@@ -158,3 +159,5 @@ export const EditCollectionDialog = ({ id, handleClose }) => {
     </Dialog.Root>
   )
 }
+
+export const editCollectionDialog = createOverlay(EditCollectionDialog)

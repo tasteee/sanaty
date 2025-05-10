@@ -141,14 +141,14 @@ async function addSampleToCollection(_id: string, sampleId: string) {
   const collection = await $collections.findOneAsync({ _id })
   const sampleIds = collection.sampleIds || []
   const newSampleIds = Array.from(new Set([...sampleIds, sampleId]))
-  await $collections.updateAsync({ _id }, { sampleIds: newSampleIds })
+  await $collections.updateAsync({ _id }, { $set: { sampleIds: newSampleIds } })
 }
 
 async function removeSampleFromCollection(_id: string, sampleId: string) {
   const collection = await $collections.findOneAsync({ _id })
   const sampleIds = collection.sampleIds || []
   const newSampleIds = sampleIds.filter((assetId) => assetId !== sampleId)
-  await $collections.updateAsync({ _id }, { sampleIds: newSampleIds })
+  await $collections.updateAsync({ _id }, { $set: { sampleIds: newSampleIds } })
 }
 
 // get all .wav or .mp3 file paths recursively inside folder.
@@ -277,24 +277,45 @@ type SampleSearchQueryT = {
   sortOrder: string
   sortBy: string
   tags: string[]
+  collectionId?: string
+  folderId?: string
 }
 
 async function searchSamples(filters: SampleSearchQueryT) {
+  console.log('searchSamples with: ', filters)
+
   const query = {} as any
+  let collectionSampleIds: string[] = []
+
+  // Handle collection filter first
+  if (filters.collectionId) {
+    const collection = await $collections.findOneAsync({ _id: filters.collectionId })
+    if (!collection) return [] // Collection doesn't exist
+    collectionSampleIds = collection.sampleIds || []
+    query._id = { $in: collectionSampleIds }
+  }
+
+  // Existing query conditions
   query.bpm = { $gte: filters.bpmMin, $lte: filters.bpmMax }
   query.duration = { $gte: filters.durationMin, $lte: filters.durationMax }
+
+  // Add folderId condition
+  if (filters.folderId) {
+    query.folderId = filters.folderId
+  }
+
+  // Remaining filters
   if (filters.key !== 'any') query.key = filters.key
   if (filters.scale !== 'any') query.scale = filters.scale
   if (filters.sampleType !== 'any') query.sampleType = filters.sampleType
   if (filters.searchValue) query.name = { $regex: filters.searchValue, $options: 'i' }
-  if (filters.tags && filters.tags.length > 0) query.tags = { $in: filters.tags }
+  if (filters.tags?.length) query.tags = { $in: filters.tags }
+
   const sortQuery = { [filters.sortBy]: filters.sortOrder === 'ascending' ? 1 : -1 }
   const samples = await $samples.findAsync(query).sort(sortQuery)
-  if (!filters.isLiked) return samples
 
-  return samples.filter((sample) => {
-    return $likes.list.includes(sample.id)
-  })
+  // Apply like filtering last
+  return filters.isLiked ? samples.filter((s) => $likes.list.includes(s.id)) : samples
 }
 
 async function getCollectionSampleCount(_id: string) {
@@ -333,7 +354,6 @@ async function verifyFoldersAndSamples() {
   const missingFolders = await $folders.findAsync({ _id: { $in: missingFolderIds } })
   const missingSamples = await $samples.findAsync({ _id: { $in: missingSampleIds } })
   const final = { missingFolders, missingSamples, missingFolderIds, missingSampleIds }
-  console.log({ ...final })
   return final
 }
 

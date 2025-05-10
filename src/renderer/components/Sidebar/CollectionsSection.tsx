@@ -5,11 +5,22 @@ import { $collections } from '#/stores/collections'
 import { datass } from 'datass'
 import { CreateCollectionDialog } from './CreateCollectionDialog'
 import { useLocation } from 'wouter'
+import { dialogs } from '../dialogs'
+import { $samplesViewStore } from '../views/SamplesResultsView/samplesView.store'
 
 export const CollectionsSection = () => {
   const [location, setLocation] = useLocation()
   const collectionsMenuItems = $collections.list.use() as CollectionT[]
   const collectionsCount = collectionsMenuItems.length
+  const addToCollectionState = $samplesViewStore.addToCollectionStore.use()
+  const iconName = addToCollectionState.isActive ? 'add-square' : 'playlist-2'
+
+  const getMenuItemClickHandler = (item) => {
+    if (!addToCollectionState.isActive) return setLocation(`/collections/collection/${item._id}`)
+    const sampleId = addToCollectionState.sampleId
+    $collections.addSampleToCollection(item._id, sampleId)
+    $samplesViewStore.toggleAddToCollectionMode()
+  }
 
   return (
     <Flex direction="column" minHeight="0" overflow="hidden" flex="1">
@@ -26,19 +37,21 @@ export const CollectionsSection = () => {
               label={item.name}
               style={{ paddingRight: 24 }}
               isActive={location === `/collections/collection/${item._id}`}
-              onClick={() => setLocation(`/collections/collection/${item._id}`)}
-              iconName="playlist-2"
+              onClick={() => getMenuItemClickHandler(item)}
+              iconName={iconName}
             >
-              <CuteIcon
-                className="collectionMenuItemTrashIcon"
-                name="delete-2"
-                size="md"
-                onClick={(event) => {
-                  event.stopPropagation()
-                  if (location === `/collections/collection//${item._id}`) setLocation('/')
-                  $collections.deleteCollection(item._id)
-                }}
-              />
+              {!addToCollectionState.isActive && (
+                <CuteIcon
+                  className="collectionMenuItemTrashIcon"
+                  name="delete-2"
+                  size="md"
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    if (location === `/collections/collection//${item._id}`) setLocation('/')
+                    $collections.deleteCollection(item._id)
+                  }}
+                />
+              )}
             </MenuItem>
           ))}
         </Flex>
@@ -47,11 +60,10 @@ export const CollectionsSection = () => {
   )
 }
 
-const $isCreateCollectionDialogOpen = datass.boolean(false)
-
 const AddCollectionMenuItem = () => {
-  const isCreateCollectionDialogOpen = $isCreateCollectionDialogOpen.use()
-  const onClick = () => $isCreateCollectionDialogOpen.set(true)
+  const onClick = () => {
+    dialogs.createCollection.open()
+  }
 
   return (
     <>
@@ -59,10 +71,6 @@ const AddCollectionMenuItem = () => {
         <CuteIcon name="add" size="sm" />
         <Text>New Collection</Text>
       </Flex>
-
-      {isCreateCollectionDialogOpen && (
-        <CreateCollectionDialog handleClose={() => $isCreateCollectionDialogOpen.set(false)} />
-      )}
     </>
   )
 }

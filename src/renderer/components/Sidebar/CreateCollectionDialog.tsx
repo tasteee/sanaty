@@ -9,7 +9,8 @@ import {
   Portal,
   Text,
   Textarea,
-  FileUpload
+  FileUpload,
+  createOverlay
 } from '@chakra-ui/react'
 import { Image } from '@chakra-ui/react'
 import { HiUpload } from 'react-icons/hi'
@@ -156,3 +157,5 @@ export const CreateCollectionDialog = (props) => {
     </Dialog.Root>
   )
 }
+
+export const createCollectionDialog = createOverlay(CreateCollectionDialog)
