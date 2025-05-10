@@ -1,0 +1,9 @@
+.inactiveTagAdder {
+  bottom: 6.5px;
+  position: relative;
+}
+
+.activeTagCloser {
+  bottom: 6px;
+  position: relative;
+}

@@ -7,9 +7,18 @@ type PropsT = {
   value: string
   onChange: any
   placeholder?: string
+  masker?: any
+}
+
+const DEFAULT_MASKER = (item: any) => {
+  return item.label
 }
 
 export const SelectInput = (props: PropsT) => {
+  const masker = props.masker || DEFAULT_MASKER
+  const selectedItem = props.collection.items.find((item: any) => item.value === props.value)
+  const maskedValueText = selectedItem ? masker(selectedItem) : props.placeholder
+
   const onChange = (event: any) => {
     const value = event.value[0]
     const item = props.collection.items.find((item: any) => item.value === value)
@@ -22,13 +31,14 @@ export const SelectInput = (props: PropsT) => {
       collection={props.collection}
       width={props.width || '120px'}
       value={[props.value]}
+      flex="1"
       onValueChange={onChange}
     >
       <Select.HiddenSelect />
       {props.label && <Select.Label>{props.label}</Select.Label>}
       <Select.Control>
         <Select.Trigger>
-          <Select.ValueText placeholder={props.placeholder} />
+          <Select.ValueText placeholder={props.placeholder}>{maskedValueText}</Select.ValueText>
         </Select.Trigger>
         <Select.IndicatorGroup>
           <Select.Indicator />

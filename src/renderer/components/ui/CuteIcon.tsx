@@ -1,4 +1,5 @@
 import { Icon } from '@iconify/react'
+import { Icon as ChakraIcon } from '@chakra-ui/react'
 import clsx from 'clsx'
 import React from 'react'
 
@@ -6,40 +7,46 @@ type PropsT = {
   id?: string
   name?: string
   kind?: string
-  size?: number
-  width?: number
-  height?: number
+  size?: string
   rotate?: number
-  color?: string
+  color?: string | any
   className?: string
   isActive?: boolean
-  activeColor?: string
+  activeColor?: string | any
   style?: React.CSSProperties
   customIcon?: string
   onClick?: any
+  zIndex?: any
+  isActionable?: boolean
 }
 
 export const CuteIcon = React.memo((props: PropsT) => {
-  const { customIcon, ...otherProps } = props
-
   const library = 'mingcute'
   const kind = props.kind || 'line'
-  const width = props.width || props.size || 24
-  const height = props.height || props.height || props.size || 24
   const mingIcon = `${library}:${props.name}-${kind}`
   const icon = props.customIcon || mingIcon
   const color = props.isActive ? props.activeColor : props.color
   const className = clsx('CuteIcon', props.className)
+  const style = { ...(props.style || {}), cursor: props.isActionable ? 'pointer' : undefined }
+
+  const innerIconProps = {
+    rotate: props.rotate,
+    icon
+  }
+
+  const outerIconProps = {
+    className,
+    color,
+    style,
+    zIndex: props.zIndex,
+    onClick: props.onClick,
+    id: props.id,
+    size: props.size
+  }
 
   return (
-    <Icon
-      {...otherProps}
-      className={className}
-      rotate={props.rotate}
-      color={color}
-      icon={icon}
-      width={width}
-      height={height}
-    />
+    <ChakraIcon {...outerIconProps}>
+      <Icon {...innerIconProps} />
+    </ChakraIcon>
   )
 })

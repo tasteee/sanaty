@@ -74,3 +74,7 @@ div:focus {
   border: unset;
   outline: unset;
 }
+
+.hiddenTag {
+  display: none;
+}

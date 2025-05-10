@@ -20,8 +20,9 @@ const deleteCollection = async (collectionId: string) => {
 }
 
 const updateCollection = async (id, updates: Partial<CollectionT>) => {
-  await window.electron.updateCollection(id, updates)
+  const final = await window.electron.updateCollection(id, updates)
   await reload()
+  return final
 }
 
 const addSampleToCollection = async (collectionId: string, assetId: string) => {
@@ -34,10 +35,16 @@ const removeSampleFromCollection = async (collectionId: string, assetId: string)
   await reload()
 }
 
+const useCollection = (id: string) => {
+  const collection = $list.use((items) => items.find((item) => item._id === id))
+  return collection
+}
+
 export const $collections = {
   list: $list,
   updateCollection,
   reload,
+  useCollection,
   createCollection,
   deleteCollection,
   addSampleToCollection,

@@ -1,8 +1,8 @@
 import './SearchInput.css'
-import { InputGroup, Input, CuteIcon } from '#/components'
+import { InputGroup, Input, CuteIcon, Button } from '#/components'
 import { $samplesViewStore } from '../samplesView.store'
 
-const SearchIcon = <CuteIcon name="search-2" />
+const SearchIcon = <CuteIcon name="search-2" size="md" />
 
 export const SearchInput = () => {
   const value = $samplesViewStore.filters.use((state) => state.searchValue)
@@ -13,7 +13,7 @@ export const SearchInput = () => {
 
   return (
     <InputGroup className="SearchInput" flex="1" startElement={SearchIcon}>
-      <Input size="xs" placeholder="Search" value={value} onChange={onChange} />
+      <Input size="xs" placeholder="Search" value={value} onChange={onChange} colorPalette="pink" />
     </InputGroup>
   )
 }

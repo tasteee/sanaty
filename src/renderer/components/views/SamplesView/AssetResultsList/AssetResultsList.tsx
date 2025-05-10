@@ -1,25 +1,27 @@
 import React from 'react'
-import { datass } from 'datass'
+import { Paginator } from './Paginator'
 import { Box, Flex, Portal, IconButton, Text, Tag, Menu, CuteIcon, Popover } from '#/components'
 import { Card } from '#/components'
 import { useActiveElement } from '@siberiacancode/reactuse'
 import { SortOptionsRow } from '../SearchFilterSection/SortOptionsRow'
 import { AssetRowOptionsMenu } from './AssetRowOptionsMenu'
 import { SanatyTag } from '../../../ui/SanatyTag'
+import capitalize from 'capitalize'
 
 import { useUnmount } from '@siberiacancode/reactuse'
 import { AssetTagsOverview } from '../../../AssetTagsOverview'
 import { $samplesViewStore } from '../samplesView.store'
-
-const $sampleResults = datass.array([])
-const $activeRowIndex = datass.number(-1)
+import { $main } from '#/stores/main'
+import { $folders } from '#/stores/folders'
+import { $likes } from '#/stores/likes'
+import clsx from 'clsx'
 
 const handleArrowKeys = (event: KeyboardEvent) => {
   const isPrevious = event.code === 'KeyQ'
   const isNext = event.code === 'KeyW'
 
-  const previousIndex = $activeRowIndex.state - 1
-  const nextIndex = $activeRowIndex.state + 1
+  const previousIndex = $samplesViewStore.activeAssetIndex.state - 1
+  const nextIndex = $samplesViewStore.activeAssetIndex.state + 1
 
   const maxIndex = $samplesViewStore.results.state.length - 1
   const minIndex = 0
@@ -27,39 +29,24 @@ const handleArrowKeys = (event: KeyboardEvent) => {
   const finalPreviousIndex = Math.max(minIndex, previousIndex)
   const finalNextIndex = Math.min(maxIndex, nextIndex)
 
-  if (isPrevious) $activeRowIndex.set(finalPreviousIndex)
-  if (isNext) $activeRowIndex.set(finalNextIndex)
+  if (isPrevious) $samplesViewStore.activeAssetIndex.set(finalPreviousIndex)
+  if (isNext) $samplesViewStore.activeAssetIndex.set(finalNextIndex)
 }
 
 export const SampleResultsList = () => {
-  const activeRowIndex = $activeRowIndex.use()
-  const sampleResults = $sampleResults.use()
-  const activeElement = useActiveElement()
-  const ref = React.useRef(null)
-
-  useUnmount(() => {
-    $sampleResults.set.reset()
-    $activeRowIndex.set.reset()
-  })
-
-  // when results list container is te active element, handle arrow keys
-  // when it is not, do not handle arrow keys
-  React.useEffect(() => {
-    if (!ref || !activeElement) return
-    if (ref.current === activeElement) console.log('adding events...')
-    if (ref.current === activeElement) window.addEventListener('keydown', handleArrowKeys)
-    if (ref.current !== activeElement) window.removeEventListener('keydown', handleArrowKeys)
-  }, [ref.current, activeElement])
+  const sampleResults = $samplesViewStore.currentPageResults.use()
 
   return (
-    <Flex direction="column" flex="1" overflow="hidden" pb="24px" ref={ref} tabIndex="0">
+    <Flex direction="column" flex="1" overflow="hidden" pb="24px" tabIndex="0" gap="1">
       <SortOptionsRow />
 
       <Flex className="AssetResultsList customScrollbar" direction="column" gap="2" padding="2" overflowY="auto" flex="1">
         {sampleResults.map((sample, index) => {
-          return <AssetRow key={sample._id} id={sample._id} index={index} isActive={activeRowIndex === index} />
+          return <AssetRow key={sample._id} id={sample._id} index={index} />
         })}
       </Flex>
+
+      {sampleResults.length > 0 && <Paginator />}
     </Flex>
   )
 }
@@ -79,51 +66,46 @@ const activeStyles = {
 
 type AssetRowPropsT = {
   id: string
-  isActive: boolean
   index: number
-}
-
-const AssetRowPlaybackController = (props) => {
-  const iconName = true ? 'play' : 'pause'
-
-  return (
-    <AssetRowLeftBox>
-      <CuteIcon name={iconName} />
-    </AssetRowLeftBox>
-  )
-}
-
-const AssetRowLeftBox = (props) => {
-  return (
-    <Box
-      bg="gray.600"
-      boxSize="40px"
-      borderRadius="md"
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-      flexShrink={0}
-      {...props}
-    />
-  )
 }
 
 const ACTIVE_BG_GRADIENT = 'linear-gradient(to right, #18181b, transparent)'
 
-export const AssetRow = React.memo((props: AssetRowPropsT) => {
-  const sample = $samplesViewStore.useAssetResult(props.id)
-  const beforeStyles = props.isActive ? activeStyles : {}
-  const bgGradient = props.isActive ? ACTIVE_BG_GRADIENT : ''
+const getKeyScale = (sample) => {
+  if (!sample) {
+    const results = $samplesViewStore.results.state
+    const pageResults = $samplesViewStore.currentPageResults.state
+    debugger
+  }
 
-  React.useEffect(() => {
-    if (!props.isActive) return
-    $samplesViewStore.activeSample.set(sample)
-  }, [props.isActive])
+  const key = sample.key.toUpperCase()
+  const scale = capitalize.words(sample.scale)
+  return `${key} ${scale}`
+}
+
+const useSampleData = (id) => {
+  const sampleResult = $samplesViewStore.useAssetResult(id)
+  const keyScale = getKeyScale(sampleResult)
+  const isLiked = $likes.useIsLiked(id)
+  const { key, scale, ...otherData } = sampleResult
+  const sample = { id, keyScale, isLiked, ...otherData }
+  return sample
+}
+
+export const AssetRow = (props: AssetRowPropsT) => {
+  const isActive = $samplesViewStore.useIsSampleActive(props.id)
+  const sample = useSampleData(props.id)
+  const beforeStyles = isActive ? activeStyles : {}
+  const bgGradient = isActive ? ACTIVE_BG_GRADIENT : ''
+  const isCompactView = $main.isCompactViewEnabled.use()
+  const bodyPadding = isCompactView ? '0' : undefined
 
   const activateAssetRow = (event) => {
     const isInsideHoverCard = event.target.closest('.hoverCardContent') !== null
+    console.log('activateeee', props.id)
     if (isInsideHoverCard) return
-    $activeRowIndex.set(props.index)
+    $samplesViewStore.activeSample.set(sample)
+    $samplesViewStore.activeAssetIndex.set(props.index)
   }
 
   // TODO: On play click
@@ -132,25 +114,28 @@ export const AssetRow = React.memo((props: AssetRowPropsT) => {
   // TODO: truncate tags.
   // TODO: hover to show all tags.
 
+  const className = clsx('AssetRow', isActive && 'activeRow')
+
   return (
     <Card.Root
-      className="AssetRow"
+      className={className}
       size="sm"
       borderRadius="lg"
       position="relative"
+      style={{ background: 'none', border: 'none', boxShadow: 'none', padding: 0 }}
       _before={beforeStyles}
       onMouseUp={activateAssetRow}
     >
-      <Card.Body zIndex={1} position="relative" bgGradient={bgGradient}>
+      <Card.Body zIndex={1} position="relative" bgGradient={bgGradient} padding={bodyPadding} className="AssetRowBody">
         <Flex align="center" gap="4">
-          <LeftColumn {...sample} />
-          <MiddleColumn {...sample} />
-          <RightColumn {...sample} />
+          <LeftColumn {...sample} isActive={isActive} />
+          <MiddleColumn {...sample} isActive={isActive} />
+          <RightColumn {...sample} isActive={isActive} />
         </Flex>
       </Card.Body>
     </Card.Root>
   )
-})
+}
 
 const MiddleColumn = (props) => {
   return (
@@ -158,7 +143,7 @@ const MiddleColumn = (props) => {
       <Flex gap="4" align="center" cassName="topRow">
         <AssetName name={props.name} />
         <Flex fontSize="sm" color="gray.500" gap="4">
-          <AssetKeyScale key={props.key} scale={props.scale} />
+          <AssetKeyScale keyScale={props.keyScale} />
           <AssetBpm bpm={props.bpm} />
           <AssetDuration duration={props.duration} />
         </Flex>
@@ -170,10 +155,24 @@ const MiddleColumn = (props) => {
   )
 }
 
+import { Clipboard } from '@chakra-ui/react'
+
 const RightColumn = (props) => {
+  const onClick = (event) => {
+    event.stopPropagation()
+    console.log('clickeddd')
+  }
+
   return (
     <Flex gap="2" align="flex-end" ml="2">
-      <AssetLikeToggler id={props._id} isLiked={props.isLiked} />
+      <AssetLikeToggler {...props} />
+      <Clipboard.Root value="https://chakra-ui.com" onMouseUp={onClick}>
+        <Clipboard.Trigger asChild>
+          <IconButton variant="plain" size="xs">
+            <Clipboard.Indicator style={{ scale: 1.25, position: 'relative', bottom: 4 }} />
+          </IconButton>
+        </Clipboard.Trigger>
+      </Clipboard.Root>
       <AssetRowOptionsMenu />
     </Flex>
   )
@@ -187,7 +186,8 @@ const AssetLikeToggler = (props) => {
 
   const handleClick = (event) => {
     event.stopPropagation()
-    $samplesViewStore.toggleSampleLiked(props.id)
+    console.log('liking ', props.name)
+    $likes.toggleLike(props.id)
   }
 
   return (
@@ -197,41 +197,46 @@ const AssetLikeToggler = (props) => {
   )
 }
 
-export const AssetLikedFilterSwitch = (props) => {
-  const iconName = props.isLiked ? 'bxs:heart' : 'bx:heart'
-  const color = props.isLiked ? '#ec4899' : '#71717a'
-  const scale = props.isLiked ? 1.25 : 1.1
-  const style = { scale }
-
-  const handleClick = (event) => {
-    event.stopPropagation()
-  }
-
-  return (
-    <IconButton onMouseUp={handleClick} variant="outline">
-      <CuteIcon customIcon={iconName} color={color} style={style} />
-    </IconButton>
-  )
-}
-
 const LeftColumn = (props) => {
+  const artworkUrl = $folders.getFolderArtwork(props.folderId)
+  const isSoundPlaying = $samplesViewStore.isPlayingSound.use()
+  const isThisSamplePlaying = props.isActive && isSoundPlaying
+  const iconName = isThisSamplePlaying ? 'pause' : 'play'
+  const className = clsx('leftColumn')
+
   return (
-    <Flex className="leftColumn">
-      {props.isActive && <AssetRowPlaybackController />}
-      {!props.isActive && <AssetRowLeftBox />}
+    <Flex className={className}>
+      <Box
+        className="assetRowArtworkBox"
+        bg="gray.600"
+        boxSize="40px"
+        borderRadius="md"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        flexShrink={0}
+        style={{ background: `url(${artworkUrl})`, backgroundSize: 'cover' }}
+      >
+        <div className="iconBackdrop">
+          <CuteIcon name={iconName} className="assetRowPlayPauseIcon" />
+        </div>
+      </Box>
     </Flex>
   )
 }
 
 const AssetName = (props) => {
-  return <Text fontWeight="bold">{props.name}</Text>
+  return (
+    <Text fontWeight="bold" textStyle="sm" maxWidth="350px" truncate>
+      {props.name}
+    </Text>
+  )
 }
 
 const AssetKeyScale = (props) => {
   return (
     <Flex gap="1">
-      <Text>{props.key}</Text>
-      <Text>{props.scale}</Text>
+      <Text>{props.keyScale}</Text>
     </Flex>
   )
 }

@@ -5,3 +5,49 @@
   background: nonw;
   padding: 0px;
 }
+
+.AssetRow {
+  box-shadow: 0px 0px 2px transparent !important;
+  transition: all 0.1s;
+}
+
+.AssetRow:hover:not(.activeRow) {
+  box-shadow: 0px 0px 2px rgb(251 207 232 / 15%) !important;
+  background: #111111 !important;
+}
+
+.AssetRow .leftColumn .assetRowArtworkBox .assetRowPlayPauseIcon {
+  opacity: 0;
+  transition: all 0.1s;
+}
+
+.AssetRow:hover .leftColumn .assetRowArtworkBox .assetRowPlayPauseIcon,
+.AssetRow.activeRow .assetRowArtworkBox .assetRowPlayPauseIcon {
+  opacity: 1 !important;
+}
+
+.assetRowPlayPauseIcon {
+}
+
+.assetRowArtworkBox {
+}
+
+.assetRowArtworkBox {
+  position: relative;
+  overflow: hidden; /* Just in case */
+  transition: box-shadow 0.2s;
+}
+
+.iconBackdrop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  /* Size can be adjusted as needed */
+  width: 100%;
+  height: 100%;
+}
+
+.AssetRow:hover .assetRowArtworkBox .iconBackdrop {
+  background: rgba(0, 0, 0, 0.45); /* Semi-transparent black */
+}

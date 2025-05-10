@@ -1,5 +1,5 @@
 import './index.css'
-import { Redirect, Route, Switch } from 'wouter'
+import { Redirect, Route, Switch, useLocation, useParams, useSearch } from 'wouter'
 import { Sidebar } from '#/components/Sidebar'
 import { Provider, Flex, Toaster, VStack, Spinner, Text } from '#/components'
 import { SearchFilterSection } from '#/components/views/SamplesView/SearchFilterSection'
@@ -8,16 +8,20 @@ import { $folders } from './stores/folders'
 import { NoFoldersView } from './components/NoFoldersView'
 import { ViewBox } from './components/ui/ViewBox'
 import React from 'react'
-import { $main } from './stores/main'
+import { $main, $routing } from './stores/main'
 import { $collections } from './stores/collections'
 import { HomeView } from './components/views/HomeView/HomeView'
 import { PlaybackBar } from './components/views/SamplesView/PlaybackBar/PlaybackBar'
+import { SamplesView } from './components/views/SamplesView/SamplesView'
+import { $likes } from './stores/likes'
+import { CollectionView, FolderView } from './components/views/CollectionsView/CollectionsView'
 
 export function App() {
   return (
     <Provider>
       <AppFrame />
       <Toaster />
+      <RouterStateSync />
     </Provider>
   )
 }
@@ -25,6 +29,9 @@ export function App() {
 const setupAppData = async () => {
   await $folders.reloadFolders()
   await $collections.reload()
+  await $likes.reload()
+  await $main.verifyFoldersAndSamples()
+  console.clear()
   console.log('[sanaty] setup done')
   $main.isSetupDone.set(true)
 }
@@ -61,29 +68,26 @@ const Router = () => {
     <Switch>
       <Route path="/" component={HomeView} />
       <Route path="/index.html" component={() => <Redirect to="/" />} />
+
       <Route path="/samples" component={SamplesView} />
-      <Route path="/collection/:collectionId" component={CollectionView} />
+
+      <Route path="/collections/collection/:collectionId" component={CollectionView} />
+      {/* <Route path="/collections" component={CollectionsView} /> */}
+
+      <Route path="/folders/folder/:folderId" component={FolderView} />
+      <Route path="/folders" component={HomeView} />
     </Switch>
   )
 }
 
-const SamplesView = () => {
-  // TODO: On mount, get 500 samples from the database for SampleResultsList to render.
-  return (
-    <ViewBox id="SamplesView">
-      <SearchFilterSection />
-      <SampleResultsList />
-      <PlaybackBar />
-    </ViewBox>
-  )
-}
+const RouterStateSync = React.memo(() => {
+  const [location] = useLocation()
+  const params = useParams()
+  const search = useSearch()
+  console.log({ location, params, search })
 
-const CollectionView = () => {
-  // TODO: On mount, get collection samples from the database for SampleResultsList to render.
-  return (
-    <ViewBox id="CollectionsView">
-      <SearchFilterSection />
-      <SampleResultsList />
-    </ViewBox>
-  )
-}
+  React.useEffect(() => {
+    $routing.set({ location, params, search })
+  }, [location, params, search])
+  return null
+})

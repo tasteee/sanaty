@@ -24,18 +24,18 @@ export const CollectionsSection = () => {
               key={item._id}
               id={item._id}
               label={item.name}
-              style={{ paddingRight: 8 }}
-              isActive={location === `/collections/${item._id}`}
-              onClick={() => setLocation(`/collections/${item._id}`)}
+              style={{ paddingRight: 24 }}
+              isActive={location === `/collections/collection/${item._id}`}
+              onClick={() => setLocation(`/collections/collection/${item._id}`)}
               iconName="playlist-2"
             >
               <CuteIcon
-                className="trashyIcon"
+                className="collectionMenuItemTrashIcon"
                 name="delete-2"
-                size={16}
+                size="md"
                 onClick={(event) => {
                   event.stopPropagation()
-                  if (location === `/collections/${item._id}`) setLocation('/')
+                  if (location === `/collections/collection//${item._id}`) setLocation('/')
                   $collections.deleteCollection(item._id)
                 }}
               />
@@ -51,17 +51,15 @@ const $isCreateCollectionDialogOpen = datass.boolean(false)
 
 const AddCollectionMenuItem = () => {
   const isCreateCollectionDialogOpen = $isCreateCollectionDialogOpen.use()
-
-  const onClick = () => {
-    $isCreateCollectionDialogOpen.set(true)
-  }
+  const onClick = () => $isCreateCollectionDialogOpen.set(true)
 
   return (
     <>
       <Flex className="AddCollectionMenuItem" onClick={onClick} position="relative" align="center" gap="2">
-        <CuteIcon name="add" size={16} />
+        <CuteIcon name="add" size="sm" />
         <Text>New Collection</Text>
       </Flex>
+
       {isCreateCollectionDialogOpen && (
         <CreateCollectionDialog handleClose={() => $isCreateCollectionDialogOpen.set(false)} />
       )}

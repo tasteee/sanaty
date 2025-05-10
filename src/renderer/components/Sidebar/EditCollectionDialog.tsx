@@ -11,24 +11,24 @@ import {
   Textarea,
   FileUpload
 } from '@chakra-ui/react'
-import { Image } from '@chakra-ui/react'
 import { HiUpload } from 'react-icons/hi'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { toaster } from '#/components/ui/toaster'
-import { $collections } from '#/stores/collections'
 import { CuteIcon } from '../ui/CuteIcon'
+import { $collections } from '#/stores/collections'
 
-export const CreateCollectionDialog = (props) => {
-  const [name, setName] = useState('')
+export const EditCollectionDialog = ({ id, handleClose }) => {
+  const collection = $collections.useCollection(id)
   const [isOpen, setIsOpen] = useState(true)
-  const [description, setDesc] = useState('')
+  const [name, setName] = useState(collection?.name || '')
+  const [description, setDesc] = useState(collection?.description || '')
   const [file, setFile] = useState(null)
   const [imageBase64, setImageBase64] = useState('')
-  const imageSrc = imageBase64 || 'https://i.imgur.com/Zsft8Uj.png'
+  const imageSrc = imageBase64 || collection?.artworkPath || 'https://placehold.co/400'
 
   const close = () => {
     setIsOpen(false)
-    props.handleClose()
+    handleClose?.()
   }
 
   const handleFileChange = (event) => {
@@ -41,38 +41,40 @@ export const CreateCollectionDialog = (props) => {
       reader.onloadend = () => {
         setImageBase64(reader.result)
       }
-
       reader.readAsDataURL(file)
       setFile(file)
     }
   }
 
-  const handleCreate = async () => {
-    const collection = await $collections.createCollection({
+  const handleSave = async () => {
+    const { result, error } = await $collections.updateCollection(id, {
       name,
       description,
       artworkPath: imageSrc
     })
 
-    if (collection) {
-      toaster.create({
-        type: 'success',
-        title: 'Collection created',
-        duration: 3000,
-        isClosable: true
-      })
-    }
-
-    if (!collection) {
+    if (error) {
       toaster.create({
         type: 'error',
-        title: 'Collection creation failed',
+        title: 'Failed to update collection',
         duration: 3000,
         isClosable: true
       })
+
+      debugger
+      return
     }
 
-    close()
+    console.log('edit collection result: ', result)
+
+    toaster.create({
+      type: 'success',
+      title: 'Collection updated',
+      duration: 3000,
+      isClosable: true
+    })
+
+    handleClose?.()
   }
 
   return (
@@ -82,7 +84,7 @@ export const CreateCollectionDialog = (props) => {
         <Dialog.Positioner>
           <Dialog.Content>
             <Dialog.Header>
-              <Dialog.Title>Create New Collection</Dialog.Title>
+              <Dialog.Title>Edit Collection</Dialog.Title>
             </Dialog.Header>
             <Dialog.Body>
               <Flex direction="column" gap="4">
@@ -106,13 +108,13 @@ export const CreateCollectionDialog = (props) => {
                       <FileUpload.Trigger asChild>
                         <Button variant="outline" size="sm" leftIcon={<HiUpload />}>
                           <Text truncate maxW="200px">
-                            {file ? file.name : 'Upload Artwork'}
+                            {file ? file.name : 'Change Artwork'}
                           </Text>
-                          {file && (
+                          {(file || imageBase64) && (
                             <CuteIcon
                               name="close"
-                              onClick={(event) => {
-                                event.stopPropagation()
+                              onClick={(e) => {
+                                e.stopPropagation()
                                 setFile(null)
                                 setImageBase64('')
                               }}
@@ -143,8 +145,8 @@ export const CreateCollectionDialog = (props) => {
                   Cancel
                 </Button>
               </Dialog.ActionTrigger>
-              <Button colorScheme="blue" onClick={handleCreate} isDisabled={!name || !file}>
-                Create
+              <Button colorScheme="blue" onClick={handleSave} isDisabled={!name}>
+                Save
               </Button>
             </Dialog.Footer>
             <Dialog.CloseTrigger asChild>

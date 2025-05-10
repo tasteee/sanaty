@@ -14,6 +14,7 @@ type PropsT = {
 
 export const MenuItem = (props: PropsT) => {
   const className = classes('MenuItem', props.isActive && 'isActive', props.className)
+  const style = { ...props.style }
 
   return (
     <Flex
@@ -22,11 +23,13 @@ export const MenuItem = (props: PropsT) => {
       onClick={props.onClick}
       position="relative"
       align="center"
-      style={props.style}
+      style={style}
     >
-      <Flex gap="2">
+      <Flex gap="2" align="center">
         {props.iconName && <CuteIcon id="aaa" name={props.iconName} color="#71717a" />}
-        <Text>{props.label}</Text>
+        <Text maxWidth="170px" truncate>
+          {props.label}
+        </Text>
       </Flex>
       {props.children}
     </Flex>

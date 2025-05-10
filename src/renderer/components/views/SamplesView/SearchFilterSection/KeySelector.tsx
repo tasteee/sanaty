@@ -10,5 +10,6 @@ const keysCollection = createListCollection({
 export const KeySelector = () => {
   const key = $samplesViewStore.filters.use((state) => state.key)
   const setKey = (_, value: string) => $samplesViewStore.filters.set({ key: value })
-  return <SelectInput placeholder="Key" value={key.value} onChange={setKey} collection={keysCollection} width="100px" />
+  console.log({ key })
+  return <SelectInput placeholder="Key" value={key} onChange={setKey} collection={keysCollection} width="100px" />
 }

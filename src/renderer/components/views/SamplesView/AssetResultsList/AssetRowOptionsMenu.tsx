@@ -15,9 +15,9 @@ export const AssetRowOptionsMenu = (props) => {
   }
 
   return (
-    <HoverCard.Root positioning={PLACEMENTS.BOTTOM_END} onOpenChange={handleOpenChange} openDelay={300}>
+    <HoverCard.Root positioning={PLACEMENTS.BOTTOM_END} onOpenChange={handleOpenChange} openDelay={150}>
       <HoverCard.Trigger asChild>
-        <IconButton variant="outline">
+        <IconButton variant="plain" colorPalette={{ base: 'gray', _hover: 'purple' }}>
           <CuteIcon name="more-3" />
         </IconButton>
       </HoverCard.Trigger>

@@ -30,12 +30,12 @@ export const BpmRangeController = () => {
   }
 
   return (
-    <Flex gap="2" align="center" className="BpmRangeController">
-      <InputGroup size="xs" startElement="Min BPM" width="140px">
+    <Flex gap="2" align="center" className="BpmRangeController" flex="1">
+      <InputGroup size="xs" startElement="Min BPM" width="140px" flex="1">
         <Input ref={minBpmRef} size="xs" type="number" value={minBpmValue} onBlur={onMinBpmBlur} onChange={onMinBpmChange} />
       </InputGroup>
 
-      <InputGroup size="xs" startElement="Max BPM" width="140px">
+      <InputGroup size="xs" startElement="Max BPM" width="140px" flex="1">
         <Input ref={maxBpmRef} size="xs" type="number" value={maxBpmValue} onBlur={onMaxBpmBlur} onChange={onMaxBpmChange} />
       </InputGroup>
     </Flex>

@@ -1,6 +1,6 @@
 import './Sidebar.css'
 import { useLocation } from 'wouter'
-import { Card, Heading, Separator, HStack, Text, Flex, Circle, CuteIcon, ProgressCircle } from '#/components'
+import { Card, Heading, Separator, HStack, Text, Flex, Circle, CuteIcon, ProgressCircle, IconButton } from '#/components'
 import { MenuItem } from './MenuItem'
 import { CollectionsSection } from './CollectionsSection'
 import { Button, Menu, Portal } from '#/components'
@@ -64,6 +64,9 @@ export const Sidebar = () => {
 }
 
 const LogoSection = () => {
+  const isCompactView = $main.isCompactViewEnabled.use()
+  const sizeIconName = isCompactView ? 'clarity:resize-up-line' : 'clarity:resize-down-line'
+
   return (
     <Flex className="LogoBox" height="34px" position="relative" justify="space-between">
       <Flex position="relative" className="haederBox">
@@ -77,7 +80,15 @@ const LogoSection = () => {
           sanaty
         </Heading>
       </Flex>
-      <SettingsMenu />
+      {/* <SettingsMenu /> */}
+      <Flex gap="1">
+        <IconButton variant="ghost" onClick={() => $main.isCompactViewEnabled.set.toggle()}>
+          <CuteIcon customIcon={sizeIconName} />
+        </IconButton>
+        <IconButton variant="ghost" onClick={() => window.location.reload()}>
+          <CuteIcon name="refresh-1" />
+        </IconButton>
+      </Flex>
     </Flex>
   )
 }
@@ -87,6 +98,7 @@ const TopNavSection = () => {
   const isHomeActive = location === '/' || location === '/index.html'
   const isSamplesActive = location === '/samples'
   const isMidiActive = location === '/midi'
+  const isFoldersActive = location.startsWith('/folders')
 
   return (
     <Flex gap="3" direction="column" flex="0">
@@ -95,6 +107,7 @@ const TopNavSection = () => {
       </Heading>
       <Flex gap="2" direction="column">
         <MenuItem id="home" label="Home" isActive={isHomeActive} onClick={() => setLocation('/')} />
+        <MenuItem id="folders" label="Folders" isActive={isFoldersActive} onClick={() => setLocation('/folders')} />
         <MenuItem id="samples" label="Samples" isActive={isSamplesActive} onClick={() => setLocation('/samples')} />
         <MenuItem id="midi" label="MIDI" isActive={isMidiActive} onClick={() => setLocation('/midi')} />
       </Flex>

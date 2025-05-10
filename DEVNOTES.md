@@ -1,5 +1,47 @@
 # sanaty devnotes
 
+## Features
+
+### Add folder
+
+User can add a folder for sanaty to index all the samples in it recursively.
+
+### View folders
+
+User can view the folders added and indexed by sanaty.
+
+### Remove folder
+
+User can remove a folder from sanaty (which also removes its samples).
+
+### Create collection
+
+### Delete collection
+
+### Edit collection
+
+### View collection
+
+### Search collection
+
+### Add a sample to a collection
+
+### Remove a sample from a collection
+
+### View all samples
+
+### Search all samples
+
+### Like a sample
+
+### Unlike a sample
+
+### Play a sample
+
+### Copy a sample to clipboard
+
+### Adjust output volume of app
+
 ## AssetsView
 
 - Should include filters section

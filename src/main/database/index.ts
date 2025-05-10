@@ -1,8 +1,9 @@
+import fs from 'fs'
 import path from 'path'
 import { glob } from 'glob'
-import { list } from '#/modules/list'
 import { $likes, $folders, $samples, $collections } from './setup'
 import { dialog } from 'electron'
+import { of } from 'await-of'
 
 //
 // helpers
@@ -20,8 +21,8 @@ async function checkHasFolderBeenAdded(folderPath: string) {
   return existingFolders.some((folder: FolderT) => folder.path === folderPath)
 }
 
-function toggleAssetLiked(id: string) {
-  $likes.toggle(id)
+async function toggleAssetLiked(id: string) {
+  await $likes.toggle(id)
   return $likes.list
 }
 
@@ -36,7 +37,12 @@ async function getAllFolders() {
 
 async function getAllSamples() {
   const allSamples: SampleT[] = await $samples.findAsync({})
-  return allSamples
+  return allSamples || []
+}
+
+async function getAllSamplesWithFolderId(id) {
+  const results: SampleT[] = await $samples.findAsync({ folderId: id })
+  return results || []
 }
 
 async function getAllCollections() {
@@ -53,14 +59,17 @@ async function getAllLikes() {
 //
 
 // Build the base FolderT object.
-async function createFolder(folderPath: string, sampleCount: number) {
+async function createFolder(folderPath: string, folderId, sampleCount: number) {
   const folderName = path.basename(folderPath)
 
   return {
-    _id: folderPath,
+    _id: folderId,
+    id: folderId,
     path: folderPath,
     name: folderName,
     sampleCount,
+    lastIndexedDate: Date.now(),
+    artworkUrl: 'https://placehold.co/400',
     createdDate: Date.now()
   } as FolderT
 }
@@ -69,6 +78,8 @@ async function createFolder(folderPath: string, sampleCount: number) {
 function createSample(filePath: string, folderId: string) {
   const fileName = path.basename(filePath)
   const name = path.parse(fileName).name
+  const fileExtension = path.extname(fileName).replace('.', '')
+  const id = crypto.randomUUID()
 
   // TODO: Determine what npm packages I can use
   // to determine the duration, bpm, musical key / scale
@@ -76,12 +87,14 @@ function createSample(filePath: string, folderId: string) {
   // tags for the audio file...
 
   return {
-    _id: filePath,
+    id,
+    _id: id,
     name, // 'soul-guitar'
     fileName, // 'soul-guitar.wav'
     filePath, // 'C://foo/bar/soul-guitar.wav'
     fileSize: 12345, // bytes
     folderId, // Reference to FolderT._id
+    fileExtension,
     duration: 10,
     bpm: 93,
     key: 'd',
@@ -93,24 +106,13 @@ function createSample(filePath: string, folderId: string) {
 }
 
 async function createCollection(data: CollectionT) {
-  return await $collections.insertAsync(data)
+  const id = crypto.randomUUID()
+  return await $collections.insertAsync({ ...data, _id: id, id, sampleIds: [] })
 }
 
 //
 // update*
 //
-
-async function updateFolder(_id: string, updates: Partial<FolderT>) {
-  await $folders.updateAsync({ _id }, updates)
-}
-
-async function updateSample(_id: string, updates: Partial<SampleT>) {
-  await $samples.updateAsync({ _id }, updates)
-}
-
-async function updateCollection(_id: string, updates: Partial<SampleT>) {
-  await $collections.updateAsync({ _id }, updates)
-}
 
 // Get all paths from sample objects in the DB.
 async function getAllSamplePaths() {
@@ -118,7 +120,7 @@ async function getAllSamplePaths() {
   return allSamples.map((sample) => sample.filePath)
 }
 
-async function getOnlyNewSampleFilePaths(filePaths: string[]) {
+async function getOnlyNewSampleFilePaths(filePaths: string[] = []) {
   const existingSampleFilePaths = await getAllSamplePaths()
 
   return filePaths.filter((sampleFilePath) => {
@@ -130,28 +132,22 @@ async function getOnlyNewSampleFilePaths(filePaths: string[]) {
 // files recursively inside of the folder
 async function getFilePathsInFolder(folderPath: string) {
   const globOptions = { stat: true, absolute: true }
-  const globString = `${folderPath}/**/*.{mp3|wav}`
+  const globString = `${folderPath}/**/*.{mp3,wav,MP3,WAV}`
   const audioFilePaths = glob.sync(globString, globOptions)
-  return audioFilePaths
-}
-
-async function getAllFolderSamples(folderId: string) {
-  const allSamples = await getAllSamples()
-
-  return allSamples.filter((sample) => {
-    return sample.folderId === folderId
-  })
+  return audioFilePaths || []
 }
 
 async function addSampleToCollection(_id: string, sampleId: string) {
   const collection = await $collections.findOneAsync({ _id })
-  const newSampleIds = Array.from(new Set([...collection.sampleIds, sampleId]))
+  const sampleIds = collection.sampleIds || []
+  const newSampleIds = Array.from(new Set([...sampleIds, sampleId]))
   await $collections.updateAsync({ _id }, { sampleIds: newSampleIds })
 }
 
 async function removeSampleFromCollection(_id: string, sampleId: string) {
   const collection = await $collections.findOneAsync({ _id })
-  const newSampleIds = collection.sampleIds.filter((assetId) => assetId !== sampleId)
+  const sampleIds = collection.sampleIds || []
+  const newSampleIds = sampleIds.filter((assetId) => assetId !== sampleId)
   await $collections.updateAsync({ _id }, { sampleIds: newSampleIds })
 }
 
@@ -159,22 +155,14 @@ async function removeSampleFromCollection(_id: string, sampleId: string) {
 // ensure that none of the paths already exist on any samples
 // in the dataabse. create a new SampleT for each *new*
 // sample file path, then bulk add the new SampleTs to the db.
-async function indexFolderSamples(folderPath: string) {
+async function indexFolderSamples(folderPath: string, folderId) {
+  const buildSample = (samplePath) => createSample(samplePath, folderId) as SampleT
   const samplePaths = await getFilePathsInFolder(folderPath)
   const newSampleFilePaths = await getOnlyNewSampleFilePaths(samplePaths)
-  const buildSample = (samplePath) => createSample(samplePath, folderPath) as SampleT
   const sampleDatas = newSampleFilePaths.map(buildSample)
   const sampleDocs = await $samples.insertAsync(sampleDatas)
-  const sampleCount = sampleDocs.length
-  console.log({ sampleCount, sampleDatas, samplePaths, newSampleFilePaths, sampleDocs })
+  const sampleCount = samplePaths.length
   return { sampleCount, sampleDocs }
-  // [1] { log output: Please fix why no samples are being found.....
-  //   [1]   sampleCount: 0,
-  //   [1]   sampleDatas: [],
-  //   [1]   samplePaths: [],
-  //   [1]   newSampleFilePaths: [],
-  //   [1]   sampleDocs: []
-  //   [1] }
 }
 
 // Re-index the samples recusrively in the folder.
@@ -183,11 +171,40 @@ async function indexFolderSamples(folderPath: string) {
 // with unique paths are inserted into the db.
 async function refreshFolder(_id: string) {
   const folderDoc = await $folders.findOneAsync({ _id })
-  const oldSampleCount = folderDoc.sampleCount
-  const { sampleCount } = await indexFolderSamples(folderDoc.path)
-  await updateFolder(_id, { sampleCount })
-  console.log('refreshFolder ', { folderDoc, oldSampleCount, sampleCount })
-  return true
+  const existingSamples = await getAllSamplesWithFolderId(_id)
+  const actualFilePaths = await getFilePathsInFolder(folderDoc.path)
+  const actualFilePathSet = new Set(actualFilePaths)
+
+  // Remove samples that no longer exist on disk
+  const missingSamples = existingSamples.filter((s) => !actualFilePathSet.has(s.filePath))
+  const missingSampleIds = missingSamples.map((s) => s._id)
+
+  // Remove missing samples from db.
+  // Remove missing sample ids from collections.
+  if (missingSampleIds.length > 0) {
+    await removeSamplesByIds(missingSampleIds)
+    await removeSamplesFromCollections(missingSampleIds)
+  }
+
+  // Index any new files
+  const { sampleCount } = await indexFolderSamples(folderDoc.path, folderDoc._id)
+  await $folders.updateAsync({ _id }, { $set: { sampleCount } })
+  const newFolderDoc = await $folders.findOneAsync({ _id })
+  return newFolderDoc
+}
+
+function removeSamplesByIds(sampleIds: string[]) {
+  return $samples.removeAsync({ _id: { $in: sampleIds } }, { multi: true })
+}
+
+function removeSamplesByFolderId(folderId: string) {
+  return $samples.removeAsync({ folderId }, { multi: true })
+}
+
+async function updateCollection(_id, updates) {
+  const [result, error] = await of($collections.updateAsync({ _id }, { $set: updates }))
+  if (error) return { error, result: null }
+  return { result, error: null }
 }
 
 // Create a FolderT object and then
@@ -199,19 +216,30 @@ async function addFolder() {
   const noFolderWasSelected = result.filePaths.length === 0
   const selectionWasCanceled = result.canceled
   const shouldExit = selectionWasCanceled || noFolderWasSelected
-
   if (shouldExit) return null
 
   const folderPath = result.filePaths[0]
   const isAlreadyAdded = await checkHasFolderBeenAdded(folderPath)
-
   if (isAlreadyAdded) return false
 
-  const { sampleCount } = await indexFolderSamples(folderPath)
-  const folderData = await createFolder(folderPath, sampleCount)
+  const folderId = crypto.randomUUID()
+  const { sampleCount } = await indexFolderSamples(folderPath, folderId)
+  // const folderData = await createFolder(folderId, folderPath, sampleCount)
+  const folderData = await createFolder(folderPath, folderId, sampleCount)
   const folderDoc = await $folders.insertAsync(folderData)
-  console.log('addFolder ', { folderDoc, sampleCount })
   return true
+}
+
+async function removeSamplesFromCollections(sampleIds: string[]) {
+  const allCollections = await getAllCollections()
+
+  for (const collection of allCollections) {
+    const currentSampleIds = collection.sampleIds || []
+    const newCollectionSampleIds = currentSampleIds.filter((id) => !sampleIds.includes(id))
+    const didListChange = currentSampleIds.length !== newCollectionSampleIds.length
+    const updateQuery = { $set: { sampleIds: newCollectionSampleIds } }
+    if (didListChange) await $collections.updateAsync({ _id: collection._id }, updateQuery)
+  }
 }
 
 // find all SampleT ids in db related to the given folder id.
@@ -219,30 +247,16 @@ async function addFolder() {
 // remove all corresponding SampleT ojects from db.
 // delete corresponding folder from db
 async function removeFolder(_id: string) {
-  const folderSamples = await getAllFolderSamples(_id)
-  const allCollections = await getAllCollections()
+  const folderSamples = await getAllSamplesWithFolderId(_id)
   const folderSampleIds = folderSamples.map((sample) => sample._id)
-
-  for (const collection of allCollections) {
-    const newCollectionSampleIds = list(collection.sampleIds).intersect(folderSampleIds)
-    const didListChange = collection.sampleIds.length !== newCollectionSampleIds.length
-    const updateQuery = { $set: { sampleIds: newCollectionSampleIds } }
-    if (didListChange) await $collections.updateAsync({ _id: collection._id }, updateQuery)
-  }
-
-  await $samples.removeAsync({ folderId: _id }, { multi: true })
+  await removeSamplesFromCollections(folderSampleIds)
+  await removeSamplesByFolderId(_id)
   await $folders.removeAsync({ _id }, {})
-}
-
-// Count the samples in the DB that belong to the folder id provided.
-async function getFolderSampleCount(_id: string) {
-  const folderSamples = await getAllFolderSamples(_id)
-  return folderSamples.length
 }
 
 async function getCollectionAssets(_id: string) {
   const collection = await $collections.findOneAsync({ _id })
-  const sampleIds = collection.sampleIds
+  const sampleIds = collection.sampleIds || []
   return $samples.findAsync({ _id: { $in: sampleIds } })
 }
 
@@ -279,8 +293,48 @@ async function searchSamples(filters: SampleSearchQueryT) {
   if (!filters.isLiked) return samples
 
   return samples.filter((sample) => {
-    return $likes.list.includes(sample._id)
+    return $likes.list.includes(sample.id)
   })
+}
+
+async function getCollectionSampleCount(_id: string) {
+  const collection = await $collections.findOneAsync({ _id })
+  const sampleIds = collection.sampleIds || []
+  return sampleIds.length
+}
+
+// Count the samples in the DB that belong to the folder id provided.
+async function getFolderSampleCount(_id: string) {
+  const folderSamples = await getAllSamplesWithFolderId(_id)
+  return folderSamples.length
+}
+
+async function verifyFoldersAndSamples() {
+  const missingFolderIds = []
+  const missingSampleIds = []
+
+  // Check all folders
+  const allFolders = await getAllFolders()
+  const allSamples = await getAllSamples()
+
+  for (const folder of allFolders) {
+    if (!fs.existsSync(folder.path)) {
+      missingFolderIds.push(folder._id)
+    }
+  }
+
+  // Check all samples
+  for (const sample of allSamples) {
+    if (!fs.existsSync(sample.filePath)) {
+      missingSampleIds.push(sample._id)
+    }
+  }
+
+  const missingFolders = await $folders.findAsync({ _id: { $in: missingFolderIds } })
+  const missingSamples = await $samples.findAsync({ _id: { $in: missingSampleIds } })
+  const final = { missingFolders, missingSamples, missingFolderIds, missingSampleIds }
+  console.log({ ...final })
+  return final
 }
 
 export const database = {
@@ -290,22 +344,23 @@ export const database = {
   refreshFolder,
   getAllFolders,
   getAllSamples,
+  verifyFoldersAndSamples,
   searchSamples,
   deleteCollection,
   getAllCollections,
+  getCollectionSampleCount,
   getFolderSampleCount,
   getFilePathsInFolder,
   createCollection,
-  getAllFolderSamples,
   getAllSamplePaths,
+  createSample,
   getOnlyNewSampleFilePaths,
   getCollectionAssets,
-  createSample,
+  getAllSamplesWithFolderId,
   indexFolderSamples,
   addSampleToCollection,
   removeSampleFromCollection,
-  updateCollection,
-  updateSample,
   toggleAssetLiked,
-  getAllLikes
+  getAllLikes,
+  updateCollection
 }

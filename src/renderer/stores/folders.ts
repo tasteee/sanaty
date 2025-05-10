@@ -1,4 +1,6 @@
 import { datass } from 'datass'
+import memoize from 'memoize'
+import { $main } from './main'
 
 const $list = datass.array<FolderT>([])
 
@@ -24,11 +26,17 @@ const removeFolder = async (folderId: string) => {
 const refreshFolder = async (id: string) => {
   await window.electron.refreshFolder(id)
   await reloadFolders()
+  await $main.verifyFoldersAndSamples()
 }
 
 const getFolder = (id: string) => {
-  return $list.state.find((folder) => folder._id === id)
+  return $list.state.find((folder) => folder._id === id) as FolderT
 }
+
+const getFolderArtwork = memoize((id: string) => {
+  const folder = getFolder(id)
+  return folder.artworkUrl || 'https://placehold.co/400'
+})
 
 const useFolder = (id: string) => {
   return $list.use((folders) => folders.find((item) => item._id === id)) as FolderT
@@ -39,6 +47,7 @@ export const $folders = {
   addFolder,
   removeFolder,
   reloadFolders,
+  getFolderArtwork,
   refreshFolder,
   getFolder,
   getFolderSampleCount,

@@ -1,5 +1,5 @@
 import './SearchFilterSection.css'
-import { CuteIcon, Tag, Tabs, Card, Wrap, SegmentGroup, Flex, CloseButton, IconButton, Text } from '#/components'
+import { CuteIcon, Tag, Tabs, Card, Wrap, SegmentGroup, Flex, CloseButton, IconButton, Text, Button } from '#/components'
 import { KeySelector } from './KeySelector'
 import { ScaleSelector } from './ScaleSelector'
 import { BpmRangeController } from './BpmRangeController'
@@ -7,25 +7,168 @@ import { SearchInput } from './SearchInput'
 import { SampleTypeController } from './SampleTypeController'
 import { $samplesViewStore } from '../samplesView.store'
 import { TAGS } from '#/constants'
-import { TagCloudTag } from './TagCloudTag'
+import { ActiveTagFilter, TagCloudTag } from './TagCloudTag'
+import React from 'react'
+import { useBreakpoints, useElementSize } from '@siberiacancode/reactuse'
+import { DurationRangeController } from './DurationRangeController'
+import { $collections } from '#/stores/collections'
+import { $folders } from '#/stores/folders'
+
+const SearchButton = () => {
+  const style = {}
+
+  return (
+    <Button colorPalette="pink" size="xs" variant="solid" style={style} onClick={$samplesViewStore.submitSearch}>
+      Search
+    </Button>
+  )
+}
 
 export const SearchFilterSection = () => {
-  return (
-    <Card.Root className="SearchFilterSection">
-      <Card.Body className="SearchFilterSectionBody" padding="4" gap="2">
+  const breakpoints = useBreakpoints({ xs: 0, sm: 700, md: 950, lg: 1080, xl: 1300 })
+  const activeBreakpoint = breakpoints.active()
+
+  const TopOptions = () => {
+    if (activeBreakpoint === 'lg') {
+      return (
+        <Flex gap="2" justify="center" direction="column">
+          <Flex gap="2" align="center">
+            <SearchInput />
+            <SampleTypeController />
+            <KeySelector />
+            <ScaleSelector />
+            <LikedFilterSwitch />
+            <SearchButton />
+          </Flex>
+
+          <Flex gap="2" align="center">
+            <BpmRangeController />
+            <DurationRangeController />
+          </Flex>
+        </Flex>
+      )
+    }
+
+    if (activeBreakpoint === 'md') {
+      return (
+        <Flex gap="2" justify="center" direction="column">
+          <Flex gap="2" align="center">
+            <SearchInput />
+            <SampleTypeController />
+            <LikedFilterSwitch />
+            <SearchButton />
+          </Flex>
+
+          <Flex gap="2" align="center">
+            <KeySelector />
+            <ScaleSelector />
+          </Flex>
+          <Flex gap="2" align="center">
+            <BpmRangeController />
+            <DurationRangeController />
+          </Flex>
+        </Flex>
+      )
+    }
+
+    if (activeBreakpoint === 'sm') {
+      return (
+        <Flex gap="2" justify="center" direction="column">
+          <Flex gap="2" align="center">
+            <SearchInput />
+            <SampleTypeController />
+            <LikedFilterSwitch />
+            <SearchButton />
+          </Flex>
+          <Flex gap="2" align="center">
+            <KeySelector />
+            <ScaleSelector />
+          </Flex>
+          <Flex gap="2" align="center">
+            <BpmRangeController />
+          </Flex>
+          <Flex gap="2" align="center">
+            <DurationRangeController />
+          </Flex>
+        </Flex>
+      )
+    }
+
+    if (activeBreakpoint === 'xs') {
+      return (
+        <Flex gap="2" justify="center" direction="column">
+          <Flex gap="2" align="center">
+            <SearchInput />
+            <LikedFilterSwitch />
+            <SearchButton />
+          </Flex>
+          <Flex gap="2" align="center">
+            <SampleTypeController />
+          </Flex>
+          <Flex gap="2" align="center">
+            <ScaleSelector />
+            <KeySelector />
+          </Flex>
+          <Flex gap="2" align="center">
+            <BpmRangeController />
+          </Flex>
+          <Flex gap="2" align="center">
+            <DurationRangeController />
+          </Flex>
+        </Flex>
+      )
+    }
+
+    return (
+      <Flex gap="2" justify="center" direction="column">
         <Flex gap="2" align="center">
           <SearchInput />
           <SampleTypeController />
           <KeySelector />
           <ScaleSelector />
-          <BpmRangeController />
+          <LikedFilterSwitch />
+          <SearchButton />
         </Flex>
+
+        <Flex gap="2" align="center">
+          <BpmRangeController />
+          <DurationRangeController />
+        </Flex>
+      </Flex>
+    )
+  }
+
+  return (
+    <Card.Root className="SearchFilterSection">
+      <Card.Body className="SearchFilterSectionBody" padding="4" gap="2">
+        <TopOptions />
 
         <Flex gap="2">
           <TagsSection />
         </Flex>
       </Card.Body>
     </Card.Root>
+  )
+}
+
+export const LikedFilterSwitch = (props) => {
+  const isActive = $samplesViewStore.filters.use((state) => state.isLiked)
+  const iconName = isActive ? 'bxs:heart' : 'bx:heart'
+  const color = isActive ? '#ec4899' : '#71717a'
+  const colorPalette = isActive ? 'pink' : 'gray'
+  const variant = isActive ? 'surface' : 'outline'
+  const scale = isActive ? 1.25 : 1.1
+  const style = { scale }
+
+  const handleClick = (event) => {
+    event.stopPropagation()
+    $samplesViewStore.filters.set({ isLiked: !isActive })
+  }
+
+  return (
+    <IconButton onMouseUp={handleClick} variant={variant} size="xs" colorPalette={colorPalette}>
+      <CuteIcon customIcon={iconName} color={color} style={style} />
+    </IconButton>
   )
 }
 
@@ -68,37 +211,33 @@ const TagFilterControl = () => {
           Descriptors
         </Tabs.Trigger>
       </Tabs.List>
-      <Tabs.Content value="All">{tagCloud}</Tabs.Content>
-      <Tabs.Content value="Genre">{tagCloud}</Tabs.Content>
-      <Tabs.Content value="Instrument">{tagCloud}</Tabs.Content>
-      <Tabs.Content value="Descriptor">{tagCloud}</Tabs.Content>
+      <Tabs.Content value="All">
+        <TagCloud />
+      </Tabs.Content>
+      <Tabs.Content value="Genre">
+        <TagCloud />
+      </Tabs.Content>
+      <Tabs.Content value="Instrument">
+        <TagCloud />
+      </Tabs.Content>
+      <Tabs.Content value="Descriptor">
+        <TagCloud />
+      </Tabs.Content>
     </Tabs.Root>
   )
 }
 
-const TagCloud = () => {
-  const activeTags = $samplesViewStore.filters.use((state) => state.tags)
-  const category = $samplesViewStore.activeTagCloudCategory.use()
-
+const TagCloud = React.memo((props) => {
   return (
     <Flex overflowY="scroll" maxH="159px" className="TagCloud customScrollbar" paddingRight="8px">
       <Wrap gap="2">
         {TAGS.LIST.map((tag) => {
-          const shouldRender = checkShouldRenderTag(tag, category)
-          if (!shouldRender) return null
-          if (activeTags.includes(tag.id)) return null
-          return <TagCloudTag key={tag.id} id={tag.id} isActive={false} />
+          return <TagCloudTag key={tag.id} id={tag.id} />
         })}
       </Wrap>
     </Flex>
   )
-}
-
-const checkShouldRenderTag = (tag: TagT, activeCategory: string) => {
-  if (activeCategory === 'All') return true
-  if (activeCategory.toLowerCase() === tag.category) return true
-  return false
-}
+})
 
 const TagsSection = () => {
   return (
@@ -129,7 +268,7 @@ const ActiveTagsSection = () => {
       {!activeTags.length && <NoTagsSelectedText />}
 
       {activeTags.map((tag) => (
-        <TagCloudTag key={tag} id={tag} isActive />
+        <ActiveTagFilter key={tag} id={tag} />
       ))}
     </Wrap>
   )

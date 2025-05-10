@@ -3,3 +3,7 @@
 
 .SearchFilterSectionBody {
 }
+
+.TagCloud {
+  user-select: none;
+}

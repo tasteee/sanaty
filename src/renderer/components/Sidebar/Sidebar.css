@@ -29,11 +29,13 @@
   color: #fff;
 }
 
-.collectionMenuItem .trashyIcon {
+.collectionMenuItem .collectionMenuItemTrashIcon {
   opacity: 0;
+  position: absolute;
+  right: 4px;
 }
 
-.collectionMenuItem:hover .trashyIcon {
+.collectionMenuItem:hover .collectionMenuItemTrashIcon {
   opacity: 1;
 }
 
@@ -61,7 +63,7 @@
   }
 }
 
-.MenuItem:hover:has(.trashyIcon:hover) {
+.MenuItem:hover:has(.collectionMenuItemTrashIcon:hover) {
   color: #f87171 !important;
 
   & .CuteIcon,

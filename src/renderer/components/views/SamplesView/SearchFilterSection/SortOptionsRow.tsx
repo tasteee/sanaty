@@ -2,6 +2,7 @@ import { Flex, Text, Button } from '#/components'
 import { SortOrderSelector } from './SortOrderSelector'
 import { SortBySelector } from './SortBySelector'
 import { $samplesViewStore } from '../samplesView.store'
+import { ItemsPerPageSelector } from './ItemsPerPageSelector'
 
 export const SortOptionsRow = () => {
   const isTagCloudShown = $samplesViewStore.isTagCloudShown.use()
@@ -16,6 +17,7 @@ export const SortOptionsRow = () => {
         </Text>
       </Flex>
       <Flex gap="2" justify="flex-end">
+        <ItemsPerPageSelector />
         <SortBySelector />
         <SortOrderSelector />
       </Flex>
