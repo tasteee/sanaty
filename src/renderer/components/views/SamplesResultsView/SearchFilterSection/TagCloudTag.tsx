@@ -18,15 +18,13 @@ const useIsCategoryActive = (tagCategory) => {
 
 export const TagCloudTag = React.memo((props: TagCloudTagPropsT) => {
   const tag = TAGS.MAP[props.id]
-  const isCompactView = $ui.isCompactViewEnabled.use()
-  const size = isCompactView ? 'sm' : 'lg'
   const categoryClassName = `tagCategory_${tag.category}`
   const className = clsx('TagCloudTag', props.className, categoryClassName, props.isActive && 'hiddenTag')
 
   return (
     <AssetTag
       id={props.id}
-      size={size}
+      size="lg"
       className={className}
       colorPalette="gray"
       iconColor="#a1a1aa"
@@ -40,15 +38,13 @@ export const TagCloudTag = React.memo((props: TagCloudTagPropsT) => {
 export const ActiveTagFilter = (props) => {
   const tag = TAGS.MAP[props.id]
   const [colorPalette, iconColor] = getColors(tag)
-  const isCompactView = $ui.isCompactViewEnabled.use()
-  const size = isCompactView ? 'sm' : 'lg'
   const className = clsx('ActiveTagFilter', props.className)
 
   return (
     <AssetTag
       isActive
       id={props.id}
-      size={size}
+      size="lg"
       colorPalette={colorPalette}
       iconColor={iconColor}
       variant="surface"

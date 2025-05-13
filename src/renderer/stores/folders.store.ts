@@ -1,5 +1,6 @@
 import { makeGlobal } from '#/modules/_global'
 import { datass } from 'datass'
+import { $collections } from './collections.store'
 
 class FoldersStore {
   list = datass.array<FolderT>([])
@@ -19,6 +20,7 @@ class FoldersStore {
   remove = async (id) => {
     await window.electron.removeFolder(id)
     await this.load()
+    $collections.load()
   }
 
   refresh = async (id) => {

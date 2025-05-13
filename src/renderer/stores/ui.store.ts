@@ -10,6 +10,8 @@ const foo = (event) => {
 }
 
 class UiStore {
+  currentAudio = datass.object(null)
+
   isCreateCollectionDialogOpen = datass.boolean(false)
   isEditCollectionDialogOpen = datass.boolean(false)
 
@@ -42,6 +44,16 @@ class UiStore {
   // The id of the active sample in the search results.
   activeSampleId = datass.string('')
 
+  setActiveSampleId = (id) => {
+    console.log('setttttting id', { id })
+    this.activeSampleId.set(id)
+  }
+
+  setActiveSampleIndex = (index) => {
+    console.log('setttttting indexxxx', index)
+    this.activeAssetIndex.set(index)
+  }
+
   // When the user clicks the PLUS icon on a sample
   // in the search results, addToCollection mode is enabled.
   // The collections in the sidebar are highlighted and
@@ -70,4 +82,4 @@ class UiStore {
 }
 
 export const $ui = new UiStore()
-makeGlobal('ui', $ui)
+globalThis.ui = $ui

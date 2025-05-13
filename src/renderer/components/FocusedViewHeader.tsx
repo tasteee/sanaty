@@ -8,21 +8,18 @@ import { Text, Stat } from '@chakra-ui/react'
 import { CuteIcon } from './ui/CuteIcon'
 import { navigateTo } from '#/modules/routing'
 import { $ui } from '#/stores/ui.store'
+import { ACTIVE_BG_GRADIENT, activeStyles } from '#/styles/objects'
 
-const activeStyles = {
-  content: '""',
-  position: 'absolute',
+const customActiveStyles = {
+  ...activeStyles,
   top: '-0px',
   bottom: '-0',
   left: '-0',
-  right: '-0',
-  bgGradient: `linear-gradient(to right, #2c0514, transparent)`,
-  borderRadius: 'lg',
-  zIndex: 0,
-  border: '1px solid #ec4899'
+  right: '-0'
 }
 
-const ACTIVE_BG_GRADIENT = 'linear-gradient(to right, #18181b, transparent)'
+const _hover = { bg: ACTIVE_BG_GRADIENT }
+const variantObject = { base: 'plain', _hover: 'subtle' }
 
 export const FocusedViewHeader = (props) => {
   return (
@@ -31,9 +28,9 @@ export const FocusedViewHeader = (props) => {
       p="0px"
       rounded="md"
       colorPalette="pink"
-      variant={{ base: 'plain', _hover: 'subtle' }}
-      _hover={{ bg: ACTIVE_BG_GRADIENT }}
-      _before={activeStyles}
+      variant={variantObject}
+      _hover={_hover}
+      _before={customActiveStyles}
       className="FocusedViewHeader"
     >
       <Card.Body p="8px">

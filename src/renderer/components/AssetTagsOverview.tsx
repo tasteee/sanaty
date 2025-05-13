@@ -25,7 +25,7 @@ const getLimitedCategorizedTags = (tags: string[], limit: number) => {
 }
 
 export const AssetTagsOverview = React.memo((props: PropsT) => {
-  const overviewTags = getLimitedCategorizedTags(props.tags, 2)
+  const overviewTags = getLimitedCategorizedTags(props.tags || [], 2)
   const [isOpen, toggleOpen] = useToggle()
   const handleOpenChange = (event) => toggleOpen(event.open)
 

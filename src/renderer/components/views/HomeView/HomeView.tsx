@@ -25,6 +25,7 @@ import { Stat } from '@chakra-ui/react'
 import './HomeView.css'
 import { $likes } from '#/stores/likes.store'
 import { ViewHeading } from '#/components/ViewHeading'
+import { ACTIVE_BG_GRADIENT } from '#/styles/objects'
 
 const COL_MAP = {
   desktop: 3,
@@ -91,8 +92,6 @@ const activeStyles = {
   zIndex: 0,
   border: '1px solid #ec4899'
 }
-
-const ACTIVE_BG_GRADIENT = 'linear-gradient(to right, #18181b, transparent)'
 
 const AddFolderCard = () => {
   return (
@@ -205,7 +204,6 @@ const BrowseFolderAssetsIconButton = (props) => {
 
 const FolderPathHoverTip = (props) => {
   const [isOpen, setIsOpen] = React.useState(false)
-  console.log({ isOpen })
 
   const handleOpenChange = (event) => {
     setIsOpen(event.open)

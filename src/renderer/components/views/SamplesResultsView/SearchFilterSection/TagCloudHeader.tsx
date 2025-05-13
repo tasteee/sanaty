@@ -14,13 +14,13 @@ import { $ui } from '#/stores/ui.store'
 import { $search } from '#/stores/search.store'
 import clsx from 'clsx'
 
-export const TagCloudHeader = () => {
+export const TagCloudHeader = React.memo(() => {
   return (
     <Flex gap="2">
       <TagsSection />
     </Flex>
   )
-}
+})
 
 const DISPLAY_NONE_STYLE = { display: 'none' }
 const EMPTY_STYLE = {}
@@ -33,10 +33,6 @@ const TagFilterControl = () => {
   const onChange = (event) => {
     $ui.activeTagCloudCategory.set(event.value)
   }
-
-  const tagCloud = React.useMemo(() => {
-    return <TagCloud />
-  }, [tagCategoryFilter])
 
   return (
     <Tabs.Root value={tagCategoryFilter} variant="outline" onValueChange={onChange} orientation="vertical" style={style} mt="2">
@@ -58,10 +54,18 @@ const TagFilterControl = () => {
           Descriptors
         </Tabs.Trigger>
       </Tabs.List>
-      <Tabs.Content value="All">{tagCloud}</Tabs.Content>
-      <Tabs.Content value="Genre">{tagCloud}</Tabs.Content>
-      <Tabs.Content value="Instrument">{tagCloud}</Tabs.Content>
-      <Tabs.Content value="Descriptor">{tagCloud}</Tabs.Content>
+      <Tabs.Content value="All">
+        <TagCloud />
+      </Tabs.Content>
+      <Tabs.Content value="Genre">
+        <TagCloud />
+      </Tabs.Content>
+      <Tabs.Content value="Instrument">
+        <TagCloud />
+      </Tabs.Content>
+      <Tabs.Content value="Descriptor">
+        <TagCloud />
+      </Tabs.Content>
     </Tabs.Root>
   )
 }

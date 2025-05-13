@@ -200,6 +200,24 @@ export const refreshFolder = async (id: string) => {
 // Remove folder
 export const removeFolder = (id: string): void => {
   const folder = folders.findOne({ id })
+  const folderSamples = samples.find({ folderId: id })
+  console.log('removing samples: ', folderSamples.length)
+
+  const sampleIds = folderSamples.map((item) => item.id)
+  const allCollections = collections.find()
+
+  const updatedCollections = allCollections.map((collection) => {
+    collection.sampleIds = collection.sampleIds.filter((id) => {
+      return !sampleIds.includes(id)
+    })
+
+    return collection
+  })
+
+  updatedCollections.forEach((collection) => {
+    collections.update(collection)
+  })
+
   samples.findAndRemove({ folderId: id })
   folders.remove(folder)
   console.log('\n\n\nREMOVED FOLDER ', folder.path)
@@ -234,7 +252,7 @@ export const searchSamples = (filters: {
   bpmRange?: [number, number]
   durationRange?: [number, number]
   sortBy?: string
-  sortDirection?: 'asc' | 'desc'
+  sortOrder?: 'ascending' | 'descending'
   limit?: number
   offset?: number
 }) => {
@@ -283,12 +301,9 @@ export const searchSamples = (filters: {
     chain = chain.find({ duration: { $between: [minDuration, maxDuration] } })
   }
 
-  // Apply sorting
-  if (filters.sortBy) {
-    chain = chain.simplesort(filters.sortBy, { desc: filters.sortDirection === 'desc' })
-  } else {
-    chain = chain.simplesort('name')
-  }
+  const sortBy = filters.sortBy || 'name'
+  const isDescending = filters.sortOrder === 'descending'
+  chain = chain.simplesort(sortBy, { desc: isDescending })
 
   // Apply pagination
   if (filters.limit !== undefined && filters.offset !== undefined) {
@@ -365,8 +380,11 @@ export const addToCollection = (id: string, sampleId: string) => {
 
 // Remove sample from collection
 export const removeFromCollection = (id: string, sampleId: string) => {
+  console.log('\n\n\nREMOVING FROM COLLECTION', { id, sampleId })
   const collection = collections.findOne({ id })
+  console.log('original sampleis length', collection.sampleIds.length)
   collection.sampleIds = collection.sampleIds.filter((id) => id !== sampleId)
+  console.log('new sampleis length', collection.sampleIds.length)
   collections.update(collection)
   return true
 }

@@ -32,10 +32,13 @@ export function App() {
 const Overlays = () => {
   const isCreateCollectionDialogOpen = $ui.isCreateCollectionDialogOpen.use()
   const isEditCollectionDialogOpen = $ui.isEditCollectionDialogOpen.use()
+  const routeEntityId = $ui.routeEntityId.use()
 
   return (
     <>
-      {isEditCollectionDialogOpen && <EditCollectionDialog handleClose={() => $ui.isEditCollectionDialogOpen.set(false)} />}
+      {isEditCollectionDialogOpen && (
+        <EditCollectionDialog collectionId={routeEntityId} handleClose={() => $ui.isEditCollectionDialogOpen.set(false)} />
+      )}
       {isCreateCollectionDialogOpen && <CreateCollectionDialog handleClose={() => $ui.isCreateCollectionDialogOpen.set(false)} />}
     </>
   )
@@ -59,9 +62,11 @@ const AppFrame = () => {
 }
 
 const useAppFrameClassNames = () => {
+  const isCompactView = $ui.isCompactViewEnabled.use()
   const isAddingAssetToCollection = $ui.isAddingToCollection.use()
   const addingToCollectionClassName = isAddingAssetToCollection ? 'isAddingSampleToCollection' : ''
-  return clsx('App', 'AppFrame', addingToCollectionClassName)
+  const isCompactViewClassName = isCompactView ? 'isCompactView' : ''
+  return clsx('App', 'AppFrame', addingToCollectionClassName, isCompactViewClassName)
 }
 
 const MainLoader = () => {

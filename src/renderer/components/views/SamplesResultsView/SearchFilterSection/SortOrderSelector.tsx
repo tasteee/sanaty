@@ -10,7 +10,7 @@ const sortOrderCollection = createListCollection({
 
 export const SortOrderSelector = () => {
   const sortOrder = $search.filters.use((state) => state.sortOrder)
-  const onChange = (_, value) => $search.filters.set({ sortOrder: value })
+  const onChange = (_, value) => $search.setSortOrder(value)
 
   return (
     <SelectInput

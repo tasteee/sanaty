@@ -1,57 +1,88 @@
+import { useEffect } from 'react'
 import './AssetResultsList.css'
 import { Paginator } from './Paginator'
-import { Box, Flex, Portal, IconButton, Text, Tag, Menu, CuteIcon, Popover } from '#/components'
+import { Box, Flex, IconButton, Text, CuteIcon } from '#/components'
 import { Card } from '#/components'
 import { SortOptionsRow } from '../SearchFilterSection/SortOptionsRow'
 import { AssetRowOptionsMenu } from './AssetRowOptionsMenu'
 import { SanatyTag } from '../../../ui/SanatyTag'
-import capitalize from 'capitalize'
 import { AssetTagsOverview } from '../../../AssetTagsOverview'
 import { $ui } from '#/stores/ui.store'
 import { $likes } from '#/stores/likes.store'
 import clsx from 'clsx'
 import { motion } from 'framer-motion'
+import { Clipboard } from '@chakra-ui/react'
+import { $search } from '#/stores/search.store'
+import { useDeferredRender } from '#/modules/hooks'
+import { activeStyles, ACTIVE_BG_GRADIENT } from '#/styles/objects'
+import { KeyboardNavigationProvider } from '#/components/KeyboardNavigationProvider'
+import React from 'react'
 
-export const SampleResultsList = () => {
-  const pageResults = $search.usePageResults()
-  const [ready, setReady] = React.useState(false)
+function loadInitialSampleResults() {
+  console.log('loadInitialSampleResults')
+  const entityType = $ui.routeEntityType.state
+  const entityId = $ui.routeEntityId.state
+  const filterKey = entityType === 'collection' ? 'collectionId' : 'folderId'
 
-  React.useEffect(() => {
-    if (!pageResults.length) return
-    setTimeout(() => {
-      setReady(true)
-    }, 250)
-  }, [pageResults])
-
-  return (
-    <Flex className="SampleResultsList" direction="column" overflow="hidden" pb="24px" tabIndex="0" gap="1" height="100%">
-      <SortOptionsRow />
-
-      <Flex gap="2" direction="column" justify="space-between" height="95%" className="mainResultsArea">
-        <Flex className="AssetResultsList customScrollbar" direction="column" gap="2" padding="2" overflowY="auto" height="100%">
-          {ready &&
-            pageResults.map((sample, index) => {
-              return <AssetRow key={sample.id} id={sample.id} index={index} />
-            })}
-        </Flex>
-
-        {pageResults.length > 0 && <Paginator />}
-      </Flex>
-    </Flex>
-  )
+  $ui.setActiveSampleIndex(-1)
+  $ui.setActiveSampleId('')
+  $search.filters.set.reset()
+  $search.results.set.reset()
+  $search.pagination.set.reset()
+  $search.filters.set({ [filterKey]: entityId })
+  $search.searchSamples()
 }
 
-const activeStyles = {
-  content: '""',
-  position: 'absolute',
-  top: '-3px',
-  bottom: '-3px',
-  left: '-3px',
-  right: '-3px',
-  bgGradient: `linear-gradient(to right, #2c0514, transparent)`,
-  borderRadius: 'lg',
-  zIndex: 0,
-  border: '1px solid #ec4899'
+export const SampleResultsList = () => {
+  const routeEntityType = $ui.routeEntityType.use()
+  const routeEntityId = $ui.routeEntityId.use()
+  const pageResults = $search.usePageResults()
+  const isReady = useDeferredRender(pageResults)
+
+  React.useEffect(() => {
+    loadInitialSampleResults()
+  }, [routeEntityId, routeEntityType])
+
+  // Effect to initialize keyboard focus when results load
+  useEffect(() => {
+    if (!isReady || pageResults.length < 1) return
+
+    // Set focus to the container to enable keyboard navigation
+    const container = document.querySelector('.SampleResultsList')
+    if (container) container.focus()
+
+    // If no active asset is set and we have results, prepare for keyboard navigation
+    const currentActiveIndex = $ui.activeAssetIndex.state
+
+    if (currentActiveIndex === -1) {
+      // Don't auto-activate the first item, but prepare for down arrow press
+      // This follows the behavior where down arrow first activates item 0
+    }
+  }, [isReady, pageResults])
+
+  return (
+    <KeyboardNavigationProvider>
+      <Flex className="SampleResultsList" direction="column" overflow="hidden" pb="24px" tabIndex="0" gap="1" height="100%">
+        <SortOptionsRow />
+
+        <Flex gap="2" direction="column" justify="space-between" height="95%" className="mainResultsArea">
+          <Flex className="AssetResultsList customScrollbar" direction="column" gap="2" padding="2" overflowY="auto" height="100%">
+            {isReady &&
+              pageResults.map((sample, index) => {
+                // Calculate the actual index in the full results array
+                const currentPage = $search.pagination.state.currentPage
+                const itemsPerPage = $search.pagination.state.itemsPerPage
+                const globalIndex = (currentPage - 1) * itemsPerPage + index
+
+                return <AssetRow key={sample.id} id={sample.id} index={globalIndex} />
+              })}
+          </Flex>
+
+          {pageResults.length > 0 && <Paginator />}
+        </Flex>
+      </Flex>
+    </KeyboardNavigationProvider>
+  )
 }
 
 type AssetRowPropsT = {
@@ -59,10 +90,8 @@ type AssetRowPropsT = {
   index: number
 }
 
-const ACTIVE_BG_GRADIENT = 'linear-gradient(to right, #18181b, transparent)'
-
 const useSampleData = (id) => {
-  const sampleResult = $search.useSampleResult(id)
+  const sampleResult = $search.useSampleResult(id) || {}
   const isLiked = $likes.useIsLiked(id)
   const { key, scale, ...otherData } = sampleResult
   const sample = { id, isLiked, ...otherData }
@@ -75,31 +104,30 @@ export const AssetRow = (props: AssetRowPropsT) => {
   const sample = useSampleData(props.id)
   const beforeStyles = isActive ? activeStyles : {}
   const bgGradient = isActive ? ACTIVE_BG_GRADIENT : ''
-  const isCompactView = $ui.isCompactViewEnabled.use()
-  const bodyPadding = isCompactView ? '0' : undefined
+  const beingAddedClassName = isBeingAddedToCollection ? 'sampleBeingAdded' : ''
+  const className = clsx('AssetRow', isActive && 'activeRow', beingAddedClassName)
 
   const activateAssetRow = (event) => {
     const isInsideHoverCard = event.target.closest('.hoverCardContent') !== null
     if (isInsideHoverCard) return
-    $ui.activeAssetIndex.set(props.index)
+    $ui.setActiveSampleIndex(props.index)
+    $ui.setActiveSampleId(props.id)
+    $ui.isPlayingSound.set(true)
+    // Simulate audio completion after duration
+    const duration = sample.duration * 1000 // Convert to milliseconds
+    setTimeout(() => {
+      $ui.isPlayingSound.set(false)
+    }, duration || 3000) // Default to 3 seconds
   }
-
-  // TODO: On play click
-  // TODO: play/pause icon based on $ui.isPlayingSound.use()
-  // TODO: show 2 tags from each category.
-  // TODO: truncate tags.
-  // TODO: hover to show all tags.
-
-  const beingAddedClassName = isBeingAddedToCollection ? 'sampleBeingAdded' : ''
-  const className = clsx('AssetRow', isActive && 'activeRow', beingAddedClassName)
 
   return (
     <motion.div
       initial={{ opacity: 0, translateX: -5, translateY: -5 }}
       animate={{ opacity: 1, translateX: 0, translateY: 0 }}
-      transition={{ duration: 0.5, delay: props.index * 0.1 }}
+      transition={{ duration: 0.5, delay: props.index * 0.05 }} // Reduced delay for better performance
     >
       <Card.Root
+        data-sampleid={props.id}
         className={className}
         size="sm"
         borderRadius="lg"
@@ -108,7 +136,7 @@ export const AssetRow = (props: AssetRowPropsT) => {
         _before={beforeStyles}
         onMouseUp={activateAssetRow}
       >
-        <Card.Body zIndex={1} position="relative" bgGradient={bgGradient} padding={bodyPadding} className="AssetRowBody">
+        <Card.Body zIndex={1} position="relative" bgGradient={bgGradient} className="AssetRowBody">
           <Flex align="center" gap="4">
             <LeftColumn {...sample} isActive={isActive} />
             <MiddleColumn {...sample} isActive={isActive} />
@@ -138,10 +166,6 @@ const MiddleColumn = (props) => {
   )
 }
 
-import { Clipboard } from '@chakra-ui/react'
-import { $search } from '#/stores/search.store'
-import React from 'react'
-
 const RightColumn = (props) => {
   const onClick = (event) => {
     event.stopPropagation()
@@ -150,7 +174,6 @@ const RightColumn = (props) => {
   return (
     <Flex gap="2" align="flex-end" ml="2">
       <AssetLikeToggler {...props} />
-
       <AddToCollectionButton {...props} />
 
       <Clipboard.Root value="TODO" onMouseUp={onClick}>
@@ -160,7 +183,7 @@ const RightColumn = (props) => {
           </IconButton>
         </Clipboard.Trigger>
       </Clipboard.Root>
-      <AssetRowOptionsMenu />
+      <AssetRowOptionsMenu {...props} />
     </Flex>
   )
 }
@@ -169,7 +192,6 @@ const useIsAddingSampleToCollection = (id) => {
   const isAddingToCollection = $ui.isAddingToCollection.use()
   const addingSampleId = $ui.collectionAdditionSampleId.use()
   const isThisAssetBeingAdded = isAddingToCollection && addingSampleId === id
-  // console.log({ isAddingToCollection, addingSampleId, isThisAssetBeingAdded })
   return isThisAssetBeingAdded
 }
 
@@ -177,18 +199,11 @@ const AddToCollectionButton = (props) => {
   const isBeingAddedToCollection = useIsAddingSampleToCollection(props.id)
   const color = isBeingAddedToCollection ? 'orange.400' : 'gray.400'
   const iconName = isBeingAddedToCollection ? 'raphael:no' : 'si:add-square-line'
-  if (isBeingAddedToCollection) console.log('AND NOW ITS BEING ADDED', props.id)
-  // const iconName = isAddingAssetToCollection ? 'bxs:heart' : 'bx:heart'
-  // const color = isAddingAssetToCollection ? '#ec4899' : '#71717a'
-  // const scale = isAddingAssetToCollection ? 1.25 : 1.1
-  // const style = { scale }
 
   const handleClick = (event) => {
     event.stopPropagation()
-    console.log('clicked to add to collection', props.id)
     if (isBeingAddedToCollection) console.log('is already being added...')
     if (isBeingAddedToCollection) return $ui.turnAddToCollectionModeOff()
-    console.log('turning on add to collection', props.id)
     $ui.turnAddToCollectionModeOn(props.id)
   }
 

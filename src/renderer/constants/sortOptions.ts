@@ -1,8 +1,7 @@
 export const SORT_BY_OPTIONS = [
-  { label: 'Date Added', value: 'date' },
-  { label: 'Length', value: 'length' },
-  { label: 'Name', value: 'name' },
-  { label: 'Random', value: 'random' }
+  { label: 'Date Added', value: 'dateAdded' },
+  { label: 'Length', value: 'duration' },
+  { label: 'Name', value: 'name' }
 ]
 
 export const SORT_ORDER_OPTIONS = [

@@ -52,11 +52,18 @@ class SearchStore {
   usePaginationItemsPerPage = () => this.usePaginationValue('itemsPerPage')
 
   searchSamples = async () => {
-    // console.log('searching samples', this.filters.state)
+    const filters = this.filters.state
+    const results = await window.electron.searchSamples(filters)
+    $ui.setActiveSampleIndex(-1)
+    $ui.setActiveSampleId('')
+    this.results.set({ all: results })
+    this.update()
+  }
+
+  softSearchSamples = async () => {
     const filters = this.filters.state
     const results = await window.electron.searchSamples(filters)
     this.results.set({ all: results })
-    // console.log('search results', results)
     this.update()
   }
 
@@ -179,12 +186,14 @@ class SearchStore {
 
   setSortBy = (value) => {
     this.filters.set({ sortBy: value })
+    this.searchSamples()
   }
 
   setSortOrder = (value) => {
     this.filters.set({ sortOrder: value })
+    this.searchSamples()
   }
 }
 
 export const $search = new SearchStore()
-makeGlobal('search', $search)
+globalThis.search = $search

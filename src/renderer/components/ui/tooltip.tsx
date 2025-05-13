@@ -17,7 +17,7 @@ export type TooltipProps = ChakraTooltip.RootProps & {
 export const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(function Tooltip(props, ref) {
   const { showArrow, children, disabled, portalled = true, content, contentProps, portalRef, isOpen, ...rest } = props
   if (disabled) return children
-  console.log('RENDERING TIP ', props)
+
   return (
     <ChakraTooltip.Root {...rest} open={isOpen}>
       <ChakraTooltip.Trigger asChild>{children}</ChakraTooltip.Trigger>

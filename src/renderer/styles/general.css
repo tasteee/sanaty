@@ -7,3 +7,19 @@
   top: 1px !important;
   position: relative;
 }
+
+.AppFrame.isCompactView .AssetRowBody {
+  padding: 0 !important;
+}
+
+.AppFrame.isCompactView .TagCloudTag {
+  scale: 0.95 !important;
+}
+
+.AppFrame.isCompactView .ActiveTagFilter {
+  scale: 0.95 !important;
+}
+
+.SampleResultsList p {
+  user-select: none;
+}

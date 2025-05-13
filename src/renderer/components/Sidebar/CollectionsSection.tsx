@@ -1,6 +1,6 @@
 import './CollectionsSection.css'
 import { MenuItem } from './MenuItem'
-import { Button, CuteIcon, Flex, Heading, Text } from '#/components'
+import { Button, CuteIcon, Em, Flex, Heading, Text } from '#/components'
 import { $collections } from '#/stores/collections.store'
 import { useLocation } from 'wouter'
 import { $ui } from '#/stores/ui.store'
@@ -28,7 +28,10 @@ export const CollectionsSection = () => {
     <Flex className="SideBarCollectionsSection" direction="column" minHeight="0" overflow="hidden" flex="1">
       <Flex gap="3" direction="column">
         <Heading size="xl" className="collectionsSectionHeader">
-          Collections ({collectionsCount})
+          Collections
+          <Em ml="2" fontWeight="normal" textStyle="md" className="emphasizedSubtext">
+            ({collectionsCount})
+          </Em>
         </Heading>
         <Flex className="collectionsBox" direction="column" gap="2" overflowY="scroll" pr="0" height="670px">
           <AddCollectionMenuItem />

@@ -36,13 +36,11 @@ export const EditCollectionDialog = (props) => {
   }
 
   const handleSave = async () => {
-    const { error } = await $collections.update(props.collectionId, {
+    const error = await $collections.update(props.collectionId, {
       name,
       description,
       artworkPath: imageSrc
     })
-
-    // TODO: Handle error???
 
     if (error) {
       toaster.create({

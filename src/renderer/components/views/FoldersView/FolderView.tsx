@@ -10,21 +10,8 @@ import { SampleResultsList } from '../SamplesResultsView/AssetResultsList/AssetR
 import { TagCloudHeader } from '../SamplesResultsView/SearchFilterSection/TagCloudHeader'
 
 export const FolderView = () => {
-  const routeEntityType = $ui.routeEntityType.use()
   const routeEntityId = $ui.routeEntityId.use()
   const folder = $folders.useFolder(routeEntityId)
-
-  React.useEffect(() => {
-    if (routeEntityType !== 'folder') return
-    if (!routeEntityId) return
-    $search.filters.set.reset()
-    $search.results.set.reset()
-    $search.pagination.set.reset()
-    $search.filters.set({ folderId: routeEntityId })
-    $search.searchSamples()
-  }, [routeEntityType, routeEntityId])
-
-  console.log('>>>', folder)
   if (!folder) return
 
   return (
@@ -38,7 +25,7 @@ export const FolderView = () => {
           sampleCount={folder.sampleCount}
         />
         <TagCloudHeader />
-        <SampleResultsList />
+        <SampleResultsList key={routeEntityId} />
       </ViewBox>
       <FilterBar />
     </>

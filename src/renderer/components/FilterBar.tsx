@@ -6,10 +6,11 @@ import { DurationRangeController } from './views/SamplesResultsView/SearchFilter
 import { KeySelector } from './views/SamplesResultsView/SearchFilterSection/KeySelector'
 import { SampleTypeController } from './views/SamplesResultsView/SearchFilterSection/SampleTypeController'
 import { ScaleSelector } from './views/SamplesResultsView/SearchFilterSection/ScaleSelector'
-import { LikedFilterSwitch } from './views/SamplesResultsView/SearchFilterSection/SearchFilterSection'
 import { SearchInput } from './views/SamplesResultsView/SearchFilterSection/SearchInput'
 import { $search } from '#/stores/search.store'
 import { Switch } from '@chakra-ui/react'
+import React from 'react'
+import { $ui } from '#/stores/ui.store'
 
 const SearchButton = () => {
   return (

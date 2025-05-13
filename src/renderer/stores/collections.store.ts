@@ -7,6 +7,7 @@ class CollectionsStore {
 
   load = async () => {
     const allCollections = await window.electron.getAllCollections()
+    console.log({ allCollections })
     this.store.set(allCollections)
   }
 
@@ -27,7 +28,7 @@ class CollectionsStore {
     if (error) return error
     console.log('updateCollection success', result)
     await this.load()
-    return result
+    return null
   }
 
   addSampleToCollection = async (id, sampleId) => {
