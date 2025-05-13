@@ -15,7 +15,7 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 import { FaPlay, FaPause, FaStepForward, FaStepBackward, FaVolumeUp, FaVolumeMute } from 'react-icons/fa'
-import { $samplesViewStore } from '../samplesView.store'
+import { $ui } from '#/stores/ui.store'
 
 // Custom hook for handling audio playback
 const useAudioPlayer = (sample: SampleT | null) => {
@@ -109,9 +109,9 @@ const useActiveSampleId = () => {
 }
 
 export const PlaybackBar = () => {
-  const activeSample = $samplesViewStore.activeSample.use()
-  const player = useAudioPlayer(activeSample)
-  if (!activeSample) return
+  const activeSampleId = $ui.activeSampleId.use()
+  const player = useAudioPlayer(activeSampleId)
+  if (!activeSampleId) return
 
   return (
     <Card className="PlaybackBar" width="full">
@@ -120,34 +120,26 @@ export const PlaybackBar = () => {
           {/* Sample info and artwork */}
           <Flex gap="4" flex="1" align="center">
             <Box minWidth="64px" height="64px" borderRadius="md" overflow="hidden" bg="gray.200">
-              {activeSample.artworkUrl ? (
-                <Image src={activeSample.artworkUrl} alt={activeSample.name} objectFit="cover" width="64px" height="64px" />
+              {activeSampleId.artworkUrl ? (
+                <Image src={activeSampleId.artworkUrl} alt={activeSampleId.name} objectFit="cover" width="64px" height="64px" />
               ) : (
-                <Box
-                  width="64px"
-                  height="64px"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  bg="gray.300"
-                  color="gray.600"
-                >
-                  {activeSample.fileExtension.toUpperCase()}
+                <Box width="64px" height="64px" display="flex" alignItems="center" justifyContent="center" bg="gray.300" color="gray.600">
+                  {activeSampleId.fileExtension.toUpperCase()}
                 </Box>
               )}
             </Box>
 
             <Flex gap="1" direction="column" overflow="hidden">
               <Text fontWeight="bold" noOfLines={1}>
-                {activeSample.name}
+                {activeSampleId.name}
               </Text>
 
               <Flex gap="2">
                 <Badge colorScheme="purple" borderRadius="full" px="2" fontSize="xs">
-                  {activeSample.bpm} BPM
+                  {activeSampleId.bpm} BPM
                 </Badge>
                 <Badge colorScheme="green" borderRadius="full" px="2" fontSize="xs">
-                  {activeSample.key} {activeSample.scale}
+                  {activeSampleId.key} {activeSampleId.scale}
                 </Badge>
               </Flex>
             </Flex>
@@ -191,7 +183,7 @@ export const PlaybackBar = () => {
               <Slider
                 aria-label="Playback progress"
                 min={0}
-                max={activeSample.duration}
+                max={activeSampleId.duration}
                 value={player.currentTime}
                 onChange={player.seekTo}
                 focusThumbOnChange={false}
@@ -204,7 +196,7 @@ export const PlaybackBar = () => {
               </Slider>
 
               <Text fontSize="xs" minWidth="40px">
-                {formatTime(activeSample.duration)}
+                {formatTime(activeSampleId.duration)}
               </Text>
             </Flex>
           </Flex>

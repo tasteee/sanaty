@@ -1,28 +1,32 @@
 import { createCollectionDialog } from './Sidebar/CreateCollectionDialog'
 import { editCollectionDialog } from './Sidebar/EditCollectionDialog'
 
-export const dialogs = {
-  editCollection: {
-    open: (collectionId) => {
-      const id = crypto.randomUUID()
-      const handleClose = () => dialogs.editCollection.close(id)
-      editCollectionDialog.open(id, { collectionId, handleClose })
-    },
+const createDialog = (target) => {
+  let uuid = crypto.randomUUID()
 
-    close: (id) => {
-      editCollectionDialog.close(id)
-    }
-  },
-
-  createCollection: {
-    open: () => {
-      const id = crypto.randomUUID()
-      const handleClose = () => createCollectionDialog.close(id)
-      createCollectionDialog.open(id, { handleClose })
-    },
-
-    close: (id) => createCollectionDialog.close(id)
+  function close() {
+    target.close(uuid)
   }
+
+  function open(props = {} as any) {
+    const handleClose = () => {
+      props.onClose?.()
+      close()
+    }
+
+    target.open(uuid, { ...props, handleClose })
+    return handleClose
+  }
+
+  return {
+    open,
+    close
+  }
+}
+
+export const dialogs = {
+  editCollection: createDialog(editCollectionDialog),
+  createCollection: createDialog(createCollectionDialog)
 }
 
 globalThis.dialogs = dialogs

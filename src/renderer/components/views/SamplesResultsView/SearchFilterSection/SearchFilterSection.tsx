@@ -1,24 +1,23 @@
 import './SearchFilterSection.css'
+import React from 'react'
 import { CuteIcon, Tag, Tabs, Card, Wrap, SegmentGroup, Flex, CloseButton, IconButton, Text, Button } from '#/components'
 import { KeySelector } from './KeySelector'
 import { ScaleSelector } from './ScaleSelector'
 import { BpmRangeController } from './BpmRangeController'
 import { SearchInput } from './SearchInput'
 import { SampleTypeController } from './SampleTypeController'
-import { $samplesViewStore } from '../samplesView.store'
 import { TAGS } from '#/constants'
 import { ActiveTagFilter, TagCloudTag } from './TagCloudTag'
-import React from 'react'
-import { useBreakpoints, useElementSize } from '@siberiacancode/reactuse'
+import { useBreakpoints } from '@siberiacancode/reactuse'
 import { DurationRangeController } from './DurationRangeController'
-import { $collections } from '#/stores/collections'
-import { $folders } from '#/stores/folders'
+import { $ui } from '#/stores/ui.store'
+import { $search } from '#/stores/search.store'
 
 const SearchButton = () => {
   const style = {}
 
   return (
-    <Button colorPalette="pink" size="xs" variant="solid" style={style} onClick={$samplesViewStore.submitSearch}>
+    <Button colorPalette="pink" size="xs" variant="solid" style={style} onClick={$search.searchSamples}>
       Search
     </Button>
   )
@@ -152,7 +151,7 @@ export const SearchFilterSection = () => {
 }
 
 export const LikedFilterSwitch = (props) => {
-  const isActive = $samplesViewStore.filters.use((state) => state.isLiked)
+  const isActive = $search.filters.use((state) => state.isLiked)
   const iconName = isActive ? 'bxs:heart' : 'bx:heart'
   const color = isActive ? '#ec4899' : '#71717a'
   const colorPalette = isActive ? 'pink' : 'gray'
@@ -162,7 +161,7 @@ export const LikedFilterSwitch = (props) => {
 
   const handleClick = (event) => {
     event.stopPropagation()
-    $samplesViewStore.filters.set({ isLiked: !isActive })
+    $search.filters.set({ isLiked: !isActive })
   }
 
   return (
@@ -176,23 +175,16 @@ const DISPLAY_NONE_STYLE = { display: 'none' }
 const EMPTY_STYLE = {}
 
 const TagFilterControl = () => {
-  const tagCategoryFilter = $samplesViewStore.activeTagCloudCategory.use()
-  const isTagCloudShown = $samplesViewStore.isTagCloudShown.use()
+  const tagCategoryFilter = $ui.activeTagCloudCategory.use()
+  const isTagCloudShown = $ui.isTagCloudOpen.use()
   const style = isTagCloudShown ? EMPTY_STYLE : DISPLAY_NONE_STYLE
 
   const onChange = (event) => {
-    $samplesViewStore.activeTagCloudCategory.set(event.value)
+    $ui.activeTagCloudCategory.set(event.value)
   }
 
   return (
-    <Tabs.Root
-      value={tagCategoryFilter}
-      variant="outline"
-      onValueChange={onChange}
-      orientation="vertical"
-      style={style}
-      mt="2"
-    >
+    <Tabs.Root value={tagCategoryFilter} variant="outline" onValueChange={onChange} orientation="vertical" style={style} mt="2">
       <Tabs.List>
         <Tabs.Trigger value="All">
           <CuteIcon name="earth-2" />
@@ -249,22 +241,17 @@ const TagsSection = () => {
 }
 
 const ActiveTagsSection = () => {
-  const isTagCloudShown = $samplesViewStore.isTagCloudShown.use()
-  const activeTags = $samplesViewStore.filters.use((state) => state.tags)
+  const isTagCloudShown = $ui.isTagCloudOpen.use()
+  const activeTags = $search.filters.use((state) => state.tags)
   const arrowIconName = isTagCloudShown ? 'down-small' : 'right-small'
 
   return (
     <Wrap gap="2" mt="2">
-      <IconButton
-        size="2xs"
-        variant="subtle"
-        className="expanderIconButton"
-        onClick={$samplesViewStore.toggleTagCloudVisibility}
-      >
-        <CuteIcon name={arrowIconName} size={48} className="expanderCaret" />
+      <IconButton size="2xs" variant="subtle" className="expanderIconButton" onClick={() => $ui.isTagCloudOpen.set.toggle()}>
+        <CuteIcon name={arrowIconName} size="md" className="expanderCaret" />
       </IconButton>
 
-      {!!activeTags.length && <CloseButton size="2xs" variant="subtle" onClick={$samplesViewStore.clearTags} />}
+      {!!activeTags.length && <CloseButton size="2xs" variant="subtle" onClick={$search.clearTags} />}
       {!activeTags.length && <NoTagsSelectedText />}
 
       {activeTags.map((tag) => (

@@ -1,5 +1,3 @@
-import { useRoute } from 'wouter'
-import { $samplesViewStore } from './samplesView.store'
 import { SampleResultsList } from '#/components/views/SamplesResultsView/AssetResultsList/AssetResultsList'
 import { SearchFilterSection } from '#/components/views/SamplesResultsView/SearchFilterSection'
 import { ViewBox } from '#/components/ui/ViewBox'

@@ -1,52 +1,29 @@
-import React from 'react'
 import { Paginator } from './Paginator'
 import { Box, Flex, Portal, IconButton, Text, Tag, Menu, CuteIcon, Popover } from '#/components'
 import { Card } from '#/components'
-import { useActiveElement } from '@siberiacancode/reactuse'
 import { SortOptionsRow } from '../SearchFilterSection/SortOptionsRow'
 import { AssetRowOptionsMenu } from './AssetRowOptionsMenu'
 import { SanatyTag } from '../../../ui/SanatyTag'
 import capitalize from 'capitalize'
-
-import { useUnmount } from '@siberiacancode/reactuse'
 import { AssetTagsOverview } from '../../../AssetTagsOverview'
-import { $samplesViewStore } from '../samplesView.store'
-import { $main } from '#/stores/main'
-import { $folders } from '#/stores/folders'
-import { $likes } from '#/stores/likes'
+import { $ui } from '#/stores/ui.store'
+import { $likes } from '#/stores/likes.store'
 import clsx from 'clsx'
 
-const handleArrowKeys = (event: KeyboardEvent) => {
-  const isPrevious = event.code === 'KeyQ'
-  const isNext = event.code === 'KeyW'
-
-  const previousIndex = $samplesViewStore.activeAssetIndex.state - 1
-  const nextIndex = $samplesViewStore.activeAssetIndex.state + 1
-
-  const maxIndex = $samplesViewStore.results.state.length - 1
-  const minIndex = 0
-
-  const finalPreviousIndex = Math.max(minIndex, previousIndex)
-  const finalNextIndex = Math.min(maxIndex, nextIndex)
-
-  if (isPrevious) $samplesViewStore.activeAssetIndex.set(finalPreviousIndex)
-  if (isNext) $samplesViewStore.activeAssetIndex.set(finalNextIndex)
-}
-
 export const SampleResultsList = () => {
-  const sampleResults = $samplesViewStore.currentPageResults.use()
+  const pageResults = $search.usePageResults()
 
   return (
     <Flex direction="column" flex="1" overflow="hidden" pb="24px" tabIndex="0" gap="1">
       <SortOptionsRow />
 
       <Flex className="AssetResultsList customScrollbar" direction="column" gap="2" padding="2" overflowY="auto" flex="1">
-        {sampleResults.map((sample, index) => {
+        {pageResults.map((sample, index) => {
           return <AssetRow key={sample._id} id={sample._id} index={index} />
         })}
       </Flex>
 
-      {sampleResults.length > 0 && <Paginator />}
+      {pageResults.length > 0 && <Paginator />}
     </Flex>
   )
 }
@@ -73,8 +50,7 @@ const ACTIVE_BG_GRADIENT = 'linear-gradient(to right, #18181b, transparent)'
 
 const getKeyScale = (sample) => {
   if (!sample) {
-    const results = $samplesViewStore.results.state
-    const pageResults = $samplesViewStore.currentPageResults.state
+    const results = $search.results.state
     debugger
   }
 
@@ -84,7 +60,7 @@ const getKeyScale = (sample) => {
 }
 
 const useSampleData = (id) => {
-  const sampleResult = $samplesViewStore.useAssetResult(id)
+  const sampleResult = $search.useSampleResult(id)
   const keyScale = getKeyScale(sampleResult)
   const isLiked = $likes.useIsLiked(id)
   const { key, scale, ...otherData } = sampleResult
@@ -93,22 +69,21 @@ const useSampleData = (id) => {
 }
 
 export const AssetRow = (props: AssetRowPropsT) => {
-  const isActive = $samplesViewStore.useIsSampleActive(props.id)
+  const isActive = $search.useIsSampleActive(props.id)
   const sample = useSampleData(props.id)
   const beforeStyles = isActive ? activeStyles : {}
   const bgGradient = isActive ? ACTIVE_BG_GRADIENT : ''
-  const isCompactView = $main.isCompactViewEnabled.use()
+  const isCompactView = $ui.isCompactViewEnabled.use()
   const bodyPadding = isCompactView ? '0' : undefined
 
   const activateAssetRow = (event) => {
     const isInsideHoverCard = event.target.closest('.hoverCardContent') !== null
     if (isInsideHoverCard) return
-    $samplesViewStore.activeSample.set(sample)
-    $samplesViewStore.activeAssetIndex.set(props.index)
+    $ui.activeAssetIndex.set(props.index)
   }
 
   // TODO: On play click
-  // TODO: play/pause icon based on $main.isPlayingSound.use()
+  // TODO: play/pause icon based on $ui.isPlayingSound.use()
   // TODO: show 2 tags from each category.
   // TODO: truncate tags.
   // TODO: hover to show all tags.
@@ -155,7 +130,7 @@ const MiddleColumn = (props) => {
 }
 
 import { Clipboard } from '@chakra-ui/react'
-import { $collections } from '#/stores/collections'
+import { $search } from '#/stores/search.store'
 
 const RightColumn = (props) => {
   const onClick = (event) => {
@@ -179,8 +154,9 @@ const RightColumn = (props) => {
 }
 
 const AddToCollectionButton = (props) => {
-  const addToCollectionState = $samplesViewStore.addToCollectionStore.use()
-  const isThisAssetBeingAdded = addToCollectionState.sampleId === props.id
+  const isAddingToCollection = $ui.isAddingToCollection.use()
+  const addingSampleId = $ui.collectionAdditionSampleId.use()
+  const isThisAssetBeingAdded = isAddingToCollection && addingSampleId === props.id
   const color = isThisAssetBeingAdded ? 'blue.500' : 'gray.400'
   // const iconName = isAddingAssetToCollection ? 'bxs:heart' : 'bx:heart'
   // const color = isAddingAssetToCollection ? '#ec4899' : '#71717a'
@@ -189,7 +165,7 @@ const AddToCollectionButton = (props) => {
 
   const handleClick = (event) => {
     event.stopPropagation()
-    $samplesViewStore.toggleAddToCollectionMode(props.id)
+    $ui.turnAddToCollectionModeOn(props.id)
   }
 
   return (
@@ -207,7 +183,7 @@ const AssetLikeToggler = (props) => {
 
   const handleClick = (event) => {
     event.stopPropagation()
-    $likes.toggleLike(props.id)
+    $likes.toggle(props.id)
   }
 
   return (
@@ -218,8 +194,8 @@ const AssetLikeToggler = (props) => {
 }
 
 const LeftColumn = (props) => {
-  const artworkUrl = $folders.getFolderArtwork(props.folderId)
-  const isSoundPlaying = $samplesViewStore.isPlayingSound.use()
+  const artworkUrl = 'https://placehold.co/400'
+  const isSoundPlaying = $ui.isPlayingSound.use()
   const isThisSamplePlaying = props.isActive && isSoundPlaying
   const iconName = isThisSamplePlaying ? 'pause' : 'play'
   const className = clsx('leftColumn')
@@ -271,7 +247,7 @@ const AssetDuration = (props) => {
 
 export const AssetRowTag = (props) => {
   const handleClick = () => {
-    $samplesViewStore.toggleFilterTag(props.id)
+    $search.toggleTag(props.id)
   }
 
   return (

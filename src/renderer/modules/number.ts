@@ -4,6 +4,7 @@ export const parseToNumber = (value: string | number) => {
 
 export const _number = (target: any) => {
   return {
-    parseToNumber: () => parseToNumber(target)
+    parseToNumber: () => parseToNumber(target),
+    clamp: (min, max) => Math.min(Math.max(target, min), max)
   }
 }

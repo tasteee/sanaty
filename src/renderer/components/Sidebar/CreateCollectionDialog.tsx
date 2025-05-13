@@ -12,11 +12,10 @@ import {
   FileUpload,
   createOverlay
 } from '@chakra-ui/react'
-import { Image } from '@chakra-ui/react'
 import { HiUpload } from 'react-icons/hi'
 import { useState } from 'react'
 import { toaster } from '#/components/ui/toaster'
-import { $collections } from '#/stores/collections'
+import { $collections } from '#/stores/collections.store'
 import { CuteIcon } from '../ui/CuteIcon'
 
 export const CreateCollectionDialog = (props) => {
@@ -40,6 +39,7 @@ export const CreateCollectionDialog = (props) => {
       const reader = new FileReader()
 
       reader.onloadend = () => {
+        // @ts-ignore
         setImageBase64(reader.result)
       }
 
@@ -49,7 +49,7 @@ export const CreateCollectionDialog = (props) => {
   }
 
   const handleCreate = async () => {
-    const collection = await $collections.createCollection({
+    const collection = await $collections.create({
       name,
       description,
       artworkPath: imageSrc
@@ -130,11 +130,7 @@ export const CreateCollectionDialog = (props) => {
                 </Field.Root>
                 <Field.Root>
                   <Field.Label>Description</Field.Label>
-                  <Textarea
-                    placeholder="Describe your collection"
-                    value={description}
-                    onChange={(e) => setDesc(e.target.value)}
-                  />
+                  <Textarea placeholder="Describe your collection" value={description} onChange={(e) => setDesc(e.target.value)} />
                 </Field.Root>
               </Flex>
             </Dialog.Body>

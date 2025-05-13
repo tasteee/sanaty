@@ -1,24 +1,16 @@
 import './index.css'
-import { Redirect, Route, Switch, useLocation, useParams, useSearch } from 'wouter'
+import '#/modules/_global'
+import React from 'react'
 import { Sidebar } from '#/components/Sidebar'
 import { Provider, Flex, Toaster, VStack, Spinner, Text } from '#/components'
-import { SearchFilterSection } from '#/components/views/SamplesResultsView/SearchFilterSection'
-import { SampleResultsList } from './components/views/SamplesResultsView/AssetResultsList/AssetResultsList'
-import { $folders } from './stores/folders'
+import { $folders } from './stores/folders.store'
 import { NoFoldersView } from './components/NoFoldersView'
-import { ViewBox } from './components/ui/ViewBox'
-import React from 'react'
-import { $main, $routing } from './stores/main'
-import { $collections } from './stores/collections'
-import { HomeView } from './components/views/HomeView/HomeView'
-import { PlaybackBar } from './components/views/SamplesResultsView/PlaybackBar/PlaybackBar'
-import { SamplesResultsView } from './components/views/SamplesResultsView/SamplesResultsView'
-import { $likes } from './stores/likes'
-import { CollectionView } from './components/views/CollectionsView/CollectionsView'
-import { FolderView } from './components/views/FoldersView/FolderView'
+import { $collections } from './stores/collections.store'
+import { $likes } from './stores/likes.store'
 import { editCollectionDialog } from './components/Sidebar/EditCollectionDialog'
 import { createCollectionDialog } from './components/Sidebar/CreateCollectionDialog'
 import { Router } from './Router'
+import { $ui } from './stores/ui.store'
 
 export function App() {
   return (
@@ -40,33 +32,32 @@ const Overlays = () => {
 }
 
 const setupAppData = () => {
-  ;(async () => {
-    await $folders.reloadFolders()
-    await $collections.reload()
-    await $likes.reload()
-    await $main.verifyFoldersAndSamples()
+  const a = $folders.load()
+  const b = $collections.load()
+  const c = $likes.load()
+
+  Promise.all([a, b, c]).then(() => {
     console.clear()
     console.log('[sanaty] setup done')
-    $main.isSetupDone.set(true)
-  })()
+    $ui.isSetupDone.set(true)
+  })
 }
 
 const AppFrame = () => {
+  React.useEffect(() => setupAppData(), [])
+
   const folders = $folders.list.use()
-  const isSetupDone = $main.isSetupDone.use()
-  React.useEffect(setupAppData, [])
+  const isSetupDone = $ui.isSetupDone.use()
   if (!isSetupDone) return <MainLoader />
   const content = !folders.length ? <NoFoldersView /> : <Router />
 
   return (
-    <AppDiv>
+    <Flex className="App" height="100vh" gap="4">
       <Sidebar />
       {content}
-    </AppDiv>
+    </Flex>
   )
 }
-
-const AppDiv = (props) => <Flex className="App" height="100vh" gap="4" {...props} />
 
 const MainLoader = () => {
   return (

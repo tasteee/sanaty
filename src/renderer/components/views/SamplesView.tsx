@@ -1,14 +1,23 @@
 import React from 'react'
-import { SamplesResultsView } from './SamplesResultsView/SamplesResultsView'
-import { $samplesViewStore } from './SamplesResultsView/samplesView.store'
+import { ViewBox } from '../ui/ViewBox'
+import { SampleResultsList } from './SamplesResultsView/AssetResultsList/AssetResultsList'
+import { SearchFilterSection } from './SamplesResultsView/SearchFilterSection'
+import { $search } from '#/stores/search.store'
 
 export const SamplesView = () => {
   React.useEffect(() => {
-    $samplesViewStore.filters.set.reset()
-    $samplesViewStore.results.set.reset()
-    $samplesViewStore.currentPageResults.set.reset()
-    $samplesViewStore.submitSearch()
-  }, [location])
+    console.log('SamplesView useEffect')
+    $search.filters.set.reset()
+    $search.results.set.reset()
+    $search.pagination.set.reset()
+    $search.searchSamples()
+    console.log('SamplesView useEffect done')
+  }, [])
 
-  return <SamplesResultsView />
+  return (
+    <ViewBox id="SamplesView" className="SamplesView">
+      <SearchFilterSection />
+      <SampleResultsList />
+    </ViewBox>
+  )
 }

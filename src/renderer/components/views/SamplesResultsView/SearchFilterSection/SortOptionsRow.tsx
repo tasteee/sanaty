@@ -1,18 +1,20 @@
-import { Flex, Text, Button } from '#/components'
+import { Flex, Text } from '#/components'
 import { SortOrderSelector } from './SortOrderSelector'
 import { SortBySelector } from './SortBySelector'
-import { $samplesViewStore } from '../samplesView.store'
 import { ItemsPerPageSelector } from './ItemsPerPageSelector'
+import { $ui } from '#/stores/ui.store'
+import { $search } from '#/stores/search.store'
 
 export const SortOptionsRow = () => {
-  const isTagCloudShown = $samplesViewStore.isTagCloudShown.use()
+  const isTagCloudShown = $ui.isTagCloudOpen.use()
   const toggleTagCloudText = isTagCloudShown ? 'Hide' : 'Show'
+  const toggleTagcloud = () => $ui.isTagCloudOpen.set.toggle()
 
   return (
     <Flex justify="space-between" align="center" padding="4px">
       <Flex gap="8" align="center">
         <SearchResultCount />
-        <Text color="gray.500" textStyle="sm" onClick={$samplesViewStore.toggleTagCloudVisibility} className="clickableText">
+        <Text color="gray.500" textStyle="sm" onClick={toggleTagcloud} className="clickableText">
           {toggleTagCloudText} tag cloud
         </Text>
       </Flex>
@@ -26,6 +28,6 @@ export const SortOptionsRow = () => {
 }
 
 const SearchResultCount = () => {
-  const assetCount = $samplesViewStore.results.use((list) => list.length)
-  return <Text color="gray.500">{assetCount} results</Text>
+  const sampleCount = $search.useResultCount()
+  return <Text color="gray.500">{sampleCount} results</Text>
 }

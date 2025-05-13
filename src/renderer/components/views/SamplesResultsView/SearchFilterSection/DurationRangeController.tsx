@@ -1,32 +1,32 @@
 import './DurationRangeController.css'
 import React from 'react'
 import { Flex, InputGroup, Input } from '#/components'
-import { $samplesViewStore } from '../samplesView.store'
+import { $search } from '#/stores/search.store'
 
 export const DurationRangeController = () => {
   const minDurationRef = React.useRef(null)
   const maxDurationRef = React.useRef(null)
-  const minDurationValue = $samplesViewStore.filters.use((state) => state.durationMin)
-  const maxDurationValue = $samplesViewStore.filters.use((state) => state.durationMax)
+  const minDurationValue = $search.filters.use((state) => state.durationMin)
+  const maxDurationValue = $search.filters.use((state) => state.durationMax)
 
   const onMinDurationBlur = () => {
-    $samplesViewStore.setMinDuration(minDurationValue)
+    $search.setMinDuration(minDurationValue)
   }
 
   const onMaxDurationBlur = () => {
-    $samplesViewStore.setMaxDuration(maxDurationValue)
+    $search.setMaxDuration(maxDurationValue)
   }
 
   const onMinDurationChange = (event) => {
     const numberValue = parseInt(event.target.value)
     const clampedValue = Math.max(numberValue, 0)
-    $samplesViewStore.filters.set({ durationMin: clampedValue })
+    $search.filters.set({ durationMin: clampedValue })
   }
 
   const onMaxDurationChange = (event) => {
     const numberValue = parseInt(event.target.value)
     const clampedValue = Math.min(numberValue, 300)
-    $samplesViewStore.filters.set({ durationMax: clampedValue })
+    $search.filters.set({ durationMax: clampedValue })
   }
 
   return (

@@ -1,46 +1,48 @@
-import { Card } from '@chakra-ui/react/card'
 import { SamplesResultsView } from '../SamplesResultsView/SamplesResultsView'
-import { Text } from '@chakra-ui/react/typography'
-import { $collections } from '#/stores/collections'
-import { Flex } from '@chakra-ui/react/flex'
-import { useLocation, useRoute } from 'wouter'
-import { Stat } from '@chakra-ui/react'
-import React from 'react'
-import { useMount, useUnmount } from '@siberiacancode/reactuse'
-import { Image } from '@chakra-ui/react/image'
-import { Box } from '@chakra-ui/react/box'
-import { CuteIcon } from '#/components/ui/CuteIcon'
-import { $samplesViewStore } from '../SamplesResultsView/samplesView.store'
+import { $collections } from '#/stores/collections.store'
 import { FocusedViewHeader } from '#/components/FocusedViewHeader'
+import { $search } from '#/stores/search.store'
+import React from 'react'
+import { useParams, useRoute, useLocation } from 'wouter'
 
-export const CollectionView = () => {
-  const route = useRoute('/collections/collection/:collectionId')
-  const params = route[1] as any
-  const collection = $collections.useCollection(params.collectionId)
-  const sampleCount = collection.sampleIds.length
-  const [location, setLocation] = useLocation()
+export const InnerCollectionView = (props) => {
+  const collection = $collections.useCollection(props.collectionId)
+  if (!collection) return <p>4040404</p>
 
-  React.useEffect(() => {
-    if (!collection._id) return
-    $samplesViewStore.filters.set.reset()
-    $samplesViewStore.results.set.reset()
-    $samplesViewStore.currentPageResults.set.reset()
-    $samplesViewStore.filters.set({ collectionId: collection._id })
-    $samplesViewStore.submitSearch()
-  }, [location])
-
-  if (!collection.id) setLocation('/')
+  console.log('CollectionView', { collection })
 
   return (
     <SamplesResultsView id="CollectionView">
       <FocusedViewHeader
-        key={collection._id}
+        id={collection._id}
         kind="Collection"
-        sampleCount={sampleCount}
         name={collection.name}
         description={collection.description}
-        id={collection._id}
+        sampleCount={collection.sampleCount}
       />
     </SamplesResultsView>
   )
+}
+
+export const CollectionView = () => {
+  const params = useParams()
+  const [isCollectionPath] = useRoute('/collections/*?')
+  const [isFolderPath] = useRoute('/folders/*?')
+  const idParam = params.id
+  const [location] = useLocation()
+
+  React.useEffect(() => {
+    console.log('Router', { params, location, idParam, isCollectionPath, isFolderPath })
+    if (!idParam) return
+    if (!isCollectionPath && !isFolderPath) return
+    console.log('using the effect...', { idParam, isCollectionPath, isFolderPath, idParam })
+    const key = isCollectionPath ? 'collectionId' : 'folderId'
+    $search.filters.set.reset()
+    $search.results.set.reset()
+    $search.pagination.set.reset()
+    $search.filters.set({ [key]: idParam })
+    $search.searchSamples()
+  }, [idParam, isCollectionPath, isFolderPath, location])
+
+  return <InnerCollectionView collectionId={idParam} />
 }

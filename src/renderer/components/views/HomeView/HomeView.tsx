@@ -1,10 +1,9 @@
-import { ViewBox } from '#/components/ui/ViewBox'
 import React from 'react'
+import { ViewBox } from '#/components/ui/ViewBox'
 import { Flex, Text, Card, Button, Image, HoverTip, Grid, CuteIcon, IconButton, Heading } from '#/components'
 import { useElementSize } from '@siberiacancode/reactuse'
-import { $folders } from '#/stores/folders'
+import { $folders } from '#/stores/folders.store'
 import { useBreakpoints } from '@siberiacancode/reactuse'
-import { useLocation } from 'wouter'
 import './HomeView.css'
 
 const COL_MAP = {
@@ -19,17 +18,6 @@ export const HomeView = () => {
   const breakpoints = useBreakpoints({ mobile: 0, tablet: 840, laptop: 1100, desktop: 1300 })
   const active = breakpoints.active()
   const templateColumns = `repeat(${COL_MAP[active]}, 1fr)`
-  const fileSystemErrors = $main.fileSystemErrors.use()
-
-  const checkFolderIssues = (folder) => {
-    const isMissing = fileSystemErrors.missingFolderIds.includes(folder._id)
-
-    const hasMissingSamples = fileSystemErrors.missingSamples.some((sample) => {
-      return sample.folderId === folder._id
-    })
-
-    return isMissing || hasMissingSamples
-  }
 
   return (
     <ViewBox id="HomeView">
@@ -40,7 +28,7 @@ export const HomeView = () => {
         </Flex>
         <Grid templateColumns={templateColumns} gap="6">
           {folders.map((folder) => (
-            <FolderCard key={folder._id} {...folder} hasIssues={checkFolderIssues(folder)} />
+            <FolderCard key={folder._id} {...folder} />
           ))}
 
           <AddFolderCard />
@@ -51,15 +39,15 @@ export const HomeView = () => {
 }
 
 import { EmptyState, VStack } from '@chakra-ui/react'
-import { $main } from '#/stores/main'
+import { navigateTo } from '#/modules/routing'
 
 const activeStyles = {
   content: '""',
   position: 'absolute',
   top: '-0px',
-  bottom: '-3px',
-  left: '-3px',
-  right: '-3px',
+  bottom: '-0px',
+  left: '-0px',
+  right: '-0px',
   bgGradient: `linear-gradient(to right, #2c0514, transparent)`,
   borderRadius: 'lg',
   zIndex: 0,
@@ -76,9 +64,8 @@ const AddFolderCard = () => {
       variant={{ base: 'plain', _hover: 'subtle' }}
       _hover={{ bg: ACTIVE_BG_GRADIENT }}
       style={{ cursor: 'pointer' }}
-      onClick={$folders.addFolder}
+      onClick={$folders.add}
       _before={activeStyles}
-      // style={{ background: 'none', border: '1px dashed #a1a1aa' }}
     >
       <Card.Body gap="2">
         <EmptyState.Root>
@@ -113,7 +100,7 @@ const FolderCard = (props) => {
         <Flex gap="2" direction="column">
           <Flex gap="2" align="center">
             <Text textStyle="lg">{props.name}</Text>
-            {props.hasIssues && <CuteIcon name="alert-octagon" size="md" color="red.500" />}
+            {false && <CuteIcon name="alert-octagon" size="md" color="red.500" />}
           </Flex>
           <FolderPathHoverTip content={props.path}>
             <Text textStyle="sm" color="gray.500" truncate maxW={value}>
@@ -147,7 +134,7 @@ const OpenFileExplorerIconButton = (props) => {
 }
 
 const RemoveFolderIconButton = (props) => {
-  const onClick = () => $folders.removeFolder(props.id)
+  const onClick = () => $folders.remove(props.id)
 
   return (
     <IconButton variant="ghost" colorPalette="red" onClick={onClick}>
@@ -157,7 +144,7 @@ const RemoveFolderIconButton = (props) => {
 }
 
 const RefreshFolderIconButton = (props) => {
-  const onClick = () => $folders.refreshFolder(props.id)
+  const onClick = () => $folders.refresh(props.id)
 
   return (
     <IconButton variant="ghost" onClick={onClick}>
@@ -167,8 +154,7 @@ const RefreshFolderIconButton = (props) => {
 }
 
 const BrowseFolderAssetsIconButton = (props) => {
-  const [, setLocation] = useLocation()
-  const onClick = () => setLocation('/folders/folder/' + props.id)
+  const onClick = () => navigateTo('/folders/folder/' + props.id)
   const style = { position: 'relative', top: 2 }
 
   return (

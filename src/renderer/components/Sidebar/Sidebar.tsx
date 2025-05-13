@@ -4,17 +4,17 @@ import { Card, Heading, Separator, HStack, Text, Flex, Circle, CuteIcon, Progres
 import { MenuItem } from './MenuItem'
 import { CollectionsSection } from './CollectionsSection'
 import { Button, Menu, Portal } from '#/components'
-import { $main } from '#/stores/main'
-import { $folders } from '#/stores/folders'
+import { $ui } from '#/stores/ui.store'
+import { $folders } from '#/stores/folders.store'
 
 const handleAction = (event) => {
-  if (event.value === 'addFolder') return $folders.addFolder()
+  if (event.value === 'addFolder') return $folders.add()
   if (event.value === 'settings') return console.log('TODO: Settings Modal')
   if (event.value === 'support') return console.log('TODO: support Modal')
 }
 
 const SettingsMenu = () => {
-  const isIndexingFolder = $main.isIndexingFolder.use()
+  const isIndexingFolder = $ui.isIndexingFolder.use()
 
   return (
     <Menu.Root onSelect={handleAction}>
@@ -64,7 +64,7 @@ export const Sidebar = () => {
 }
 
 const LogoSection = () => {
-  const isCompactView = $main.isCompactViewEnabled.use()
+  const isCompactView = $ui.isCompactViewEnabled.use()
   const sizeIconName = isCompactView ? 'clarity:resize-up-line' : 'clarity:resize-down-line'
 
   return (
@@ -82,7 +82,7 @@ const LogoSection = () => {
       </Flex>
       {/* <SettingsMenu /> */}
       <Flex gap="1">
-        <IconButton variant="ghost" onClick={() => $main.isCompactViewEnabled.set.toggle()}>
+        <IconButton variant="ghost" onClick={() => $ui.isCompactViewEnabled.set.toggle()}>
           <CuteIcon customIcon={sizeIconName} />
         </IconButton>
         <IconButton variant="ghost" onClick={() => window.location.reload()}>
