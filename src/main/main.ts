@@ -5,6 +5,7 @@ import { autoUpdater } from 'electron-updater'
 import MenuBuilder from './menu'
 import { resolveHtmlPath } from './util'
 import { setupIpcHandlers } from './handlers'
+import { initDatabase } from './database'
 
 // App state
 let mainWindow: BrowserWindow | null = null
@@ -28,6 +29,8 @@ const getAssetPath = (...paths: string[]): string => {
 
 // Create main browser window
 const createWindow = async () => {
+  await initDatabase()
+
   const nearPreloadPath = path.join(__dirname, 'preload.js')
   const erbPreloadPath = path.join(__dirname, '../../.erb/dll/preload.js')
   const preload = app.isPackaged ? nearPreloadPath : erbPreloadPath

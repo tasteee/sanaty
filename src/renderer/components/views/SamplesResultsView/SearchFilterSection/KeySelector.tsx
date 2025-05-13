@@ -1,14 +1,26 @@
 import { createListCollection } from '#/components'
-import { KEYS } from '#/constants/keys'
+import { TONICS } from '#/constants/keys'
 import { SelectInput } from '#/components/ui/SelectInput'
 import { $search } from '#/stores/search.store'
+import './KeySelector.css'
 
-const keysCollection = createListCollection({
-  items: KEYS
+const tonicsCollection = createListCollection({
+  items: TONICS
 })
 
 export const KeySelector = () => {
-  const key = $search.filters.use((state) => state.key)
-  const setKey = (_, value: string) => $search.filters.set({ key: value })
-  return <SelectInput placeholder="Key" value={key} onChange={setKey} collection={keysCollection} width="100px" />
+  const tonic = $search.filters.use((state) => state.tonic)
+  const setTonic = (_, value: string) => $search.filters.set({ tonic: value })
+
+  return (
+    <SelectInput
+      size="md"
+      className="KeySelector"
+      placeholder="Tonic"
+      value={tonic}
+      onChange={setTonic}
+      collection={tonicsCollection}
+      width="100%"
+    />
+  )
 }

@@ -12,7 +12,7 @@ export const Paginator = () => {
   }
 
   return (
-    <Pagination.Root count={itemsCount} pageSize={itemsPerPage} page={currentPage} onPageChange={onPageChange}>
+    <Pagination.Root className="Paginator" count={itemsCount} pageSize={itemsPerPage} page={currentPage} onPageChange={onPageChange}>
       <ButtonGroup variant="ghost" size="sm">
         <Pagination.PrevTrigger asChild>
           <IconButton>

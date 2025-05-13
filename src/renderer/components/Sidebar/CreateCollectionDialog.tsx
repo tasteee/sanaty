@@ -28,7 +28,7 @@ export const CreateCollectionDialog = (props) => {
 
   const close = () => {
     setIsOpen(false)
-    props.handleClose()
+    props.handleClose?.()
   }
 
   const handleFileChange = (event) => {
@@ -153,5 +153,3 @@ export const CreateCollectionDialog = (props) => {
     </Dialog.Root>
   )
 }
-
-export const createCollectionDialog = createOverlay(CreateCollectionDialog)

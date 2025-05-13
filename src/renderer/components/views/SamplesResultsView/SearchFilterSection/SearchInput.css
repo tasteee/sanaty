@@ -1,5 +1,15 @@
 .SearchInput input {
-  padding-left: 36px !important;
+  padding-left: 40px !important;
+  /* background: #e4e4e7;
+  color: #18181b; */
+}
+
+.SearchInput input::placeholder {
+  /* color: #71717a; */
+}
+
+.SearchInput input:focus::placeholder {
+  /* color: #a1a1aa; */
 }
 
 .SearchInput {
@@ -12,5 +22,5 @@
 }
 
 .chakra-group.SearchInput > div:first-of-type {
-  padding-left: 6px !important;
+  padding-left: 12px !important;
 }

@@ -18,9 +18,9 @@ const getCategorizedTags = (tags: string[]) => {
 
 const getLimitedCategorizedTags = (tags: string[], limit: number) => {
   const categorizedTags = getCategorizedTags(tags)
-  const genre = categorizedTags.genre.slice(0, 2)
-  const instrument = categorizedTags.instrument.slice(0, 2)
-  const descriptor = categorizedTags.descriptor.slice(0, 2)
+  const genre = categorizedTags.genre.slice(0, 1)
+  const instrument = categorizedTags.instrument.slice(0, 1)
+  const descriptor = categorizedTags.descriptor.slice(0, 1)
   return [...genre, ...instrument, ...descriptor]
 }
 
@@ -30,16 +30,16 @@ export const AssetTagsOverview = React.memo((props: PropsT) => {
   const handleOpenChange = (event) => toggleOpen(event.open)
 
   const fullTagsList = React.useMemo(() => {
-    return <AssetTagsFullList tags={props.tags} />
+    return <AssetTagsFullList overviewTags={overviewTags} tags={props.tags} />
   }, [])
 
   return (
     <Flex width="100%" truncate className="AssetTagsOverview">
-      <HoverCard.Root positioning={PLACEMENTS.BOTTOM_END} openDelay={500} onOpenChange={handleOpenChange}>
+      <HoverCard.Root positioning={PLACEMENTS.BOTTOM_START} openDelay={500} onOpenChange={handleOpenChange}>
         <HoverCard.Trigger asChild>
           <Flex truncate width="100%" gap="2">
             {overviewTags.map((tag: TagT) => (
-              <SanatyTag size="sm" id={tag.id} label={tag.label} category={tag.category} className="AssetTagsOverviewTag" />
+              <SanatyTag key={tag.id} size="sm" id={tag.id} label={tag.label} category={tag.category} className="AssetTagsOverviewTag" />
             ))}
           </Flex>
         </HoverCard.Trigger>
@@ -60,9 +60,11 @@ const AssetTagsFullList = (props) => {
 
   return (
     <Wrap gap="2">
-      {allTags.map((tag: TagT) => (
-        <SanatyTag size="sm" id={tag.id} label={tag.label} category={tag.category} className="AssetTagsOverviewTag" />
-      ))}
+      {allTags.map((tag: TagT) => {
+        if (props.overviewTags.includes(tag)) return null
+
+        return <SanatyTag key={tag.id} size="sm" id={tag.id} label={tag.label} category={tag.category} className="AssetTagsOverviewTag" />
+      })}
     </Wrap>
   )
 }

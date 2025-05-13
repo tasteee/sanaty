@@ -1,0 +1,10 @@
+.FilterBar {
+  width: 235px;
+  min-width: 235px;
+  height: 98%;
+  z-index: 20;
+  overflow: auto;
+}
+
+.FilterBarBody {
+}

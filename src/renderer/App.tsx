@@ -1,50 +1,49 @@
 import './index.css'
+import './styles/general.css'
 import '#/modules/_global'
-import React from 'react'
 import { Sidebar } from '#/components/Sidebar'
 import { Provider, Flex, Toaster, VStack, Spinner, Text } from '#/components'
 import { $folders } from './stores/folders.store'
 import { NoFoldersView } from './components/NoFoldersView'
-import { $collections } from './stores/collections.store'
-import { $likes } from './stores/likes.store'
-import { editCollectionDialog } from './components/Sidebar/EditCollectionDialog'
-import { createCollectionDialog } from './components/Sidebar/CreateCollectionDialog'
+import { EditCollectionDialog } from './components/Sidebar/EditCollectionDialog'
+import { CreateCollectionDialog } from './components/Sidebar/CreateCollectionDialog'
 import { Router } from './Router'
 import { $ui } from './stores/ui.store'
+import { useRoutingSync } from './modules/useRoutingSync'
+import { useMount } from '@siberiacancode/reactuse'
+import { setupAppData } from './modules/appSetup'
+import { LoadingOverlay } from './components/LoadingOverlay'
+import { FilterBar } from './components/FilterBar'
+import clsx from 'clsx'
 
 export function App() {
+  useMount(setupAppData)
+
   return (
     <Provider>
       <AppFrame />
       <Toaster />
       <Overlays />
+      <LoadingOverlay />
     </Provider>
   )
 }
 
 const Overlays = () => {
+  const isCreateCollectionDialogOpen = $ui.isCreateCollectionDialogOpen.use()
+  const isEditCollectionDialogOpen = $ui.isEditCollectionDialogOpen.use()
+
   return (
     <>
-      <editCollectionDialog.Viewport />
-      <createCollectionDialog.Viewport />
+      {isEditCollectionDialogOpen && <EditCollectionDialog handleClose={() => $ui.isEditCollectionDialogOpen.set(false)} />}
+      {isCreateCollectionDialogOpen && <CreateCollectionDialog handleClose={() => $ui.isCreateCollectionDialogOpen.set(false)} />}
     </>
   )
 }
 
-const setupAppData = () => {
-  const a = $folders.load()
-  const b = $collections.load()
-  const c = $likes.load()
-
-  Promise.all([a, b, c]).then(() => {
-    console.clear()
-    console.log('[sanaty] setup done')
-    $ui.isSetupDone.set(true)
-  })
-}
-
 const AppFrame = () => {
-  React.useEffect(() => setupAppData(), [])
+  useRoutingSync()
+  const classNames = useAppFrameClassNames()
 
   const folders = $folders.list.use()
   const isSetupDone = $ui.isSetupDone.use()
@@ -52,11 +51,17 @@ const AppFrame = () => {
   const content = !folders.length ? <NoFoldersView /> : <Router />
 
   return (
-    <Flex className="App" height="100vh" gap="4">
+    <Flex className={classNames} height="100vh" gap="4">
       <Sidebar />
       {content}
     </Flex>
   )
+}
+
+const useAppFrameClassNames = () => {
+  const isAddingAssetToCollection = $ui.isAddingToCollection.use()
+  const addingToCollectionClassName = isAddingAssetToCollection ? 'isAddingSampleToCollection' : ''
+  return clsx('App', 'AppFrame', addingToCollectionClassName)
 }
 
 const MainLoader = () => {

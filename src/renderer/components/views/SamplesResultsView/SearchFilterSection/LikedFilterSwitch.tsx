@@ -14,7 +14,7 @@ export const LikedFilterSwitch = () => {
   }
 
   return (
-    <IconButton onMouseUp={handleClick} variant="outline">
+    <IconButton className="LikedFilterSwitch" onMouseUp={handleClick} variant="outline" size="md" style={{ height: 40 }}>
       <CuteIcon customIcon={iconName} color={color} style={style} />
     </IconButton>
   )

@@ -1,3 +1,8 @@
+.AssetResultsList {
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
 .hoverCardContent {
   border: none;
   outline: none;
@@ -51,3 +56,17 @@
 .AssetRow:hover .assetRowArtworkBox .iconBackdrop {
   background: rgba(0, 0, 0, 0.45); /* Semi-transparent black */
 }
+
+.AssetResultsList .AssetRow.sampleBeingAdded {
+  scale: 1.025;
+  transition: box-shadow 0.3s ease;
+  border-radius: 8px !important;
+  /* overflow: hidden; */
+}
+
+.AssetResultsList:has(.AssetRow.sampleBeingAdded) .AssetRow:not(.sampleBeingAdded) {
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+/* filter: saturate(0.1); */

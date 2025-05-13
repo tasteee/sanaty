@@ -1,5 +1,6 @@
 import { makeGlobal } from '#/modules/_global'
 import { datass } from 'datass'
+import { toaster } from '#/components/ui/toaster'
 
 class CollectionsStore {
   store = datass.array<CollectionT>([])
@@ -30,12 +31,19 @@ class CollectionsStore {
   }
 
   addSampleToCollection = async (id, sampleId) => {
-    await window.electron.addSampleToCollection(id, sampleId)
+    const success = await window.electron.addToCollection(id, sampleId)
     await this.load()
+    if (!success) return
+
+    toaster.create({
+      title: `Added to collection.`,
+      type: 'success',
+      duration: 2000
+    })
   }
 
   removeSampleFromCollection = async (id, sampleId) => {
-    await window.electron.removeSampleFromCollection(id, sampleId)
+    await window.electron.removeFromCollection(id, sampleId)
     await this.load()
   }
 

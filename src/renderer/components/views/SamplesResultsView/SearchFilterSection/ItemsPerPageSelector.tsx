@@ -1,6 +1,7 @@
 import { createListCollection } from '#/components'
 import { SelectInput } from '#/components/ui/SelectInput'
 import { $search } from '#/stores/search.store'
+import './ItemsPerPageSelector.css'
 
 const ITEMS_PER_PAGE_OPTIONS = [
   { label: '10', value: '10' },
@@ -20,6 +21,8 @@ export const ItemsPerPageSelector = () => {
   return (
     <SelectInput
       width="180px"
+      size="sm"
+      className="ItemsPerPageSelector"
       placeholder="Items Per Page"
       value={itemsPerPage + ''}
       onChange={onChange}

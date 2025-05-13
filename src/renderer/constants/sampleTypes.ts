@@ -1,5 +1,5 @@
 export const SAMPLE_TYPES = [
-  { label: 'Any Type', value: 'any' },
+  { label: 'Shots & Loops', value: 'any' },
   { label: 'One Shots', value: 'oneShots' },
   { label: 'Loops', value: 'loops' }
 ]

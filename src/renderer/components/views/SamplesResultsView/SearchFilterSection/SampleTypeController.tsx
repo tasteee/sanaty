@@ -1,3 +1,4 @@
+import './SampleTypeController.css'
 import { createListCollection } from '#/components'
 import { SAMPLE_TYPES } from '#/constants/sampleTypes'
 import { SelectInput } from '#/components/ui/SelectInput'
@@ -12,6 +13,14 @@ export const SampleTypeController = () => {
   const setSampleType = (_, value: string) => $search.filters.set({ sampleType: value })
 
   return (
-    <SelectInput placeholder="Sample Type" value={sampleType} onChange={setSampleType} collection={sampleTypesCollection} width="160px" />
+    <SelectInput
+      size="md"
+      className="SampleTypeController"
+      placeholder="Sample Type"
+      value={sampleType}
+      onChange={setSampleType}
+      collection={sampleTypesCollection}
+      width="100%"
+    />
   )
 }

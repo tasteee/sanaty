@@ -6,11 +6,13 @@ class FoldersStore {
 
   load = async () => {
     const allFolders = await window.electron.getAllFolders()
+    console.log('LOAD ', allFolders)
     this.list.set(allFolders)
   }
 
   add = async () => {
     await window.electron.addFolder()
+    console.log('ADDED FOLDER')
     this.load()
   }
 
@@ -25,11 +27,10 @@ class FoldersStore {
   }
 
   useFolder = (id) => {
-    return this.list.use((folders) => {
-      return folders.find((folder) => folder.id === id)
-    })
+    const allFolders = this.list.use()
+    return allFolders.find((folder) => folder.id === id)
   }
 }
 
 export const $folders = new FoldersStore()
-makeGlobal('folders', $folders)
+globalThis.folders = $folders

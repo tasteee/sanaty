@@ -12,6 +12,7 @@ type LoaderConfigT = {
 }
 
 const LOADERS = {
+  isLoadingView: { id: 'isLoadingView', message: 'isLoadingView' },
   loadingFolders: { id: 'loadingFolders', message: 'loadingFolders' },
   removingFolder: { id: 'removingFolder', message: 'removingFolder' },
   refreshingFolder: { id: 'refreshingFolder', message: 'refreshingFolder' },
@@ -29,6 +30,7 @@ const LOADERS = {
 
 class LoadersStore {
   isLoading = datass.boolean(false)
+  isLoadingView = datass.boolean(false)
   activeLoaders = datass.array<LoaderConfigT>([])
 
   start(id: string) {
@@ -50,6 +52,8 @@ makeGlobal('loaders', $loaders)
 
 // When activeLoaders updates, set isLoading accordingly.
 $loaders.activeLoaders.watch(() => {
+  const isLoadingView = $loaders.activeLoaders.state.some((loader) => loader.id === 'isLoadingView')
   const isLoading = !!$loaders.activeLoaders.state.length
   $loaders.isLoading.set(isLoading)
+  $loaders.isLoadingView.set(isLoadingView)
 })

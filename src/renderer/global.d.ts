@@ -1,40 +1,46 @@
+type DataStoreT = {
+  likes: LikeT[]
+  folders: FolderT[]
+  samples: Sample[]
+  collections: CollectionT[]
+}
+
+type LikeT = {
+  id: string // id of the sample that is liked
+}
+
 type FolderT = {
-  _id: string // uuidv4
   id: string
-  path: string // C://foo/bar/baz
-  name: string // baz
-  sampleCount?: number
-  artworkUrl?: string
-  createdDate: number // Date.now()
-  lastIndexedDate: number
+  path: string
+  name: string
+  sampleCount: number
+  dateAdded: number
 }
 
 type SampleT = {
-  _id: string
   id: string
   name: string
-  fileName: string
-  filePath: string
-  fileSize: number
-  fileExtension: string
+  path: string
+  fullName: string
+  size: number
+  extension: string
   folderId: string
   duration: number
   bpm: number
-  key: string
+  tonic: string
   scale: string
   sampleType: string
   tags: string[]
-  createdDate: number
+  dateAdded: number
 }
 
 type CollectionT = {
-  _id: string
   id: string
   name: string
   description: string
   artworkPath: string
   sampleIds: string[]
-  createdDate: number
+  dateAdded: number
 }
 
 // NOT A DATABASE DATA TYPE.
@@ -48,5 +54,5 @@ type TagT = {
   id: string // 'future-bass'
   label: string // 'future bass'
   category: string // 'genre' | 'instrument' | 'descriptor'
-  createdDate: number // Date.now()
+  dateAdded: number // Date.now()
 }

@@ -1,4 +1,4 @@
-export const KEYS = [
+export const TONICS = [
   { label: 'Any Key', value: 'any' },
   { label: 'A', value: 'a' },
   { label: 'A#', value: 'a#' },
@@ -14,4 +14,4 @@ export const KEYS = [
   { label: 'G#', value: 'g#' }
 ]
 
-export const ANY_KEY = KEYS[0]
+export const ANY_TONIC = TONICS[0]

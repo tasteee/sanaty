@@ -1,0 +1,9 @@
+.tall {
+  height: 100%;
+}
+
+.emphasizedSubtext {
+  color: rgba(255, 255, 255, 0.5);
+  top: 1px !important;
+  position: relative;
+}

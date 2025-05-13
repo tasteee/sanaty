@@ -8,7 +8,7 @@ import clsx from 'clsx'
 import { $search } from '#/stores/search.store'
 // import './TagCloudTag.css'
 
-type TagCloudTagPropsT = { id: string; className?: string }
+type TagCloudTagPropsT = { id: string; className?: string; isActive: boolean }
 
 const useIsCategoryActive = (tagCategory) => {
   const filter = (value) => value.toLowerCase() === 'all' || value.toLowerCase() === tagCategory
@@ -18,12 +18,10 @@ const useIsCategoryActive = (tagCategory) => {
 
 export const TagCloudTag = React.memo((props: TagCloudTagPropsT) => {
   const tag = TAGS.MAP[props.id]
-  const isCategoryActive = useIsCategoryActive(tag.category)
-  const isActive = $search.filters.use((state) => state.tags.includes(tag.id))
-  const shouldHide = isActive || !isCategoryActive
   const isCompactView = $ui.isCompactViewEnabled.use()
   const size = isCompactView ? 'sm' : 'lg'
-  const className = clsx('TagCloudTag', props.className, shouldHide && 'hiddenTag')
+  const categoryClassName = `tagCategory_${tag.category}`
+  const className = clsx('TagCloudTag', props.className, categoryClassName, props.isActive && 'hiddenTag')
 
   return (
     <AssetTag

@@ -1,5 +1,4 @@
 import { useToggle } from '@siberiacancode/reactuse'
-import './AssetResultsList.css'
 import { Box, Flex, Portal, IconButton, Text, Tag, Menu, CuteIcon, Popover } from '#/components'
 import { HoverCard } from '#/components'
 import { PLACEMENTS } from '#/constants'

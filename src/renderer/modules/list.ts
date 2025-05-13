@@ -16,6 +16,6 @@ function intersect<DataT>(target: DataT[], intersections: DataT[]) {
 // Get the item from target that has provded id.
 const getById = <DataT>(target: DataT[], id: string) => {
   return target.find((item: any) => {
-    return item._id === id
+    return item.id === id
   }) as DataT
 }

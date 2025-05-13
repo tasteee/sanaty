@@ -65,7 +65,7 @@ export type SampleT = {
   extension: string // 'wav', 'mp3', etc
   duration: number // seconds
   bpm: number
-  key: string
+  tonic: string
   scale: string
   kind: 'loop' | 'oneShot'
   createdDate: number

@@ -10,7 +10,7 @@ class LikesStore {
   }
 
   toggle = async (id) => {
-    await window.electron.toggleAssetLiked(id)
+    await window.electron.toggleLiked(id)
     await this.load()
   }
 

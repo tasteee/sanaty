@@ -1,7 +1,7 @@
-import { TAGS_LIST, TAGS_MAP } from '#/constants/tags'
+import { TAGS } from '#/constants/tags'
 
 const getTagObjectById = (id: string) => {
-  return TAGS_MAP[id] as TagT
+  return TAGS.MAP[id] as TagT
 }
 
 const categorizeTags = (tags: TagT[]) => {

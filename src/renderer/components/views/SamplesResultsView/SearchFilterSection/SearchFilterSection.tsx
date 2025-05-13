@@ -28,6 +28,19 @@ export const SearchFilterSection = () => {
   const activeBreakpoint = breakpoints.active()
 
   const TopOptions = () => {
+    return (
+      <Wrap gap="2" align="center">
+        <SearchInput />
+        <LikedFilterSwitch />
+        <SampleTypeController />
+        <KeySelector />
+        <ScaleSelector />
+        <BpmRangeController />
+        <DurationRangeController />
+        <SearchButton />
+      </Wrap>
+    )
+
     if (activeBreakpoint === 'lg') {
       return (
         <Flex gap="2" justify="center" direction="column">
@@ -165,7 +178,7 @@ export const LikedFilterSwitch = (props) => {
   }
 
   return (
-    <IconButton onMouseUp={handleClick} variant={variant} size="xs" colorPalette={colorPalette}>
+    <IconButton onMouseUp={handleClick} variant={variant} size="md" colorPalette={colorPalette}>
       <CuteIcon customIcon={iconName} color={color} style={style} />
     </IconButton>
   )
@@ -182,6 +195,10 @@ const TagFilterControl = () => {
   const onChange = (event) => {
     $ui.activeTagCloudCategory.set(event.value)
   }
+
+  const tagCloud = React.useMemo(() => {
+    return <TagCloud />
+  }, [tagCategoryFilter])
 
   return (
     <Tabs.Root value={tagCategoryFilter} variant="outline" onValueChange={onChange} orientation="vertical" style={style} mt="2">
@@ -203,37 +220,34 @@ const TagFilterControl = () => {
           Descriptors
         </Tabs.Trigger>
       </Tabs.List>
-      <Tabs.Content value="All">
-        <TagCloud />
-      </Tabs.Content>
-      <Tabs.Content value="Genre">
-        <TagCloud />
-      </Tabs.Content>
-      <Tabs.Content value="Instrument">
-        <TagCloud />
-      </Tabs.Content>
-      <Tabs.Content value="Descriptor">
-        <TagCloud />
-      </Tabs.Content>
+      <Tabs.Content value="All">{tagCloud}</Tabs.Content>
+      <Tabs.Content value="Genre">{tagCloud}</Tabs.Content>
+      <Tabs.Content value="Instrument">{tagCloud}</Tabs.Content>
+      <Tabs.Content value="Descriptor">{tagCloud}</Tabs.Content>
     </Tabs.Root>
   )
 }
 
-const TagCloud = React.memo((props) => {
+const TagCloud = (props) => {
+  const activeTags = $search.useFilterTags()
+
   return (
     <Flex overflowY="scroll" maxH="159px" className="TagCloud customScrollbar" paddingRight="8px">
       <Wrap gap="2">
         {TAGS.LIST.map((tag) => {
-          return <TagCloudTag key={tag.id} id={tag.id} />
+          return <TagCloudTag key={tag.id} id={tag.id} isActive={activeTags.includes(tag.id)} />
         })}
       </Wrap>
     </Flex>
   )
-})
+}
 
 const TagsSection = () => {
+  const activeTagCloudCategory = $ui.activeTagCloudCategory.use()
+  const className = clsx('TagsSection', `activeTagCategory_${activeTagCloudCategory}`)
+
   return (
-    <Flex gap="2" direction="column">
+    <Flex gap="2" direction="column" className={className}>
       <ActiveTagsSection />
       <TagFilterControl />
     </Flex>
@@ -261,12 +275,13 @@ const ActiveTagsSection = () => {
   )
 }
 
+import { Em } from '@chakra-ui/react'
+import clsx from 'clsx'
+
 const NoTagsSelectedText = () => {
   return (
     <Text textStyle="sm" style={{ lineHeight: '160%', marginLeft: 8 }} color="gray.500">
-      No tags selected
+      <Em>No tags selected</Em>
     </Text>
   )
 }
-
-const tagCloud = <TagCloud />

@@ -1,5 +1,10 @@
-.chakra-empty-state__root {
-  padding: 24px !important;
+.addFolderPrompter.chakra-empty-state__root {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+}
+
+.chakra-card__body:has(.addFolderPrompter.chakra-empty-state__root) {
+  padding: 0 !important;
 }
 
 .dashedBorder {

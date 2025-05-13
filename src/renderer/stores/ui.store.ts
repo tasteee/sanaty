@@ -3,7 +3,19 @@ import { makeGlobal } from '#/modules/_global'
 import { _store } from '#/modules/_stores'
 import { datass } from 'datass'
 
+const foo = (event) => {
+  if (event.key === 'Escape') {
+    $ui.turnAddToCollectionModeOff()
+  }
+}
+
 class UiStore {
+  isCreateCollectionDialogOpen = datass.boolean(false)
+  isEditCollectionDialogOpen = datass.boolean(false)
+
+  routeEntityType = datass.string('')
+  routeEntityId = datass.string('')
+
   isSetupDone = datass.boolean(false)
 
   isIndexingFolder = datass.boolean(false)
@@ -47,11 +59,13 @@ class UiStore {
   turnAddToCollectionModeOn(sampleId) {
     this.isAddingToCollection.set(true)
     this.collectionAdditionSampleId.set(sampleId)
+    window.addEventListener('keydown', foo)
   }
 
   turnAddToCollectionModeOff() {
     this.isAddingToCollection.set(false)
     this.collectionAdditionSampleId.set('')
+    window.removeEventListener('keydown', foo)
   }
 }
 

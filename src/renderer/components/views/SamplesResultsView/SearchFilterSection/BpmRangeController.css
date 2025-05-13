@@ -1,6 +1,14 @@
 .BpmRangeController {
+  z-index: 199999999;
 }
 
+.BpmRangeControllerBody,
+.BpmRangeControllerCardBody {
+  /* background: transparent;
+  box-shadow: none;
+  border: none; */
+}
+/* 
 .BpmRangeController .chakra-input {
   padding-left: 80px;
-}
+} */

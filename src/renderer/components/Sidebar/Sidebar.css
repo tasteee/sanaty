@@ -2,7 +2,8 @@
   /* position: absolute;
   top: 1%;
   left: 12px; */
-  width: 256px;
+  width: 235px;
+  min-width: 235px;
   height: 98%;
   z-index: 20;
   overflow: auto;
@@ -39,46 +40,60 @@
   opacity: 1;
 }
 
-.collectionsBox .MenuItem {
-  color: #a1a1aa;
+.isAddingSampleToCollection .collectionsBox .collectionMenuItem {
+  color: #fdba74 !important;
 }
 
-.MenuItem.isActive,
-.MenuItem.isActive p {
-  color: #f472b6 !important;
-  font-weight: 600 !important;
+.isAddingSampleToCollection .collectionsBox .collectionMenuItem:hover {
+  color: white !important;
+}
 
-  & .CuteIcon,
-  p {
-    color: #f472b6 !important;
+.isAddingSampleToCollection .collectionsBox .MenuItem:hover:has(.collectionMenuItemTrashIcon:hover) {
+  color: white !important;
+}
+
+.App:not(.isAddingSampleToCollection) {
+  .softLink {
+    color: #a1a1aa;
+    cursor: pointer;
   }
-}
 
-.MenuItem:hover:not(.isActive) {
-  color: #f9a8d4 !important;
-
-  & .CuteIcon,
-  p {
+  .softLink:hover {
     color: #f9a8d4 !important;
   }
-}
 
-.MenuItem:hover:has(.collectionMenuItemTrashIcon:hover) {
-  color: #f87171 !important;
-
-  & .CuteIcon,
-  p {
+  .MenuItem:hover:has(.collectionMenuItemTrashIcon:hover) {
     color: #f87171 !important;
+
+    & .CuteIcon,
+    p {
+      color: #f87171 !important;
+    }
   }
-}
 
-.softLink {
-  color: #a1a1aa;
-  cursor: pointer;
-}
+  .collectionsBox .MenuItem {
+    color: #a1a1aa;
+  }
 
-.softLink:hover {
-  color: #f9a8d4 !important;
+  .MenuItem.isActive,
+  .MenuItem.isActive p {
+    color: #f472b6 !important;
+    font-weight: 600 !important;
+
+    & .CuteIcon,
+    p {
+      color: #f472b6 !important;
+    }
+  }
+
+  .MenuItem:hover:not(.isActive) {
+    color: #f9a8d4 !important;
+
+    & .CuteIcon,
+    p {
+      color: #f9a8d4 !important;
+    }
+  }
 }
 
 .glitchLayer0 {
@@ -217,4 +232,118 @@
   .customScrollbar {
     scrollbar-color: var(--sb-thumb-color) var(--sb-track-color);
   }
+}
+
+.Sidebar .sectionsColumn {
+  opacity: 1;
+}
+
+/* .isAddingSampleToCollection .sectionsColumn > div:not(.SideBarCollectionsSection),
+.isAddingSampleToCollection .FilterBar,
+.isAddingSampleToCollection .SearchFilterSection,
+.isAddingSampleToCollection .TagsSection,
+.isAddingSampleToCollection .SortOptionsRow {
+  opacity: 0.35;
+  pointer-events: none;
+  filter: saturate(0.1);
+} */
+
+/* Target elements that need the animation */
+.sectionsColumn > div:not(.SideBarCollectionsSection),
+.FilterBar,
+.SearchFilterSection,
+.TagsSection,
+.SortOptionsRow {
+  /* Base styles when not in collection mode */
+  opacity: 1;
+  pointer-events: auto;
+  filter: saturate(1);
+  /* Add transition for smooth animation */
+  transition:
+    opacity 0.8s ease-in-out,
+    filter 1s ease-in-out;
+}
+
+/* Styles when in collection mode */
+.isAddingSampleToCollection .sectionsColumn > div:not(.SideBarCollectionsSection),
+.isAddingSampleToCollection .FilterBar,
+.isAddingSampleToCollection .SearchFilterSection,
+.isAddingSampleToCollection .TagsSection,
+.isAddingSampleToCollection .SortOptionsRow,
+.isAddingSampleToCollection .FocusedViewHeader {
+  opacity: 0.35;
+  pointer-events: none;
+  filter: saturate(0.1);
+  /* Same transition for consistency */
+  transition:
+    opacity 0.8s ease-in-out,
+    filter 1s ease-in-out;
+}
+
+/* Add a subtle pulsing animation for extra visual interest */
+@keyframes subtle-pulse {
+  0% {
+    opacity: 0.1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 0.1;
+  }
+}
+
+.isAddingSampleToCollection .sectionsColumn > div:not(.SideBarCollectionsSection),
+.isAddingSampleToCollection .FilterBar,
+.isAddingSampleToCollection .SearchFilterSection,
+.isAddingSampleToCollection .TagsSection,
+.isAddingSampleToCollection .SortOptionsRow {
+  animation: subtle-pulse 3s infinite ease-in-out;
+}
+
+.isAddingSampleToCollection .AddCollectionMenuItem {
+  /* opacity: 0.5; */
+  pointer-events: none;
+  color: #52525b !important;
+}
+
+.isAddingSampleToCollection .sectionsColumn > .SideBarCollectionsSection {
+  /* border-left: none; */
+  position: relative;
+  overflow: visible;
+  /* scale: 1.025; */
+  /* box-shadow: -16px 0 0 0px pink; Creates a 2px border with 4px space */
+}
+
+.isAddingSampleToCollection .sectionsColumn > .SideBarCollectionsSection:before {
+  content: '';
+  position: absolute;
+  top: -24px;
+  left: -16px;
+  right: -16px;
+  bottom: 0px;
+  background: linear-gradient(134deg, #111111, #2d0e04);
+  border: 3px solid #f87316;
+  outline: 2px #f87316;
+  border-radius: 8px;
+}
+
+.isAddingSampleToCollection .sectionsColumn > .SideBarCollectionsSection .collectionsBox {
+  z-index: 9999999;
+}
+
+.isAddingSampleToCollection .AssetResultsList .AssetRow.sampleBeingAdded {
+  scale: 1.02;
+  transition: all 0.75s ease;
+}
+
+.AssetResultsList:has(.AssetRow.sampleBeingAdded) .AssetRow:not(.sampleBeingAdded) {
+  opacity: 0.5;
+  pointer-events: none;
+  filter: saturate(0.1);
+}
+
+.collectionsSectionHeader {
+  color: white;
+  z-index: 9999;
 }

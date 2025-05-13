@@ -6,12 +6,12 @@ import { makeGlobal } from '#/modules/_global'
 class SearchStore {
   filters = datass.object({
     searchValue: '',
-    key: 'any',
+    tonic: 'any',
     scale: 'any',
     sampleType: 'any',
     tags: [],
     isLiked: false,
-    bpmMin: 0,
+    bpmMin: 50,
     bpmMax: 300,
     durationMin: 0,
     durationMax: 600,
@@ -42,6 +42,7 @@ class SearchStore {
   useSortByFilter = () => this.useFilterValue('sortBy')
   useSortOrderFilter = () => this.useFilterValue('sortOrder')
   useFilterTags = () => this.useFilterValue('tags')
+  useIsLikedFilterActive = () => this.useFilterValue('isLiked')
 
   usePageResults = () => this.useResultsValue('currentPage')
   useAllResults = () => this.useResultsValue('all')
@@ -51,12 +52,16 @@ class SearchStore {
   usePaginationItemsPerPage = () => this.usePaginationValue('itemsPerPage')
 
   searchSamples = async () => {
-    console.log('searching samples', this.filters.state)
+    // console.log('searching samples', this.filters.state)
     const filters = this.filters.state
     const results = await window.electron.searchSamples(filters)
     this.results.set({ all: results })
-    console.log('search results', results)
+    // console.log('search results', results)
     this.update()
+  }
+
+  resetSearch = () => {
+    this.filters.set.reset()
   }
 
   reset = () => {
@@ -164,7 +169,7 @@ class SearchStore {
   }
 
   useSampleResult = (id) => {
-    return this.results.use((state) => state.all.find((sample) => (sample._id || sample.id) === id))
+    return this.results.use((state) => state.all.find((sample) => sample.id === id))
   }
 
   useIsSampleActive = (id) => {

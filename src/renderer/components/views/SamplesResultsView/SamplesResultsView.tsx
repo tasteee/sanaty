@@ -2,7 +2,9 @@ import { SampleResultsList } from '#/components/views/SamplesResultsView/AssetRe
 import { SearchFilterSection } from '#/components/views/SamplesResultsView/SearchFilterSection'
 import { ViewBox } from '#/components/ui/ViewBox'
 import { useMount, useUnmount } from '@siberiacancode/reactuse'
-
+import { FilterBar } from '#/components/FilterBar'
+import { Flex } from '@chakra-ui/react/flex'
+import { TagCloudHeader } from './SearchFilterSection/TagCloudHeader'
 // Used for /samples view and /collection/:id view.
 // Can accept props.children to add in collection or folder view header.
 // Resets filters/results on unmount.
@@ -10,9 +12,9 @@ import { useMount, useUnmount } from '@siberiacancode/reactuse'
 
 export const SamplesResultsView = (props) => {
   return (
-    <ViewBox id={props.id} className="SamplesView">
+    <ViewBox id={props.id} className="SamplesResultsView">
       {props.children}
-      <SearchFilterSection />
+      <TagCloudHeader />
       <SampleResultsList />
     </ViewBox>
   )

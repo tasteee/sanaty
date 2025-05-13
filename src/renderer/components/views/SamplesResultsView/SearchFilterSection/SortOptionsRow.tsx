@@ -11,7 +11,7 @@ export const SortOptionsRow = () => {
   const toggleTagcloud = () => $ui.isTagCloudOpen.set.toggle()
 
   return (
-    <Flex justify="space-between" align="center" padding="4px">
+    <Flex className="SortOptionsRow" justify="space-between" align="center" padding="4px">
       <Flex gap="8" align="center">
         <SearchResultCount />
         <Text color="gray.500" textStyle="sm" onClick={toggleTagcloud} className="clickableText">

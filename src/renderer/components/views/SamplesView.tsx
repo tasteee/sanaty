@@ -1,23 +1,29 @@
 import React from 'react'
+import { $search } from '#/stores/search.store'
+import { SamplesResultsView } from './SamplesResultsView/SamplesResultsView'
+import { FilterBar } from '../FilterBar'
+import { ViewHeading } from '../ViewHeading'
 import { ViewBox } from '../ui/ViewBox'
 import { SampleResultsList } from './SamplesResultsView/AssetResultsList/AssetResultsList'
-import { SearchFilterSection } from './SamplesResultsView/SearchFilterSection'
-import { $search } from '#/stores/search.store'
+import { TagCloudHeader } from './SamplesResultsView/SearchFilterSection/TagCloudHeader'
 
 export const SamplesView = () => {
   React.useEffect(() => {
-    console.log('SamplesView useEffect')
     $search.filters.set.reset()
     $search.results.set.reset()
     $search.pagination.set.reset()
     $search.searchSamples()
-    console.log('SamplesView useEffect done')
   }, [])
 
   return (
-    <ViewBox id="SamplesView" className="SamplesView">
-      <SearchFilterSection />
-      <SampleResultsList />
-    </ViewBox>
+    <>
+      <ViewBox id="SamplesView">
+        <ViewHeading title="Samples" iconName="material-symbols-light:audio-file-rounded" />
+
+        <TagCloudHeader />
+        <SampleResultsList />
+      </ViewBox>
+      <FilterBar />
+    </>
   )
 }

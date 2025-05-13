@@ -1,3 +1,4 @@
+import './AssetResultsList.css'
 import { Paginator } from './Paginator'
 import { Box, Flex, Portal, IconButton, Text, Tag, Menu, CuteIcon, Popover } from '#/components'
 import { Card } from '#/components'
@@ -9,21 +10,33 @@ import { AssetTagsOverview } from '../../../AssetTagsOverview'
 import { $ui } from '#/stores/ui.store'
 import { $likes } from '#/stores/likes.store'
 import clsx from 'clsx'
+import { motion } from 'framer-motion'
 
 export const SampleResultsList = () => {
   const pageResults = $search.usePageResults()
+  const [ready, setReady] = React.useState(false)
+
+  React.useEffect(() => {
+    if (!pageResults.length) return
+    setTimeout(() => {
+      setReady(true)
+    }, 250)
+  }, [pageResults])
 
   return (
-    <Flex direction="column" flex="1" overflow="hidden" pb="24px" tabIndex="0" gap="1">
+    <Flex className="SampleResultsList" direction="column" overflow="hidden" pb="24px" tabIndex="0" gap="1" height="100%">
       <SortOptionsRow />
 
-      <Flex className="AssetResultsList customScrollbar" direction="column" gap="2" padding="2" overflowY="auto" flex="1">
-        {pageResults.map((sample, index) => {
-          return <AssetRow key={sample._id} id={sample._id} index={index} />
-        })}
-      </Flex>
+      <Flex gap="2" direction="column" justify="space-between" height="95%" className="mainResultsArea">
+        <Flex className="AssetResultsList customScrollbar" direction="column" gap="2" padding="2" overflowY="auto" height="100%">
+          {ready &&
+            pageResults.map((sample, index) => {
+              return <AssetRow key={sample.id} id={sample.id} index={index} />
+            })}
+        </Flex>
 
-      {pageResults.length > 0 && <Paginator />}
+        {pageResults.length > 0 && <Paginator />}
+      </Flex>
     </Flex>
   )
 }
@@ -48,27 +61,16 @@ type AssetRowPropsT = {
 
 const ACTIVE_BG_GRADIENT = 'linear-gradient(to right, #18181b, transparent)'
 
-const getKeyScale = (sample) => {
-  if (!sample) {
-    const results = $search.results.state
-    debugger
-  }
-
-  const key = sample.key.toUpperCase()
-  const scale = capitalize.words(sample.scale)
-  return `${key} ${scale}`
-}
-
 const useSampleData = (id) => {
   const sampleResult = $search.useSampleResult(id)
-  const keyScale = getKeyScale(sampleResult)
   const isLiked = $likes.useIsLiked(id)
   const { key, scale, ...otherData } = sampleResult
-  const sample = { id, keyScale, isLiked, ...otherData }
+  const sample = { id, isLiked, ...otherData }
   return sample
 }
 
 export const AssetRow = (props: AssetRowPropsT) => {
+  const isBeingAddedToCollection = useIsAddingSampleToCollection(props.id)
   const isActive = $search.useIsSampleActive(props.id)
   const sample = useSampleData(props.id)
   const beforeStyles = isActive ? activeStyles : {}
@@ -88,26 +90,33 @@ export const AssetRow = (props: AssetRowPropsT) => {
   // TODO: truncate tags.
   // TODO: hover to show all tags.
 
-  const className = clsx('AssetRow', isActive && 'activeRow')
+  const beingAddedClassName = isBeingAddedToCollection ? 'sampleBeingAdded' : ''
+  const className = clsx('AssetRow', isActive && 'activeRow', beingAddedClassName)
 
   return (
-    <Card.Root
-      className={className}
-      size="sm"
-      borderRadius="lg"
-      position="relative"
-      style={{ background: 'none', border: 'none', boxShadow: 'none', padding: 0 }}
-      _before={beforeStyles}
-      onMouseUp={activateAssetRow}
+    <motion.div
+      initial={{ opacity: 0, translateX: -5, translateY: -5 }}
+      animate={{ opacity: 1, translateX: 0, translateY: 0 }}
+      transition={{ duration: 0.5, delay: props.index * 0.1 }}
     >
-      <Card.Body zIndex={1} position="relative" bgGradient={bgGradient} padding={bodyPadding} className="AssetRowBody">
-        <Flex align="center" gap="4">
-          <LeftColumn {...sample} isActive={isActive} />
-          <MiddleColumn {...sample} isActive={isActive} />
-          <RightColumn {...sample} isActive={isActive} />
-        </Flex>
-      </Card.Body>
-    </Card.Root>
+      <Card.Root
+        className={className}
+        size="sm"
+        borderRadius="lg"
+        position="relative"
+        style={{ background: 'none', border: 'none', boxShadow: 'none', padding: 0 }}
+        _before={beforeStyles}
+        onMouseUp={activateAssetRow}
+      >
+        <Card.Body zIndex={1} position="relative" bgGradient={bgGradient} padding={bodyPadding} className="AssetRowBody">
+          <Flex align="center" gap="4">
+            <LeftColumn {...sample} isActive={isActive} />
+            <MiddleColumn {...sample} isActive={isActive} />
+            <RightColumn {...sample} isActive={isActive} isBeingAddedToCollection={isBeingAddedToCollection} />
+          </Flex>
+        </Card.Body>
+      </Card.Root>
+    </motion.div>
   )
 }
 
@@ -117,7 +126,7 @@ const MiddleColumn = (props) => {
       <Flex gap="4" align="center" cassName="topRow">
         <AssetName name={props.name} />
         <Flex fontSize="sm" color="gray.500" gap="4">
-          <AssetKeyScale keyScale={props.keyScale} />
+          <AssetKeyScale tonic={props.tonic} scale={props.scale} />
           <AssetBpm bpm={props.bpm} />
           <AssetDuration duration={props.duration} />
         </Flex>
@@ -131,6 +140,7 @@ const MiddleColumn = (props) => {
 
 import { Clipboard } from '@chakra-ui/react'
 import { $search } from '#/stores/search.store'
+import React from 'react'
 
 const RightColumn = (props) => {
   const onClick = (event) => {
@@ -140,7 +150,9 @@ const RightColumn = (props) => {
   return (
     <Flex gap="2" align="flex-end" ml="2">
       <AssetLikeToggler {...props} />
+
       <AddToCollectionButton {...props} />
+
       <Clipboard.Root value="TODO" onMouseUp={onClick}>
         <Clipboard.Trigger asChild>
           <IconButton variant="plain" size="xs">
@@ -153,11 +165,19 @@ const RightColumn = (props) => {
   )
 }
 
-const AddToCollectionButton = (props) => {
+const useIsAddingSampleToCollection = (id) => {
   const isAddingToCollection = $ui.isAddingToCollection.use()
   const addingSampleId = $ui.collectionAdditionSampleId.use()
-  const isThisAssetBeingAdded = isAddingToCollection && addingSampleId === props.id
-  const color = isThisAssetBeingAdded ? 'blue.500' : 'gray.400'
+  const isThisAssetBeingAdded = isAddingToCollection && addingSampleId === id
+  // console.log({ isAddingToCollection, addingSampleId, isThisAssetBeingAdded })
+  return isThisAssetBeingAdded
+}
+
+const AddToCollectionButton = (props) => {
+  const isBeingAddedToCollection = useIsAddingSampleToCollection(props.id)
+  const color = isBeingAddedToCollection ? 'orange.400' : 'gray.400'
+  const iconName = isBeingAddedToCollection ? 'raphael:no' : 'si:add-square-line'
+  if (isBeingAddedToCollection) console.log('AND NOW ITS BEING ADDED', props.id)
   // const iconName = isAddingAssetToCollection ? 'bxs:heart' : 'bx:heart'
   // const color = isAddingAssetToCollection ? '#ec4899' : '#71717a'
   // const scale = isAddingAssetToCollection ? 1.25 : 1.1
@@ -165,12 +185,16 @@ const AddToCollectionButton = (props) => {
 
   const handleClick = (event) => {
     event.stopPropagation()
+    console.log('clicked to add to collection', props.id)
+    if (isBeingAddedToCollection) console.log('is already being added...')
+    if (isBeingAddedToCollection) return $ui.turnAddToCollectionModeOff()
+    console.log('turning on add to collection', props.id)
     $ui.turnAddToCollectionModeOn(props.id)
   }
 
   return (
     <IconButton onMouseUp={handleClick} variant="plain">
-      <CuteIcon name="add-square" color={color} />
+      <CuteIcon customIcon={iconName} color={color} />
     </IconButton>
   )
 }
@@ -213,9 +237,9 @@ const LeftColumn = (props) => {
         flexShrink={0}
         style={{ background: `url(${artworkUrl})`, backgroundSize: 'cover' }}
       >
-        <div className="iconBackdrop">
+        <Flex className="iconBackdrop" height="100%">
           <CuteIcon name={iconName} className="assetRowPlayPauseIcon" />
-        </div>
+        </Flex>
       </Box>
     </Flex>
   )
@@ -223,7 +247,7 @@ const LeftColumn = (props) => {
 
 const AssetName = (props) => {
   return (
-    <Text fontWeight="bold" textStyle="sm" maxWidth="350px" truncate>
+    <Text fontWeight="bold" textStyle="sm" maxWidth="250px" truncate>
       {props.name}
     </Text>
   )
@@ -232,7 +256,9 @@ const AssetName = (props) => {
 const AssetKeyScale = (props) => {
   return (
     <Flex gap="1">
-      <Text>{props.keyScale}</Text>
+      <Text>
+        {props.tonic} {props.scale}
+      </Text>
     </Flex>
   )
 }

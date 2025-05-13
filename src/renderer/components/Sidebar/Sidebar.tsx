@@ -6,51 +6,19 @@ import { CollectionsSection } from './CollectionsSection'
 import { Button, Menu, Portal } from '#/components'
 import { $ui } from '#/stores/ui.store'
 import { $folders } from '#/stores/folders.store'
-
-const handleAction = (event) => {
-  if (event.value === 'addFolder') return $folders.add()
-  if (event.value === 'settings') return console.log('TODO: Settings Modal')
-  if (event.value === 'support') return console.log('TODO: support Modal')
-}
-
-const SettingsMenu = () => {
-  const isIndexingFolder = $ui.isIndexingFolder.use()
-
-  return (
-    <Menu.Root onSelect={handleAction}>
-      <Menu.Trigger asChild>
-        <Button variant="ghost" size="md">
-          {!isIndexingFolder && <CuteIcon name="settings-5" />}
-
-          {isIndexingFolder && (
-            <ProgressCircle.Root value={null} size="sm">
-              <ProgressCircle.Circle>
-                <ProgressCircle.Track />
-                <ProgressCircle.Range />
-              </ProgressCircle.Circle>
-            </ProgressCircle.Root>
-          )}
-        </Button>
-      </Menu.Trigger>
-      <Portal>
-        <Menu.Positioner>
-          <Menu.Content>
-            <Menu.Item value="settings">Settings</Menu.Item>
-            <Menu.Item value="support">Support</Menu.Item>
-            <Menu.Item value="addFolder">Add Folder</Menu.Item>
-          </Menu.Content>
-        </Menu.Positioner>
-      </Portal>
-    </Menu.Root>
-  )
-}
+import { navigateTo } from '#/modules/routing'
+import clsx from 'clsx'
 
 export const Sidebar = () => {
+  const isAddingAssetToCollection = $ui.isAddingToCollection.use()
+  const addingToCollectionClassName = isAddingAssetToCollection ? 'isAddingSampleToCollection' : ''
+  const className = clsx('Sidebar', addingToCollectionClassName)
+
   return (
-    <Card.Root maxW="sm" height="98%" overflow="hidden" className="Sidebar">
+    <Card.Root maxW="sm" height="98%" overflow="hidden" className={className}>
       <Card.Body className="SidebarBody" padding="4">
         <Flex direction="column" height="100%" justify="space-between">
-          <Flex direction="column" gap="6" height="100%">
+          <Flex direction="column" gap="6" height="100%" className="sectionsColumn">
             <LogoSection />
             <Separator />
             <TopNavSection />
@@ -80,7 +48,6 @@ const LogoSection = () => {
           sanaty
         </Heading>
       </Flex>
-      {/* <SettingsMenu /> */}
       <Flex gap="1">
         <IconButton variant="ghost" onClick={() => $ui.isCompactViewEnabled.set.toggle()}>
           <CuteIcon customIcon={sizeIconName} />
@@ -94,7 +61,7 @@ const LogoSection = () => {
 }
 
 const TopNavSection = () => {
-  const [location, setLocation] = useLocation()
+  const [location] = useLocation()
   const isHomeActive = location === '/' || location === '/index.html'
   const isSamplesActive = location === '/samples'
   const isMidiActive = location === '/midi'
@@ -106,10 +73,10 @@ const TopNavSection = () => {
         Assets
       </Heading>
       <Flex gap="2" direction="column">
-        <MenuItem id="home" label="Home" isActive={isHomeActive} onClick={() => setLocation('/')} />
-        <MenuItem id="folders" label="Folders" isActive={isFoldersActive} onClick={() => setLocation('/folders')} />
-        <MenuItem id="samples" label="Samples" isActive={isSamplesActive} onClick={() => setLocation('/samples')} />
-        <MenuItem id="midi" label="MIDI" isActive={isMidiActive} onClick={() => setLocation('/midi')} />
+        <MenuItem id="home" label="Home" isActive={isHomeActive} onClick={() => navigateTo('/')} />
+        <MenuItem id="folders" label="Folders" isActive={isFoldersActive} onClick={() => navigateTo('/folders')} />
+        <MenuItem id="samples" label="Samples" isActive={isSamplesActive} onClick={() => navigateTo('/samples')} />
+        <MenuItem id="midi" label="MIDI" isActive={isMidiActive} onClick={() => navigateTo('/midi')} />
       </Flex>
     </Flex>
   )

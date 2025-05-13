@@ -6,8 +6,8 @@ import { Image } from '@chakra-ui/react/image'
 import { Flex } from '@chakra-ui/react/flex'
 import { Text, Stat } from '@chakra-ui/react'
 import { CuteIcon } from './ui/CuteIcon'
-import { dialogs } from './dialogs'
 import { navigateTo } from '#/modules/routing'
+import { $ui } from '#/stores/ui.store'
 
 const activeStyles = {
   content: '""',
@@ -34,6 +34,7 @@ export const FocusedViewHeader = (props) => {
       variant={{ base: 'plain', _hover: 'subtle' }}
       _hover={{ bg: ACTIVE_BG_GRADIENT }}
       _before={activeStyles}
+      className="FocusedViewHeader"
     >
       <Card.Body p="8px">
         <Flex gap="2">
@@ -42,14 +43,14 @@ export const FocusedViewHeader = (props) => {
           </Box>
 
           <Stat.Root>
-            <Stat.Label zIndex="9999" color="pink.200">
+            <Stat.Label zIndex="10" color="pink.200">
               {props.kind}
             </Stat.Label>
             <Flex gap="2" direction="column">
-              <Stat.ValueText zIndex="9999" truncate>
+              <Stat.ValueText zIndex="10" truncate>
                 {props.name}
               </Stat.ValueText>
-              <Text color="pink.100" zIndex="9999" truncate size="xs">
+              <Text color="pink.100" zIndex="10" truncate size="xs">
                 {props.description}
               </Text>
             </Flex>
@@ -64,7 +65,7 @@ export const FocusedViewHeader = (props) => {
 // Only renders on collection view.
 const EditIcon = (props) => {
   const onClick = () => {
-    dialogs.editCollection.open(props)
+    $ui.isEditCollectionDialogOpen.set(true)
   }
 
   return <CuteIcon onClick={onClick} isActionable name="edit-2" size="lg" color={{ base: 'gray.300', _hover: 'pink.500' }} zIndex="10000" />

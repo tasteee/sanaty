@@ -8,6 +8,9 @@ type PropsT = {
   onChange: any
   placeholder?: string
   masker?: any
+  className?: string
+  flex?: string
+  size?: string
 }
 
 const DEFAULT_MASKER = (item: any) => {
@@ -27,11 +30,12 @@ export const SelectInput = (props: PropsT) => {
 
   return (
     <Select.Root
-      size="xs"
+      size={props.size || 'sm'}
+      className={props.className}
       collection={props.collection}
       width={props.width || '120px'}
       value={[props.value]}
-      flex="1"
+      flex={props.flex || '0'}
       onValueChange={onChange}
     >
       <Select.HiddenSelect />

@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { toaster } from '#/components/ui/toaster'
 import { CuteIcon } from '../ui/CuteIcon'
 import { $collections } from '#/stores/collections.store'
-import { createOverlay } from '@chakra-ui/react'
 
 export const EditCollectionDialog = (props) => {
   const collection = $collections.useCollection(props.collectionId)
@@ -144,5 +143,3 @@ export const EditCollectionDialog = (props) => {
     </Dialog.Root>
   )
 }
-
-export const editCollectionDialog = createOverlay(EditCollectionDialog)
