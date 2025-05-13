@@ -1,25 +1,24 @@
 import './CollectionsSection.css'
 import { MenuItem } from './MenuItem'
 import { Button, CuteIcon, Flex, Heading, Text } from '#/components'
-import { $collections } from '#/stores/collections'
-import { datass } from 'datass'
-import { CreateCollectionDialog } from './CreateCollectionDialog'
+import { $collections } from '#/stores/collections.store'
 import { useLocation } from 'wouter'
 import { dialogs } from '../dialogs'
-import { $samplesViewStore } from '../views/SamplesResultsView/samplesView.store'
+import { $ui } from '#/stores/ui.store'
 
 export const CollectionsSection = () => {
   const [location, setLocation] = useLocation()
-  const collectionsMenuItems = $collections.list.use() as CollectionT[]
+  const collectionsMenuItems = $collections.store.use()
   const collectionsCount = collectionsMenuItems.length
-  const addToCollectionState = $samplesViewStore.addToCollectionStore.use()
-  const iconName = addToCollectionState.isActive ? 'add-square' : 'playlist-2'
+  const isAddingToCollection = $ui.isAddingToCollection.use()
+  const collectionAdditionSampleId = $ui.collectionAdditionSampleId.use()
+  const iconName = isAddingToCollection ? 'add-square' : 'playlist-2'
 
   const getMenuItemClickHandler = (item) => {
-    if (!addToCollectionState.isActive) return setLocation(`/collections/collection/${item._id}`)
-    const sampleId = addToCollectionState.sampleId
+    if (!isAddingToCollection) return setLocation(`/collections/collection/${item._id}`)
+    const sampleId = collectionAdditionSampleId
     $collections.addSampleToCollection(item._id, sampleId)
-    $samplesViewStore.toggleAddToCollectionMode()
+    $ui.turnAddToCollectionModeOff()
   }
 
   return (
@@ -40,15 +39,15 @@ export const CollectionsSection = () => {
               onClick={() => getMenuItemClickHandler(item)}
               iconName={iconName}
             >
-              {!addToCollectionState.isActive && (
+              {!isAddingToCollection && (
                 <CuteIcon
                   className="collectionMenuItemTrashIcon"
                   name="delete-2"
                   size="md"
                   onClick={(event) => {
                     event.stopPropagation()
-                    if (location === `/collections/collection//${item._id}`) setLocation('/')
-                    $collections.deleteCollection(item._id)
+                    if (location === `/collections/collection/${item._id}`) setLocation('/')
+                    $collections.delete(item._id)
                   }}
                 />
               )}

@@ -1,21 +1,9 @@
-import {
-  Button,
-  CloseButton,
-  Dialog,
-  Field,
-  Flex,
-  HStack,
-  Input,
-  Portal,
-  Text,
-  Textarea,
-  FileUpload
-} from '@chakra-ui/react'
+import { Button, CloseButton, Dialog, Field, Flex, HStack, Input, Portal, Text, Textarea, FileUpload } from '@chakra-ui/react'
 import { HiUpload } from 'react-icons/hi'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { toaster } from '#/components/ui/toaster'
 import { CuteIcon } from '../ui/CuteIcon'
-import { $collections } from '#/stores/collections'
+import { $collections } from '#/stores/collections.store'
 import { createOverlay } from '@chakra-ui/react'
 
 export const EditCollectionDialog = (props) => {
@@ -40,6 +28,7 @@ export const EditCollectionDialog = (props) => {
       const reader = new FileReader()
 
       reader.onloadend = () => {
+        // @ts-ignore
         setImageBase64(reader.result)
       }
       reader.readAsDataURL(file)
@@ -48,7 +37,7 @@ export const EditCollectionDialog = (props) => {
   }
 
   const handleSave = async () => {
-    const { error } = await $collections.updateCollection(props.collectionId, {
+    const { error } = await $collections.update(props.collectionId, {
       name,
       description,
       artworkPath: imageSrc
@@ -132,11 +121,7 @@ export const EditCollectionDialog = (props) => {
                 </Field.Root>
                 <Field.Root>
                   <Field.Label>Description</Field.Label>
-                  <Textarea
-                    placeholder="Describe your collection"
-                    value={description}
-                    onChange={(e) => setDesc(e.target.value)}
-                  />
+                  <Textarea placeholder="Describe your collection" value={description} onChange={(e) => setDesc(e.target.value)} />
                 </Field.Root>
               </Flex>
             </Dialog.Body>

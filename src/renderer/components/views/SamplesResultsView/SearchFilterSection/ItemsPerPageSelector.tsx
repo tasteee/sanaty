@@ -1,6 +1,6 @@
 import { createListCollection } from '#/components'
 import { SelectInput } from '#/components/ui/SelectInput'
-import { $pagination } from '../samplesView.store'
+import { $search } from '#/stores/search.store'
 
 const ITEMS_PER_PAGE_OPTIONS = [
   { label: '10', value: '10' },
@@ -13,21 +13,18 @@ const itemsPerPageCollection = createListCollection({
   items: ITEMS_PER_PAGE_OPTIONS
 })
 
-const masker = (item) => `Per page: ${item.label}`
-
 export const ItemsPerPageSelector = () => {
-  const itemsPerPage = $pagination.itemsPerPage.use()
-  // const option = $pagination.itemsPerPageOption.use()
-  const onChange = (_, value) => $pagination.setItemsPerPage(value)
+  const itemsPerPage = $search.pagination.use((state) => state.itemsPerPage)
+  const onChange = (_, value) => $search.setItemsPerPage(value)
 
   return (
     <SelectInput
+      width="180px"
       placeholder="Items Per Page"
       value={itemsPerPage + ''}
       onChange={onChange}
       collection={itemsPerPageCollection}
-      width="180px"
-      masker={masker}
+      masker={(item) => `Per page: ${item.label}`}
     />
   )
 }

@@ -1,15 +1,13 @@
-import { $collections } from '#/stores/collections'
-import { $folders } from '#/stores/folders'
+import { $collections } from '#/stores/collections.store'
+import { $folders } from '#/stores/folders.store'
 import { Box } from '@chakra-ui/react/box'
 import { Card } from '@chakra-ui/react/card'
 import { Image } from '@chakra-ui/react/image'
 import { Flex } from '@chakra-ui/react/flex'
-import { datass } from 'datass'
 import { Text, Stat } from '@chakra-ui/react'
-import { navigate } from 'wouter/use-browser-location'
-import { editCollectionDialog, EditCollectionDialog } from './Sidebar/EditCollectionDialog'
 import { CuteIcon } from './ui/CuteIcon'
 import { dialogs } from './dialogs'
+import { navigateTo } from '#/modules/routing'
 
 const activeStyles = {
   content: '""',
@@ -56,55 +54,50 @@ export const FocusedViewHeader = (props) => {
               </Text>
             </Flex>
           </Stat.Root>
-          <HeaderOptions kind={props.kind} id={props.id} />
+          <HeaderOptions {...props} />
         </Flex>
       </Card.Body>
     </Card.Root>
   )
 }
 
+// Only renders on collection view.
 const EditIcon = (props) => {
   const onClick = () => {
-    dialogs.editCollection.open(props.id)
+    dialogs.editCollection.open(props)
   }
 
-  return (
-    <>
-      <CuteIcon
-        onClick={onClick}
-        isActionable
-        name="edit-2"
-        size="lg"
-        color={{ base: 'gray.300', _hover: 'pink.500' }}
-        zIndex="10000"
-      />
-    </>
-  )
+  return <CuteIcon onClick={onClick} isActionable name="edit-2" size="lg" color={{ base: 'gray.300', _hover: 'pink.500' }} zIndex="10000" />
 }
 
+// Only rendered when folder view.
+// why tf wud u wanna refresh a collection???
+// ... weirdo.
 const RefreshIcon = (props) => {
-  const onClick = () => $folders.refreshFolder(props.id)
-  return (
-    <CuteIcon onClick={onClick} name="refresh-1" size="lg" color={{ base: 'gray.300', _hover: 'blue.300' }} zIndex="10000" />
-  )
+  const onClick = () => $folders.refresh(props.id)
+  return <CuteIcon onClick={onClick} name="refresh-1" size="lg" color={{ base: 'gray.300', _hover: 'blue.300' }} zIndex="10000" />
 }
 
+// When delete icon is rendered, it means the user
+// is currently viewing the page that shows that collection
+// and its samples. We want to navigate away before we
+// delete it so it doesnt cause our shit to crash when
+// useCollection(id) returns nada. (Now read it again
+// but replace collection with folder -- because this icon
+// works for both folders and collections.
 const DeleteIcon = (props) => {
+  const color = { base: 'gray.300', _hover: 'red.600' }
+  const isCollection = props.kind === 'Collection'
+  const collectionDeleter = $collections.delete
+  const folderDeleter = $folders.remove
+  const deleter = isCollection ? collectionDeleter : folderDeleter
+
   const onClick = () => {
-    navigate('/samples')
-    $collections.deleteCollection(props.id)
+    navigateTo('/samples')
+    deleter(props.id)
   }
 
-  return (
-    <CuteIcon
-      onClick={onClick}
-      isActionable
-      name="delete-2"
-      size="lg"
-      color={{ base: 'gray.300', _hover: 'red.600' }}
-      zIndex="10000"
-    />
-  )
+  return <CuteIcon onClick={onClick} isActionable name="delete-2" size="lg" color={color} zIndex="10000" />
 }
 
 const HeaderOptions = (props) => {
@@ -112,8 +105,8 @@ const HeaderOptions = (props) => {
 
   return (
     <Flex maxW="64px" width="64px" overflow="hidden" justify="center" align="center" gap="4" direction="column">
-      <TopIcon id={props.id} />
-      <DeleteIcon id={props.id} />
+      <TopIcon {...props} />
+      <DeleteIcon {...props} />
     </Flex>
   )
 }

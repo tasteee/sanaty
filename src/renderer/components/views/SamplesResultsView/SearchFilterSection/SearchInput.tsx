@@ -1,14 +1,14 @@
 import './SearchInput.css'
 import { InputGroup, Input, CuteIcon, Button } from '#/components'
-import { $samplesViewStore } from '../samplesView.store'
+import { $search } from '#/stores/search.store'
 
 const SearchIcon = <CuteIcon name="search-2" size="md" />
 
 export const SearchInput = () => {
-  const value = $samplesViewStore.filters.use((state) => state.searchValue)
+  const value = $search.filters.use((state) => state.searchValue)
 
   const onChange = (event: any) => {
-    $samplesViewStore.filters.set({ searchValue: event.target.value })
+    $search.filters.set({ searchValue: event.target.value })
   }
 
   return (

@@ -1,27 +1,27 @@
+import React from 'react'
 import { CuteIcon } from '#/components/ui/CuteIcon'
 import { TAGS } from '#/constants'
 import { Tag } from '@chakra-ui/react/tag'
-import React from 'react'
 import { CATEGORY_PALETTES, CATEGORY_ICON_COLORS } from '#/constants/colors'
-import { $samplesViewStore } from '../samplesView.store'
-import { $main } from '#/stores/main'
+import { $ui } from '#/stores/ui.store'
 import clsx from 'clsx'
+import { $search } from '#/stores/search.store'
 // import './TagCloudTag.css'
 
 type TagCloudTagPropsT = { id: string; className?: string }
 
 const useIsCategoryActive = (tagCategory) => {
   const filter = (value) => value.toLowerCase() === 'all' || value.toLowerCase() === tagCategory
-  const isCategoryActive = $samplesViewStore.activeTagCloudCategory.use(filter)
+  const isCategoryActive = $ui.activeTagCloudCategory.use(filter)
   return isCategoryActive
 }
 
 export const TagCloudTag = React.memo((props: TagCloudTagPropsT) => {
   const tag = TAGS.MAP[props.id]
   const isCategoryActive = useIsCategoryActive(tag.category)
-  const isActive = $samplesViewStore.filters.use((state) => state.tags.includes(tag.id))
+  const isActive = $search.filters.use((state) => state.tags.includes(tag.id))
   const shouldHide = isActive || !isCategoryActive
-  const isCompactView = $main.isCompactViewEnabled.use()
+  const isCompactView = $ui.isCompactViewEnabled.use()
   const size = isCompactView ? 'sm' : 'lg'
   const className = clsx('TagCloudTag', props.className, shouldHide && 'hiddenTag')
 
@@ -42,7 +42,7 @@ export const TagCloudTag = React.memo((props: TagCloudTagPropsT) => {
 export const ActiveTagFilter = (props) => {
   const tag = TAGS.MAP[props.id]
   const [colorPalette, iconColor] = getColors(tag)
-  const isCompactView = $main.isCompactViewEnabled.use()
+  const isCompactView = $ui.isCompactViewEnabled.use()
   const size = isCompactView ? 'sm' : 'lg'
   const className = clsx('ActiveTagFilter', props.className)
 
@@ -74,7 +74,7 @@ const AssetTag = React.memo((props: AssetTagPropsT) => {
   const className = clsx('AssetTag', props.className)
 
   const toggleTag = () => {
-    $samplesViewStore.toggleFilterTag(props.id)
+    $search.toggleTag(props.id)
   }
 
   const ActiveChildren = () => {

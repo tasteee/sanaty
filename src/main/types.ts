@@ -1,3 +1,43 @@
+import { ColumnType, Generated, Insertable, JSONColumnType, Selectable, Updateable } from 'kysely'
+
+export type DatabaseT = {
+  folder: FolderTableT
+  sample: SamplTableT
+}
+
+export type FolderTableT = {
+  id: Generated<number>
+  name: string
+  path: string
+  artworkUrl: string
+  sampleCount: number
+  lastIndexedDate: number
+  createdDate: number
+}
+
+// You should not use the table schema interfaces directly. Instead, you should
+// use the `Selectable`, `Insertable` and `Updateable` wrappers. These wrappers
+// make sure that the correct types are used in each operation.
+//
+// Most of the time you should trust the type inference and not use explicit
+// types at all. These types can be useful when typing function arguments.
+export type DBFolderT = Selectable<FolderTableT>
+export type DBNewFolderT = Insertable<FolderTableT>
+export type DBFolderUpdateT = Updateable<FolderTableT>
+
+export type SamplTableT = {
+  id: Generated<number>
+  name: string
+  path: string
+  kind: string
+
+  createdDate: number
+}
+
+export type Pet = Selectable<SamplTableT>
+export type NewPet = Insertable<SamplTableT>
+export type PetUpdate = Updateable<SamplTableT>
+
 export type FolderT = {
   id: string
   path: string
