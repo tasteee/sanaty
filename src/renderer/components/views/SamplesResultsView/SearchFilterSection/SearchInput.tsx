@@ -1,19 +1,34 @@
-import './SearchInput.css'
-import { InputGroup, Input, CuteIcon, Button } from '#/components'
+import { CuteIcon } from '#/components'
 import { $search } from '#/stores/search.store'
+import { Input } from '@mantine/core'
 
-const SearchIcon = <CuteIcon name="search-2" size="md" color="#71717a" />
+const searchIcon = <CuteIcon name="search-2" size="md" color="#71717a" />
 
 export const SearchInput = () => {
   const value = $search.filters.use((state) => state.searchValue)
+
+  const clearValue = () => {
+    $search.filters.set({ searchValue: '' })
+  }
 
   const onChange = (event: any) => {
     $search.filters.set({ searchValue: event.target.value })
   }
 
+  const getRightSection = () => {
+    if (value) return <Input.ClearButton onClick={clearValue} />
+    return null
+  }
+
   return (
-    <InputGroup className="SearchInput" flex="1" startElement={SearchIcon}>
-      <Input size="md" variant="outline" placeholder="Search" value={value} onChange={onChange} />
-    </InputGroup>
+    <Input
+      value={value}
+      placeholder="Search"
+      onChange={onChange}
+      leftSection={searchIcon}
+      rightSection={getRightSection()}
+      rightSectionPointerEvents="auto"
+      size="sm"
+    />
   )
 }

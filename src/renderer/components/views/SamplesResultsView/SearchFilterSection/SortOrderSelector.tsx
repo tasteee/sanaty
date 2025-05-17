@@ -1,25 +1,20 @@
-import { createListCollection } from '#/components'
-import { SelectInput } from '#/components/ui/SelectInput'
-import { SORT_ORDER_OPTIONS } from '#/constants/sortOptions'
+import { Select } from '@mantine/core'
 import { $search } from '#/stores/search.store'
 import './SortOrderSelector.css'
 
-const sortOrderCollection = createListCollection({
-  items: SORT_ORDER_OPTIONS
-})
-
 export const SortOrderSelector = () => {
-  const sortOrder = $search.filters.use((state) => state.sortOrder)
-  const onChange = (_, value) => $search.setSortOrder(value)
+  const sortOrder = $search.useSortOrderFilter()
+  const onChange = (value) => $search.setSortOrder(value)
 
   return (
-    <SelectInput
-      className="SortOrderSelector"
-      placeholder="Sort Order"
+    <Select
+      size="xs"
+      width="160px"
       value={sortOrder}
       onChange={onChange}
-      collection={sortOrderCollection}
-      width="180px"
+      className="SortOrderSelector"
+      placeholder="Sort Order"
+      data={['Ascending', 'Descending']}
     />
   )
 }

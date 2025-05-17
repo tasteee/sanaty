@@ -1,6 +1,7 @@
 import { makeGlobal } from '#/modules/_global'
 import { datass } from 'datass'
 import { toaster } from '#/components/ui/toaster'
+import { $ui } from './ui.store'
 
 class CollectionsStore {
   store = datass.array<CollectionT>([])
@@ -31,16 +32,21 @@ class CollectionsStore {
     return null
   }
 
-  addSampleToCollection = async (id, sampleId) => {
+  addSampleToCollection = async (id) => {
+    const sampleId = $ui.collectionAdditionSampleId.state
     const success = await window.electron.addToCollection(id, sampleId)
-    await this.load()
     if (!success) return
+    $ui.isAddToCollectionModalOpen.set(false)
+    $ui.isAddingToCollection.set(false)
+    $ui.collectionAdditionSampleId.set('')
 
     toaster.create({
       title: `Added to collection.`,
       type: 'success',
       duration: 2000
     })
+
+    await this.load()
   }
 
   removeSampleFromCollection = async (id, sampleId) => {

@@ -1,0 +1,48 @@
+.NavBar {
+  width: 80px;
+  height: 100vh;
+  padding: var(--mantine-spacing-md);
+  padding-top: var(--mantine-spacing-xl);
+  display: flex;
+  z-index: 2;
+  flex-direction: column;
+  /* border-right: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4)); */
+}
+
+.NavBarMain {
+  flex: 1;
+  margin-top: 50px;
+}
+
+.NavBarLink {
+  width: 50px;
+  height: 50px;
+  border-radius: var(--mantine-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-0));
+
+  &:hover {
+    background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-5));
+  }
+
+  &[data-active] {
+    &,
+    &:hover {
+      background-color: var(--mantine-color-blue-light);
+      color: var(--mantine-color-blue-light-color);
+    }
+  }
+}
+
+.SearchBar {
+  width: 220px;
+  height: 100vh;
+  padding: var(--mantine-spacing-md);
+  padding-top: var(--mantine-spacing-xl);
+  display: flex;
+  z-index: 2;
+  flex-direction: column;
+  /* border-right: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4)); */
+}

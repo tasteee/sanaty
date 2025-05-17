@@ -1,19 +1,19 @@
-import { makeGlobal } from '#/modules/_global'
 import { datass } from 'datass'
 import { $collections } from './collections.store'
+import { $ui } from './ui.store'
 
 class FoldersStore {
   list = datass.array<FolderT>([])
 
   load = async () => {
     const allFolders = await window.electron.getAllFolders()
-    console.log('LOAD ', allFolders)
     this.list.set(allFolders)
   }
 
   add = async () => {
+    $ui.isIndexingFolder.set(true)
     await window.electron.addFolder()
-    console.log('ADDED FOLDER')
+    $ui.isIndexingFolder.set(false)
     this.load()
   }
 

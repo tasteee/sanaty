@@ -12,7 +12,6 @@
 // export { searchSamples } from './api/searchSamples'
 // export { updateCollection } from './api/updateCollection'
 
-import range from 'array-range'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as crypto from 'crypto'
@@ -21,8 +20,8 @@ import LokiFS from 'lokijs/src/loki-fs-structured-adapter'
 import { app } from 'electron'
 import { dialog } from 'electron'
 import { glob } from 'glob'
-import random from 'just-random'
-import { TAGS } from '#/constants'
+
+import { parseSample } from './parseSample'
 
 // Define allowed audio extensions
 const ALLOWED_EXTENSIONS = ['.wav', '.mp3']
@@ -115,67 +114,11 @@ function scanFolderSampleFiles(folderPath: string) {
   return audioFilePaths
 }
 
-function getRandomScale() {
-  return random([
-    'major',
-    'minor',
-    'harmonicMinor',
-    'melodicMinor',
-    'dorian',
-    'phrygian',
-    'lydian',
-    'mixolydian',
-    'locrian',
-    'pentatonicMajor',
-    'pentatonicMinor',
-    'blues'
-  ])
-}
-
-function getRandomTonic() {
-  return random(['a', 'a#', 'b', 'c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#'])
-}
-
-function getRandomTag() {
-  return random(TAGS.LIST)
-}
-
-function getRandomSampletype() {
-  return random(['shot', 'loop'])
-}
-
-function getRandomTags() {
-  return [getRandomTag().id, getRandomTag().id, getRandomTag().id, getRandomTag().id, getRandomTag().id]
-}
-
 const processFolderSamples = async (folder: FolderT) => {
   const sampleFilePaths = scanFolderSampleFiles(folder.path)
 
   for (const filePath of sampleFilePaths) {
-    const stats = fs.statSync(filePath)
-    const extension = path.extname(filePath).toLowerCase()
-    const duration = random(range(1, 30)) as number
-    const bpm = random(range(70, 160)) as number
-    const fileName = path.basename(filePath, extension)
-    const fullName = path.basename(filePath)
-
-    const sample: SampleT = {
-      id: crypto.randomUUID(),
-      fullName,
-      name: fileName,
-      path: filePath,
-      size: stats.size,
-      extension: extension.substring(1),
-      folderId: folder.id,
-      duration,
-      bpm,
-      tonic: getRandomTonic(),
-      scale: getRandomScale(),
-      sampleType: getRandomSampletype(),
-      tags: getRandomTags(),
-      dateAdded: Date.now()
-    }
-
+    const sample = await parseSample(filePath, folder.id)
     samples.insert(sample)
   }
 
@@ -239,6 +182,10 @@ export const toggleLiked = (id: string): boolean => {
   if (!existingLike) likes.insert({ id })
   console.log('IS NOW LIKED? ', !existingLike)
   return existingLike ? false : true
+}
+
+export const getSampleById = async (id: string) => {
+  return samples.findOne({ id })
 }
 
 // Search samples
@@ -389,11 +336,22 @@ export const removeFromCollection = (id: string, sampleId: string) => {
   return true
 }
 
+const getAudioData = async (filePath: string) => {
+  try {
+    const data = await fs.promises.readFile(filePath)
+    return [data.buffer, null]
+  } catch (error) {
+    console.error('Error reading audio file:', error)
+    return [null, error]
+  }
+}
+
 export const database = {
   initDatabase,
   addFolder,
   getAllFolders,
   refreshFolder,
+  getAudioData,
   removeFolder,
   getAllLikes,
   toggleLiked,
@@ -403,5 +361,6 @@ export const database = {
   updateCollection,
   deleteCollection,
   addToCollection,
-  removeFromCollection
+  removeFromCollection,
+  getSampleById
 }

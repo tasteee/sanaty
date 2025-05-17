@@ -1,5 +1,5 @@
 export const TONICS = [
-  { label: 'Any Key', value: 'any' },
+  { label: 'Any Tonic', value: 'any' },
   { label: 'A', value: 'a' },
   { label: 'A#', value: 'a#' },
   { label: 'B', value: 'b' },
@@ -15,3 +15,5 @@ export const TONICS = [
 ]
 
 export const ANY_TONIC = TONICS[0]
+
+export const TONIC_LABELS = TONICS.map((tonic) => tonic.label)

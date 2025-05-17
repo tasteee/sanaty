@@ -34,5 +34,14 @@
     "**/.DS_Store": true,
     "**/Thumbs.db": true
   },
+  
+  "cssVariables.lookupFiles": [
+    "**/*.css",
+    "**/*.scss",
+    "**/*.sass",
+    "**/*.less",
+    "node_modules/@mantine/core/styles.css"
+  ],
+
   "hide-files.files": ["node_modules"]
 }

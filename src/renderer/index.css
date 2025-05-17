@@ -61,10 +61,6 @@ body,
   -moz-osx-font-smoothing: grayscale;
 }
 
-.App {
-  padding: 12px 12px 0px;
-}
-
 input[type='number']::-webkit-outer-spin-button,
 input[type='number']::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -201,7 +197,6 @@ div:focus {
 .ViewBoxMotionDiv,
 .ViewBoxFlex {
   height: 100%;
-  max-height: calc(100vh - 24px) !important;
 }
 
 .Pagination {

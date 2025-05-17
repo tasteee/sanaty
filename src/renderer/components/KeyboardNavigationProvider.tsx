@@ -2,6 +2,7 @@ import { KeyboardEvent, useEffect } from 'react'
 import { $ui } from '#/stores/ui.store'
 import { $search } from '#/stores/search.store'
 import React from 'react'
+import { $playback } from '#/stores/playback.store'
 
 function checkIsTargetAnInput(event) {
   const target = event.target as HTMLElement
@@ -34,7 +35,7 @@ export const useKeyboardNavigation = () => {
         event.preventDefault()
 
         const allResults = $search.results.state.all
-        const currentActiveIndex = $ui.activeAssetIndex.state
+        const currentActiveIndex = $playback.activeAssetIndex.state
         const currentPage = $search.pagination.state.currentPage
         const totalPages = $search.pagination.state.totalPages
         const itemsPerPage = $search.pagination.state.itemsPerPage
@@ -71,30 +72,10 @@ export const useKeyboardNavigation = () => {
 
         // Update active asset if the index changed
         if (newIndex !== currentActiveIndex) {
-          $ui.setActiveSampleIndex(newIndex)
           const activeSample = allResults[newIndex]
-
-          if (activeSample) {
-            $ui.setActiveSampleId(activeSample.id)
-            // Play the sample audio
-            playSample(activeSample)
-          }
+          if (activeSample) $playback.playSample(activeSample, newIndex)
         }
       }
-    }
-
-    const playSample = (sample) => {
-      $ui.isPlayingSound.set(true)
-
-      // TODO: Here you would implement actual audio playback
-      // This is a placeholder for your audio playback implementation
-      console.log('Playing sample:', sample.name)
-      // Simulate audio completion after sample duration
-      const duration = sample.duration * 1000 // Convert seconds to milliseconds
-
-      setTimeout(() => {
-        $ui.isPlayingSound.set(false)
-      }, duration || 3000)
     }
 
     window.addEventListener('keydown', handleKeyDown)
@@ -107,7 +88,7 @@ export const useKeyboardNavigation = () => {
 }
 
 function useActiveSampleScrollTo() {
-  const activeSampleId = $ui.activeSampleId.use()
+  const activeSampleId = $playback.activeSampleId.use()
 
   React.useEffect(() => {
     // if (!activeSampleId) return

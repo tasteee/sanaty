@@ -1,22 +1,22 @@
+import React from 'react'
 import { datass } from 'datass'
-import { _number, parseToNumber } from '#/modules/number'
-import { $ui } from './ui.store'
-import { makeGlobal } from '#/modules/_global'
+import { _number, toNumber } from '#/modules/number'
+import { $playback } from './playback.store'
 
 class SearchStore {
   filters = datass.object({
     searchValue: '',
-    tonic: 'any',
-    scale: 'any',
-    sampleType: 'any',
+    tonic: 'Any Tonic',
+    scale: 'Any Scale',
+    sampleType: 'Any Type',
     tags: [],
     isLiked: false,
     bpmMin: 50,
     bpmMax: 300,
     durationMin: 0,
     durationMax: 600,
-    sortBy: 'name',
-    sortOrder: 'descinding',
+    sortBy: 'Date Added',
+    sortOrder: 'Descending',
     collectionId: '',
     folderId: ''
   })
@@ -27,7 +27,7 @@ class SearchStore {
   })
 
   pagination = datass.object({
-    itemsPerPage: 10,
+    itemsPerPage: 20,
     totalPages: 1,
     currentPage: 1
   })
@@ -51,11 +51,19 @@ class SearchStore {
   usePaginationTotalPages = () => this.usePaginationValue('totalPages')
   usePaginationItemsPerPage = () => this.usePaginationValue('itemsPerPage')
 
+  getCorrectedFilters = () => {
+    const filters = { ...this.filters.state }
+    if (filters.sortBy === 'Date Added') filters.sortBy = 'dateAdded'
+    if (filters.sortBy === 'Duration') filters.sortBy = 'duration'
+    if (filters.sortBy === 'Name') filters.sortBy = 'name'
+    filters.sortOrder = filters.sortOrder.toLowerCase()
+    return filters
+  }
+
   searchSamples = async () => {
-    const filters = this.filters.state
+    const filters = this.getCorrectedFilters()
     const results = await window.electron.searchSamples(filters)
-    $ui.setActiveSampleIndex(-1)
-    $ui.setActiveSampleId('')
+    $playback.clearActiveSample()
     this.results.set({ all: results })
     this.update()
   }
@@ -105,7 +113,7 @@ class SearchStore {
 
   setMinBpm = (value) => {
     const maxBpm = this.filters.state.bpmMax
-    const numberValue = parseToNumber(value)
+    const numberValue = toNumber(value)
     const shouldIncreaseMaxBpm = numberValue >= maxBpm
     const bpmMax = shouldIncreaseMaxBpm ? numberValue : maxBpm
     const bpmMin = Math.max(numberValue, 0)
@@ -114,7 +122,7 @@ class SearchStore {
 
   setMaxBpm = (value) => {
     const minBpm = this.filters.state.bpmMin
-    const numberValue = parseToNumber(value)
+    const numberValue = toNumber(value)
     const shouldReduceMinBpm = numberValue <= minBpm
     const bpmMin = shouldReduceMinBpm ? numberValue : minBpm
     const bpmMax = Math.min(numberValue, 300)
@@ -123,7 +131,7 @@ class SearchStore {
 
   setMinDuration = (value) => {
     const maxDuration = this.filters.state.durationMax
-    const numberValue = parseToNumber(value)
+    const numberValue = toNumber(value)
     const shouldIncreaseMaxDuration = numberValue >= maxDuration
     const durationMax = shouldIncreaseMaxDuration ? numberValue : maxDuration
     const durationMin = Math.max(numberValue, 0)
@@ -132,7 +140,7 @@ class SearchStore {
 
   setMaxDuration = (value) => {
     const minDuration = this.filters.state.durationMin
-    const numberValue = parseToNumber(value)
+    const numberValue = toNumber(value)
     const shouldReduceMinDuration = numberValue <= minDuration
     const durationMin = shouldReduceMinDuration ? numberValue : minDuration
     const durationMax = Math.min(numberValue, 600) // Changed to 600 to match initial state
@@ -165,14 +173,28 @@ class SearchStore {
   }
 
   setItemsPerPage = (newItemsPerPage) => {
-    const itemsPerPage = parseToNumber(newItemsPerPage)
+    const itemsPerPage = toNumber(newItemsPerPage)
     const totalResults = this.results.state.all.length
     const totalPages = Math.ceil(totalResults / itemsPerPage)
-    const activeSampleIndex = $ui.activeAssetIndex.state
+    const activeSampleIndex = $playback.activeAssetIndex.state
     const currentPageBase = Math.floor(activeSampleIndex / itemsPerPage) + 1
     const currentPage = _number(currentPageBase).clamp(1, totalPages)
     this.pagination.set({ totalPages, currentPage, itemsPerPage })
     this.update()
+  }
+
+  useSampleById = (id) => {
+    const [sample, setSample] = React.useState({})
+
+    React.useEffect(() => {
+      if (!id) return
+
+      window.electron.getSampleById(id).then((data) => {
+        setSample(data || {})
+      })
+    }, [id])
+
+    return sample as SampleT
   }
 
   useSampleResult = (id) => {
@@ -180,7 +202,7 @@ class SearchStore {
   }
 
   useIsSampleActive = (id) => {
-    const activeSampleId = $ui.activeSampleId.use()
+    const activeSampleId = $playback.activeSampleId.use()
     return activeSampleId === id
   }
 

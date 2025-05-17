@@ -1,3 +1,10 @@
+.geistFont {
+  font-family: 'Geist', sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+}
+
 .tall {
   height: 100%;
 }
@@ -23,3 +30,27 @@
 .SampleResultsList p {
   user-select: none;
 }
+
+.ViewHeading {
+  flex-wrap: wrap;
+}
+
+.ActionableIcon {
+  color: var(--iconColor);
+}
+
+.ActionableIcon:hover {
+  color: var(--iconHoverColor);
+}
+
+.View {
+  height: 100%;
+}
+
+.AssetCopyButton:active {
+  cursor: grabbing !important;
+}
+
+/* .isDragging {
+  cursor: grabbing !important;
+} */

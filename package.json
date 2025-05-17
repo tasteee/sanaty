@@ -1,40 +1,10 @@
 {
   "name": "sanaty",
   "description": "A foundation for scalable desktop apps",
-  "keywords": [
-    "electron",
-    "boilerplate",
-    "react",
-    "typescript",
-    "ts",
-    "sass",
-    "webpack",
-    "hot",
-    "reload"
-  ],
-  "homepage": "https://github.com/tasteee/sanaty#readme",
-  "bugs": {
-    "url": "https://github.com/tasteee/sanaty/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/tasteee/sanaty.git"
-  },
   "license": "MIT",
-  "author": {
-    "name": "rokki",
-    "email": "rocolcleasure@gmail.com",
-    "url": "https://github.com/tasteee"
-  },
-  "contributors": [
-    {
-      "name": "Amila Welihinda",
-      "email": "amilajack@gmail.com",
-      "url": "https://github.com/amilajack"
-    }
-  ],
   "main": "./.erb/dll/main.bundle.dev.js",
   "scripts": {
+    "start:db": ".\\pocketbase\\pocketbase.exe serve",
     "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
     "build:dll": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true NODE_OPTIONS=\"-r ts-node/register --no-warnings\" webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.ts",
     "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true NODE_OPTIONS=\"-r ts-node/register --no-warnings\" webpack --config ./.erb/configs/webpack.config.main.prod.ts",
@@ -62,6 +32,7 @@
     "overrides": [
       {
         "files": [
+          ".prettierrc.json",
           ".prettierrc",
           ".eslintrc"
         ],
@@ -105,16 +76,24 @@
   },
   "dependencies": {
     "@chakra-ui/react": "^3.17.0",
+    "@css-hooks/react": "^3.0.4",
     "@electron-toolkit/utils": "^4.0.0",
     "@electron/notarize": "^3.0.0",
     "@emotion/react": "^11.14.0",
+    "@gsap/react": "^2.1.2",
     "@iconify/react": "^5.2.1",
+    "@mantine/core": "^8.0.1",
+    "@mantine/hooks": "^8.0.1",
+    "@mantine/notifications": "^8.0.1",
+    "@mantinex/mantine-logo": "^2.0.0",
     "@nozbe/watermelondb": "^0.28.0",
     "@seald-io/nedb": "^4.1.1",
     "@siberiacancode/reactuse": "^0.1.1",
     "@tanstack/react-virtual": "^3.13.8",
     "array-range": "^1.0.1",
+    "audio-decode": "^2.2.2",
     "await-of": "^3.1.1",
+    "await-to-js": "^3.0.0",
     "bumbledb": "^0.10.0",
     "capitalize": "^2.0.4",
     "clsx": "^2.1.1",
@@ -131,22 +110,32 @@
     "framer-motion": "^12.11.0",
     "get-audio-duration": "^4.0.1",
     "glob": "^11.0.2",
+    "gsap": "^3.13.0",
     "jexidb": "^1.1.0",
     "just-debounce": "^1.1.0",
+    "just-pipe": "^1.0.0",
     "just-random": "^3.2.0",
     "just-throttle": "^4.2.0",
     "kysely": "^0.28.2",
     "listerine": "^0.0.14",
+    "load-esm": "^1.0.2",
     "lowdb": "^7.0.1",
     "memoize": "^10.1.0",
-    "music-metadata": "^11.2.1",
+    "meyda": "^5.6.3",
+    "music-metadata": "^10.0.0",
     "next-themes": "^0.4.6",
     "node-gyp": "^11.2.0",
+    "pocketbase": "^0.26.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
+    "react-use-audio-player": "^4.0.2",
+    "remeda": "^2.21.5",
+    "store": "^2.0.12",
+    "use-sound": "^5.0.0",
     "uuid": "^11.1.0",
-    "wouter": "^3.6.0"
+    "wouter": "^3.6.0",
+    "wretch": "^2.11.0"
   },
   "devDependencies": {
     "@electron/rebuild": "^3.7.1",
@@ -197,6 +186,8 @@
     "mini-css-extract-plugin": "^2.9.2",
     "postcss": "^8.5.3",
     "postcss-loader": "^8.1.1",
+    "postcss-preset-mantine": "^1.17.0",
+    "postcss-simple-vars": "^7.0.1",
     "prettier": "^3.5.3",
     "react-refresh": "^0.16.0",
     "react-test-renderer": "^19.0.0",

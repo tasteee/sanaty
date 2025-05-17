@@ -1,12 +1,13 @@
-import { Flex } from '@chakra-ui/react/flex'
-import { Heading } from '@chakra-ui/react/typography'
 import { CuteIcon } from './ui/CuteIcon'
+import { Flex, Title } from '@mantine/core'
 
 export const ViewHeading = (props) => {
   return (
-    <Flex gap="4" mb="2" align="center" className="ViewHeading">
-      <CuteIcon customIcon={props.iconName} size="xl" style={{ marginTop: 2 }} />
-      <Heading size="3xl">{props.title}</Heading>
+    <Flex gap="xs" mb="sm" mt="md" align="center" className="ViewHeading">
+      {props.iconName && <CuteIcon customIcon={props.iconName} size="2xl" />}
+      <Title order={2} lh="80%">
+        {props.title}
+      </Title>
       {props.children}
     </Flex>
   )

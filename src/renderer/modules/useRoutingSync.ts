@@ -1,10 +1,24 @@
 import { $ui } from '#/stores/ui.store'
 import React from 'react'
-import { useParams, useRoute, useRouter } from 'wouter'
+import { useLocation, useParams, useRoute, useRouter } from 'wouter'
+
+const useSearchableViewActiveSync = () => {
+  const [location] = useLocation()
+
+  React.useEffect(() => {
+    const isSamples = location.startsWith('/samples')
+    const isFolder = location.startsWith('/folders/folder')
+    const isCollection = location.startsWith('/collections/collection')
+    if (isSamples || isCollection || isFolder) $ui.isSearchableViewActive.set(true)
+  }, [location])
+}
 
 export function useRoutingSync() {
+  useSearchableViewActiveSync()
+
   const [isCollectionPath, collectionPathRest] = useRoute('/collections/collection/*?')
   const [isFolderPath, folderPathRest] = useRoute('/folders/folder/*?')
+
   const params = useParams() as any
   const collectionPathRestId = (collectionPathRest as any)?.[0]
   const folderPathRestId = (folderPathRest as any)?.[0]

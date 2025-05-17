@@ -3,6 +3,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 const electronHandler = {
   openExplorerAtPath: (path: string) => ipcRenderer.invoke('openExplorerAtPath', path),
   addFolder: () => ipcRenderer.invoke('addFolder'),
+  getSampleById: (id) => ipcRenderer.invoke('getSampleById', id),
   getAllFolders: () => ipcRenderer.invoke('getAllFolders'),
   refreshFolder: (id) => ipcRenderer.invoke('refreshFolder', id),
   removeFolder: (id) => ipcRenderer.invoke('removeFolder', id),
@@ -14,7 +15,10 @@ const electronHandler = {
   updateCollection: (id, updates) => ipcRenderer.invoke('updateCollection', id, updates),
   deleteCollection: (id) => ipcRenderer.invoke('deleteCollection', id),
   addToCollection: (id, sampleId) => ipcRenderer.invoke('addToCollection', id, sampleId),
-  removeFromCollection: (id, sampleId) => ipcRenderer.invoke('removeFromCollection', id, sampleId)
+  removeFromCollection: (id, sampleId) => ipcRenderer.invoke('removeFromCollection', id, sampleId),
+  getAudioData: (filePath) => ipcRenderer.invoke('getAudioData', filePath),
+  copySampleToClipboard: (filePath) => ipcRenderer.invoke('copySampleToClipboard', filePath),
+  startDrag: (filePath: string) => ipcRenderer.invoke('startDrag', filePath)
 }
 
 export type ElectronHandler = typeof electronHandler

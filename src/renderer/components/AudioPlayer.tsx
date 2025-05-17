@@ -2,15 +2,16 @@ import './AudioPlayer.css'
 import React, { useEffect, useState, useRef } from 'react'
 import { $ui } from '#/stores/ui.store'
 import { $search } from '#/stores/search.store'
+import { $playback } from '#/stores/playback.store'
 
 export const AudioPlayer = () => {
   const audioRef = useRef(null)
   const [isLoading, setIsLoading] = useState(false)
   const [currentSample, setCurrentSample] = useState(null)
 
-  const activeSampleId = $ui.activeSampleId.use()
-  const isPlaying = $ui.isPlayingSound.use()
-  const activeAssetIndex = $ui.activeAssetIndex.use()
+  const activeSampleId = $playback.activeSampleId.use()
+  const isPlaying = $playback.isPlayingSound.use()
+  const activeAssetIndex = $playback.activeAssetIndex.use()
 
   useEffect(() => {
     if (!activeSampleId) return setCurrentSample(null)
@@ -23,18 +24,18 @@ export const AudioPlayer = () => {
     const audioElement = audioRef.current
 
     // Update UI store with audio element reference
-    $ui.currentAudio.set(audioElement)
+    $playback.currentAudio.set(audioElement)
 
     const handlePlay = () => {
-      $ui.isPlayingSound.set(true)
+      $playback.isPlayingSound.set(true)
     }
 
     const handleEnded = () => {
-      $ui.isPlayingSound.set(false)
+      $playback.isPlayingSound.set(false)
     }
 
     const handlePause = () => {
-      $ui.isPlayingSound.set(false)
+      $playback.isPlayingSound.set(false)
     }
 
     audioElement.addEventListener('play', handlePlay)
@@ -67,7 +68,7 @@ export const AudioPlayer = () => {
       setIsLoading(false)
       audioRef.current.play().catch((err) => {
         console.error('Error playing audio:', err)
-        $ui.isPlayingSound.set(false)
+        $playback.isPlayingSound.set(false)
       })
     }, 100)
   }, [isPlaying, currentSample])

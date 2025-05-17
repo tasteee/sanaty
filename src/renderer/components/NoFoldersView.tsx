@@ -8,7 +8,7 @@ export const NoFoldersView = () => {
       <EmptyState.Root>
         <EmptyState.Content>
           <EmptyState.Indicator>
-            <CuteIcon name="sad" size={100} />
+            <CuteIcon name="sad" size="2xl" />
           </EmptyState.Indicator>
           <VStack textAlign="center">
             <EmptyState.Title>Start adding a folder</EmptyState.Title>

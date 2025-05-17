@@ -1,11 +1,16 @@
 import { app, BrowserWindow, ipcMain, shell, dialog } from 'electron'
 import path from 'path'
+import fs from 'fs'
 import log from 'electron-log'
 import { autoUpdater } from 'electron-updater'
 import MenuBuilder from './menu'
 import { resolveHtmlPath } from './util'
 import { setupIpcHandlers } from './handlers'
 import { initDatabase } from './database'
+
+// const iconBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgS8btkIAAAAASUVORK5CYII='
+// const iconPath = path.join(__dirname, '../img', 'drag-icon.png')
+// fs.writeFileSync(iconPath, Buffer.from(iconBase64, 'base64'))
 
 // App state
 let mainWindow: BrowserWindow | null = null
@@ -71,6 +76,7 @@ const createWindow = async () => {
     return { action: 'deny' }
   })
 
+  setupIpcHandlers(mainWindow)
   new AppUpdater()
 }
 
@@ -90,5 +96,3 @@ app.whenReady().then(() => {
 
 // Quit
 ipcMain.handle('closeApp', () => app.quit())
-
-setupIpcHandlers()
