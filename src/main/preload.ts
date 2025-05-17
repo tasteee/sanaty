@@ -3,6 +3,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 const electronHandler = {
   openExplorerAtPath: (path: string) => ipcRenderer.invoke('openExplorerAtPath', path),
   addFolder: () => ipcRenderer.invoke('addFolder'),
+  openExplorerAtFolder: (id) => ipcRenderer.invoke('openExplorerAtFolder', id),
   getSampleById: (id) => ipcRenderer.invoke('getSampleById', id),
   getAllFolders: () => ipcRenderer.invoke('getAllFolders'),
   refreshFolder: (id) => ipcRenderer.invoke('refreshFolder', id),

@@ -63,7 +63,7 @@ class SearchStore {
   searchSamples = async () => {
     const filters = this.getCorrectedFilters()
     const results = await window.electron.searchSamples(filters)
-    $playback.clearActiveSample()
+    $playback.reset()
     this.results.set({ all: results })
     this.update()
   }
@@ -218,4 +218,4 @@ class SearchStore {
 }
 
 export const $search = new SearchStore()
-globalThis.search = $search
+globalThis.$search = $search

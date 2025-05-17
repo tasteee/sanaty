@@ -145,7 +145,7 @@ export const parseSample = async (filePath, folderId) => {
   // console.log({ isLoop, duration, tonic, scale, sampleRate, bpm })
 
   const sample: SampleT = {
-    id: crypto.randomUUID(),
+    id: filePath,
     fullName,
     name: fileName,
     path: filePath,

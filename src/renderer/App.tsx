@@ -39,13 +39,10 @@ export const App = () => {
 const Overlays = () => {
   const isCreateCollectionDialogOpen = $ui.isCreateCollectionDialogOpen.use()
   const isEditCollectionDialogOpen = $ui.isEditCollectionDialogOpen.use()
-  const routeEntityId = $ui.routeEntityId.use()
 
   return (
     <>
-      {isEditCollectionDialogOpen && (
-        <EditCollectionDialog collectionId={routeEntityId} handleClose={() => $ui.isEditCollectionDialogOpen.set(false)} />
-      )}
+      {isEditCollectionDialogOpen && <EditCollectionDialog />}
       {isCreateCollectionDialogOpen && <CreateCollectionDialog handleClose={() => $ui.isCreateCollectionDialogOpen.set(false)} />}
       <AddToCollectionModal />
     </>

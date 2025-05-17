@@ -1,11 +1,11 @@
 import { useEffect } from 'react'
 import './AssetResultsList.css'
-import { ResultsPaginator } from '../../../ResultsPaginator'
+import { ResultsPaginator } from '../ResultsPaginator'
 import { Box, Flex, Text, ActionIcon, CopyButton, Tooltip } from '@mantine/core'
 import { Card } from '#/components'
 import { SortOptionsRow } from '../SearchFilterSection/SortOptionsRow'
 import { Menu } from '@mantine/core'
-import { SanatyTag } from '../../../ui/SanatyTag'
+import { SanatyTag } from '../ui/SanatyTag'
 import { $ui } from '#/stores/ui.store'
 import { $likes } from '#/stores/likes.store'
 import clsx from 'clsx'
@@ -23,7 +23,7 @@ function loadInitialSampleResults() {
   const entityId = $ui.routeEntityId.state
   const filterKey = entityType === 'collection' ? 'collectionId' : 'folderId'
 
-  $playback.clearActiveSample()
+  $playback.reset()
   $search.filters.set.reset()
   $search.results.set.reset()
   $search.pagination.set.reset()
@@ -107,9 +107,12 @@ export const AssetRow = (props: AssetRowPropsT) => {
 
   const activateAssetRow = (event) => {
     if (event.button === 2) return
+    AssetOpenLocationButton
+    const isOpener = event.target.closest('.AssetOpenLocationButton') !== null
+    const isLiker = event.target.closest('.AssetLikeToggler') !== null
     const isLeftColumn = event.target.closest('.leftColumn') !== null
     const isInsideHoverCard = event.target.closest('.hoverCardContent') !== null
-    if (isInsideHoverCard || isLeftColumn) return
+    if (isInsideHoverCard || isLeftColumn || isLiker || isOpener) return
     if (isActive) return
     $playback.playSample(sample, props.globalIndex)
   }
@@ -169,29 +172,30 @@ const RightColumn = (props) => {
     <Flex gap="md" align="flex-end" ml="md">
       <AssetLikeToggler {...props} />
       <AddToCollectionButton {...props} />
+      <AssetOpenLocationButton {...props} />
       <AssetCopyButton {...props} />
       {/* <AssetOptionsMenu {...props} /> */}
     </Flex>
   )
 }
 
+const AssetOpenLocationButton = (props) => {
+  const onOpenClick = (event) => {
+    event.stopPropagation()
+    window.electron.openExplorerAtFolder(props.folderId)
+  }
+
+  return <Icon className="AssetOpenLocationButton" color="gray" icon="majesticons:open-line" width={24} height={24} onClick={onOpenClick} />
+}
+
 const AssetCopyButton = (props) => {
-  const onDragStart = (e) => {
-    e.preventDefault()
+  const onDragStart = (event) => {
+    event.preventDefault()
     $ui.isDragging.set(true)
-
-    // First verify the file exists
-
     // Important: set effectAllowed to make the drag operation work
-    e.dataTransfer.effectAllowed = 'copyMove'
-
-    // For web compatibility (helps in some cases)
-    e.dataTransfer.setData('text/plain', props.path)
-
-    // Perform the actual drag via IPC
+    event.dataTransfer.effectAllowed = 'copyMove'
+    event.dataTransfer.setData('text/plain', props.path)
     window.electron.startDrag(props.path)
-
-    console.log('Drag started successfully')
   }
 
   const onDragEnd = () => {
@@ -207,7 +211,7 @@ const AssetCopyButton = (props) => {
       draggable={true}
       className="AssetCopyButton"
     >
-      <ActionableIcon width={24} height={24} icon="mingcute:clipboard-line" color="gray" />
+      <ActionableIcon width={28} height={28} icon="iconoir:drag-hand-gesture" color="gray" />
     </Flex>
   )
 }
@@ -228,16 +232,12 @@ export const AssetOptionsMenu = () => {
 }
 
 const AddToCollectionButton = (props) => {
-  const isBeingAddedToCollection = false
-  const color = isBeingAddedToCollection ? 'orange' : 'gray'
-  const iconName = isBeingAddedToCollection ? 'raphael:no' : 'si:add-square-line'
-
   const handleClick = (event) => {
     event.stopPropagation()
     $ui.turnAddToCollectionModeOn(props.id)
   }
 
-  return <ActionableIcon width={24} height={24} icon={iconName} color={color} onClick={handleClick} />
+  return <ActionableIcon width={24} height={24} icon="si:add-square-line" color="gray" onClick={handleClick} />
 }
 
 const AssetLikeToggler = (props) => {
@@ -251,7 +251,9 @@ const AssetLikeToggler = (props) => {
     $likes.toggle(props.id)
   }
 
-  return <ActionableIcon width={24} height={24} icon={iconName} color={color} onClick={handleClick} style={style} />
+  return (
+    <ActionableIcon className="AssetLikeToggler" width={24} height={24} icon={iconName} color={color} onClick={handleClick} style={style} />
+  )
 }
 
 const ActionableIcon = (props) => {
@@ -287,7 +289,6 @@ const LeftColumn = (props) => {
 
   const handleClick = (event) => {
     event.stopPropagation()
-    console.log({ isSoundPlaying, isActive: props.isActive, isThisSamplePlaying })
     isThisSamplePlaying ? $playback.pausePlayback() : $playback.playSample(props, props.globalIndex)
   }
 

@@ -1,8 +1,7 @@
 import { Wrap } from '#/components'
 import { $folders } from '#/stores/folders.store'
 import { Stat } from '@chakra-ui/react'
-import { Button, Flex, Text } from '@mantine/core'
-import './HomeView.css'
+import { Button, Flex, Slider, Text } from '@mantine/core'
 import { $likes } from '#/stores/likes.store'
 import { FolderCard } from '#/components/FolderCard'
 import { View } from '#/components/View'
@@ -15,19 +14,18 @@ const useTotalSampleCount = () => {
   }, 0)
 }
 
-export const HomeView = () => {
+export const FoldersView = () => {
   const folders = $folders.list.use()
   const totalSampleCount = useTotalSampleCount()
   const likes = $likes.store.use()
 
   return (
-    <View id="HomeView" style={{ height: '100vh' }}>
-      <View.Heading title="Home" iconName="mingcute:home-6-fill">
-        <Button variant="outline" onClick={() => $folders.add()}>
+    <View id="FoldersView" style={{ height: '100vh' }}>
+      <View.Heading title="Folders" iconName="mingcute:home-6-fill">
+        <Button size="xs" variant="default" onClick={() => $folders.add()}>
           Add Folder
         </Button>
       </View.Heading>
-
       <Flex gap="sm" mb="sm" mt="sm" justify="flex-start">
         <Stat.Root borderWidth="1px" p="4" rounded="md" maxWidth="200px">
           <Stat.Label>Folders</Stat.Label>
@@ -48,8 +46,6 @@ export const HomeView = () => {
           <FolderCard key={folder.id} {...folder} />
         ))}
       </Wrap>
-
-      {/* <ColorsPreviewGrid /> */}
     </View>
   )
 }

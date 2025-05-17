@@ -36,11 +36,11 @@
 }
 
 .ActionableIcon {
-  color: var(--iconColor);
+  color: var(--iconColor) !important;
 }
 
 .ActionableIcon:hover {
-  color: var(--iconHoverColor);
+  color: var(--iconHoverColor) !important;
 }
 
 .View {
@@ -54,3 +54,9 @@
 /* .isDragging {
   cursor: grabbing !important;
 } */
+
+.VolumeSlider {
+  /* position: absolute;
+  bottom: 70px;
+  left: -10px; */
+}

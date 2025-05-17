@@ -1,22 +1,22 @@
 import { Switch, Route, Redirect, useRoute, useLocation } from 'wouter'
-import { CollectionsView } from './components/views/CollectionsView/CollectionsView'
-import { FolderView } from './components/views/FoldersView/FolderView'
-import { HomeView } from './components/views/HomeView/HomeView'
-import { Router as Wouter, useParams } from 'wouter'
-import { SamplesView } from './components/views/SamplesView'
-import { CollectionView } from './components/views/CollectionsView/CollectionView'
+import { CollectionsView } from './components/CollectionsView'
+import { FolderView } from './components/FolderView'
+import { FoldersView } from './components/FoldersView'
+import { Router as Wouter } from 'wouter'
+import { SamplesView } from './components/SamplesView'
+import { CollectionView } from './components/CollectionView'
 
 export const Router = () => {
   return (
     <>
       <Wouter>
         <Switch>
-          <Route path="/" component={HomeView} />
+          <Route path="/" component={SamplesView} />
           <Route path="/index.html" component={() => <Redirect to="/" />} />
           <Route path="/samples" component={SamplesView} />
           <Route path="/collections/collection/:id" component={CollectionView} />
           <Route path="/folders/folder/:id" component={FolderView} />
-          <Route path="/folders" component={HomeView} />
+          <Route path="/folders" component={FoldersView} />
           <Route path="/collections" component={CollectionsView} />
         </Switch>
       </Wouter>

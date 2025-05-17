@@ -13,17 +13,17 @@ export const SearchControls = () => {
   const pt = useMatches({
     base: 'sm',
     sm: 'sm',
-    lg: ''
+    lg: 'sm'
   })
 
   const width = useMatches({
     base: '100%',
     sm: '100%',
-    lg: 'auto'
+    lg: '100%'
   })
 
   return (
-    <Flex gap="xs" pt={pt} style={{ width }}>
+    <Flex gap="xs" pt={pt} style={{ width, maxWidth: 980 }}>
       <SearchInput />
       <LikedFilterSwitch />
       <TonicSelect />
@@ -41,7 +41,7 @@ export const SearchInput = () => {
   const value = $search.filters.use((state) => state.searchValue)
 
   const handleSearch = useDebouncedCallback(() => {
-    $search.searchSamples()
+    $search.softSearchSamples()
   }, 1000)
 
   const clearValue = () => {
@@ -275,7 +275,7 @@ export const LikedFilterSwitch = () => {
   }
 
   const handleSearch = useDebouncedCallback(() => {
-    $search.searchSamples()
+    $search.softSearchSamples()
   }, 500)
 
   return (

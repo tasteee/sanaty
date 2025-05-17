@@ -17,7 +17,7 @@ import * as path from 'path'
 import * as crypto from 'crypto'
 import Loki, { Collection } from 'lokijs'
 import LokiFS from 'lokijs/src/loki-fs-structured-adapter'
-import { app } from 'electron'
+import { app, shell } from 'electron'
 import { dialog } from 'electron'
 import { glob } from 'glob'
 
@@ -83,7 +83,6 @@ export const addFolder = async () => {
   const folderPath = await openAddFolderSelectDialog()
   if (!folderPath) return false
 
-  console.log('\n\n\nADDING FOLDER ', folderPath)
   const existingFolder = folders.findOne({ path: folderPath })
   if (existingFolder) return false
 
@@ -175,12 +174,9 @@ export const getAllLikes = (): string[] => {
 }
 
 export const toggleLiked = (id: string): boolean => {
-  console.log('\n\n\n TOGGLING LIKE ', id)
   const existingLike = likes.findOne({ id })
-  console.log('IS ALREADY LIKED? ', !!existingLike)
   if (existingLike) likes.remove(existingLike)
   if (!existingLike) likes.insert({ id })
-  console.log('IS NOW LIKED? ', !existingLike)
   return existingLike ? false : true
 }
 
@@ -346,9 +342,15 @@ const getAudioData = async (filePath: string) => {
   }
 }
 
+function openExplorerAtFolder(id: string) {
+  const folder = folders.findOne({ id })
+  shell.openPath(folder.path)
+}
+
 export const database = {
   initDatabase,
   addFolder,
+  openExplorerAtFolder,
   getAllFolders,
   refreshFolder,
   getAudioData,

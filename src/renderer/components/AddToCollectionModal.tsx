@@ -1,4 +1,4 @@
-import { Modal, Button, Flex, Text } from '@mantine/core'
+import { Modal, Button, Flex, Text, Card } from '@mantine/core'
 import { $ui } from '#/stores/ui.store'
 import { $collections } from '#/stores/collections.store'
 
@@ -13,12 +13,14 @@ export const AddToCollectionModal = () => {
     <Modal opened={true} onClose={close} title="Add to Collection" centered>
       <Flex gap="sm" direction="column">
         {collections.map((collection) => (
-          <Flex p="xs" justify="space-between" key={collection.id}>
-            <Text size="sm">{collection.name}</Text>
-            <Button variant="light" size="sm" onClick={() => add(collection.id)}>
-              Add
-            </Button>
-          </Flex>
+          <Card key={collection.id} shadow="sm" p="xs" withBorder>
+            <Flex justify="space-between" align="center" pl="sm">
+              <Text size="sm">{collection.name}</Text>
+              <Button variant="light" size="sm" onClick={() => add(collection.id)}>
+                Add
+              </Button>
+            </Flex>
+          </Card>
         ))}
       </Flex>
     </Modal>

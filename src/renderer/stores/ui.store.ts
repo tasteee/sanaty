@@ -11,6 +11,17 @@ class UiStore {
   isCreateCollectionDialogOpen = datass.boolean(false)
   isEditCollectionDialogOpen = datass.boolean(false)
   isAddToCollectionModalOpen = datass.boolean(false)
+  editingCollectionId = datass.string('')
+
+  startEditingCollection = (id) => {
+    this.isEditCollectionDialogOpen.set(true)
+    this.editingCollectionId.set(id)
+  }
+
+  stopEditingCollection = () => {
+    this.isEditCollectionDialogOpen.set(false)
+    this.editingCollectionId.set('')
+  }
 
   isDragging = datass.boolean(false)
 

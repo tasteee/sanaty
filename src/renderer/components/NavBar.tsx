@@ -1,8 +1,10 @@
 import './NavBar.css'
-import { Center, Stack, Tooltip, UnstyledButton } from '@mantine/core'
+import { Center, Flex, Popover, Slider, Stack, Tooltip, UnstyledButton } from '@mantine/core'
 import { MantineLogo } from '@mantinex/mantine-logo'
 import { CuteIcon } from './ui/CuteIcon'
 import { navigateTo } from '#/modules/routing'
+import { $playback } from '#/stores/playback.store'
+import { Icon } from '@iconify/react'
 
 type NavbarLinkPropsT = {
   iconName: string
@@ -24,19 +26,32 @@ const NavbarLink = (props: NavbarLinkPropsT) => {
 }
 
 export const NavBar = () => {
+  const volume = $playback.volume.use()
+
   return (
     <nav className="NavBar">
       <Center>
-        <MantineLogo type="mark" size={30} />
+        <img src="https://i.imgur.com/fc3lTS2.png" style={{ width: 30, height: 30 }} />
       </Center>
 
       <div className="NavBarMain">
         <Stack justify="center" gap={0}>
-          <NavbarLink label="Folders" path="/folders" iconName="mingcute:folders-line" />
           <NavbarLink label="Samples" path="/samples" iconName="mingcute:music-fill" />
           <NavbarLink label="Collections" path="/collections" iconName="mingcute:playlist-2-fill" />
+          <NavbarLink label="Folders" path="/folders" iconName="mingcute:folders-line" />
         </Stack>
       </div>
+
+      <Flex className="VolumeController" mb="md">
+        <Popover width={240} withArrow shadow="md" position="right">
+          <Popover.Target>
+            <Icon icon="mingcute:volume-line" width={24} height={24} />
+          </Popover.Target>
+          <Popover.Dropdown style={{ background: 'var(--mantine-color-dark-8)', paddingTop: 12 }}>
+            <Slider className="VolumeSlider" min={0} max={100} value={volume} onChange={$playback.volume.set} />
+          </Popover.Dropdown>
+        </Popover>
+      </Flex>
     </nav>
   )
 }

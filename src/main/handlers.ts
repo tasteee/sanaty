@@ -1,12 +1,12 @@
 // src/main/handlers.ts
 import { database } from './database'
-import { ipcMain, clipboard, nativeImage, BrowserWindow } from 'electron'
+import { ipcMain, clipboard, nativeImage, BrowserWindow, shell } from 'electron'
 import fs from 'fs'
 import path from 'path'
 import os from 'os'
 import plist from 'plist' // macOS-specific
 
-const image = nativeImage.createFromPath(path.join(__dirname, 'icon.png'))
+const image = nativeImage.createFromPath(path.join(__dirname, 'drag-icon.png'))
 
 const copySampleToClipboard = (filePath: string): boolean => {
   try {
@@ -79,6 +79,7 @@ export const setupIpcHandlers = (mainWindow) => {
   createHandler('startDrag', startDrag)
   createHandler('copySampleToClipboard', copySampleToClipboard)
   createHandler('openExplorerAtPath', openExplorerAtPath)
+  createHandler('openExplorerAtFolder', database.openExplorerAtFolder)
   createHandler('addFolder', database.addFolder)
   createHandler('getAllFolders', database.getAllFolders)
   createHandler('refreshFolder', database.refreshFolder)

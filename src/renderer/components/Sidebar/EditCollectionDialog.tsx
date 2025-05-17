@@ -4,9 +4,11 @@ import { useState } from 'react'
 import { toaster } from '#/components/ui/toaster'
 import { CuteIcon } from '../ui/CuteIcon'
 import { $collections } from '#/stores/collections.store'
+import { $ui } from '#/stores/ui.store'
 
-export const EditCollectionDialog = (props) => {
-  const collection = $collections.useCollection(props.collectionId)
+export const EditCollectionDialog = () => {
+  const editingCollectionId = $ui.editingCollectionId.use()
+  const collection = $collections.useCollection(editingCollectionId)
   const [isOpen, setIsOpen] = useState(true)
   const [name, setName] = useState(collection?.name || '')
   const [description, setDesc] = useState(collection?.description || '')
@@ -16,7 +18,7 @@ export const EditCollectionDialog = (props) => {
 
   const close = () => {
     setIsOpen(false)
-    props.handleClose?.()
+    $ui.stopEditingCollection()
   }
 
   const handleFileChange = (event) => {
@@ -36,7 +38,7 @@ export const EditCollectionDialog = (props) => {
   }
 
   const handleSave = async () => {
-    const error = await $collections.update(props.collectionId, {
+    const error = await $collections.update(editingCollectionId, {
       name,
       description,
       artworkPath: imageSrc

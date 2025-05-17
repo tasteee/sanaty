@@ -26,7 +26,7 @@ export const View = (props) => {
 
 View.Heading = (props) => {
   return (
-    <Flex gap="xs" mb="sm" mt="md" align="center" className="ViewHeading" justify="space-between" style={{ flexWrap: 'wrap' }}>
+    <Flex gap="xs" mt="md" align="center" className="ViewHeading" justify="space-between">
       <Flex gap="xs" align="center" className="ViewHeadingMain">
         {props.iconName && <CuteIcon customIcon={props.iconName} size="2xl" />}
         <Title order={2} lh="80%">

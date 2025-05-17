@@ -1,4 +1,8 @@
+import { toNumber } from '#/modules/number'
 import { datass } from 'datass'
+import store from 'store'
+
+const INITIAL_VOLUME = toNumber(store.get('volume') || '50')
 
 class PlaybackStore {
   isPlayingSound = datass.boolean(false)
@@ -6,6 +10,7 @@ class PlaybackStore {
   activeSampleId = datass.string('')
   activeSample = datass.object({})
   currentAudio = datass.object(null)
+  volume = datass.number(INITIAL_VOLUME)
 
   setActiveSampleId = (id) => {
     this.activeSampleId.set(id)
@@ -23,15 +28,16 @@ class PlaybackStore {
     this.isPlayingSound.set(false)
   }
 
-  clearActiveSample = () => {
-    this.setActiveSampleIndex(-1)
-    this.setActiveSampleId('')
+  reset = () => {
+    this.activeAssetIndex.set(-1)
+    this.activeSampleId.set('')
     this.activeSample.set({})
+    this.isPlayingSound.set(false)
   }
 
   playSample = (sample, globalIndex) => {
-    this.setActiveSampleIndex(globalIndex)
-    this.setActiveSampleId(sample.id)
+    this.activeAssetIndex.set(globalIndex)
+    this.activeSampleId.set(sample.id)
     this.activeSample.set(sample)
     this.isPlayingSound.set(true)
   }
@@ -39,6 +45,10 @@ class PlaybackStore {
 
 export const $playback = new PlaybackStore()
 globalThis.playback = $playback
+
+$playback.volume.watch(() => {
+  store.set('volume', String($playback.volume.state))
+})
 
 $playback.activeSampleId.watch(() => {
   const activeSampleId = $playback.activeSampleId.state
