@@ -40,7 +40,7 @@ const CONTAINER_SIZES: Record<string, string> = {
   xxl: rem('1600px')
 }
 
-export const zincColors: MantineColorsTuple = [
+const zincColors: MantineColorsTuple = [
   '#fafafa',
   '#f4f4f5',
   '#e4e4e7',
@@ -53,7 +53,7 @@ export const zincColors: MantineColorsTuple = [
   '#09090b',
   '#71717A'
 ]
-export const slateColors: MantineColorsTuple = [
+const slateColors: MantineColorsTuple = [
   '#f8fafc',
   '#f1f5f9',
   '#e2e8f0',
@@ -66,7 +66,7 @@ export const slateColors: MantineColorsTuple = [
   '#020817',
   '#64748B'
 ]
-export const grayColors: MantineColorsTuple = [
+const grayColors: MantineColorsTuple = [
   '#f9fafb',
   '#f3f4f6',
   '#e5e7eb',
@@ -79,7 +79,7 @@ export const grayColors: MantineColorsTuple = [
   '#030712',
   '#6B7280'
 ]
-export const neutralColors: MantineColorsTuple = [
+const neutralColors: MantineColorsTuple = [
   '#fafafa',
   '#f5f5f5',
   '#e5e5e5',
@@ -92,7 +92,7 @@ export const neutralColors: MantineColorsTuple = [
   '#0a0a0a',
   '#737373'
 ]
-export const stoneColors: MantineColorsTuple = [
+const stoneColors: MantineColorsTuple = [
   '#fafaf9',
   '#f5f5f4',
   '#e7e5e4',
@@ -105,7 +105,7 @@ export const stoneColors: MantineColorsTuple = [
   '#0c0a09',
   '#78716C'
 ]
-export const redColors: MantineColorsTuple = [
+const redColors: MantineColorsTuple = [
   '#FEF2F2',
   '#FEE2E2',
   '#FECACA',
@@ -118,7 +118,7 @@ export const redColors: MantineColorsTuple = [
   '#450A0A',
   '#EF4444'
 ]
-export const roseColors: MantineColorsTuple = [
+const roseColors: MantineColorsTuple = [
   '#fff1f2',
   '#ffe4e6',
   '#fecdd3',
@@ -131,7 +131,7 @@ export const roseColors: MantineColorsTuple = [
   '#4c0519',
   '#F43F5E'
 ]
-export const orangeColors: MantineColorsTuple = [
+const orangeColors: MantineColorsTuple = [
   '#fff7ed',
   '#ffedd5',
   '#fed7aa',
@@ -144,7 +144,7 @@ export const orangeColors: MantineColorsTuple = [
   '#431407',
   '#F97316'
 ]
-export const amberColors: MantineColorsTuple = [
+const amberColors: MantineColorsTuple = [
   '#FFFBEB',
   '#FEF3C7',
   '#FDE68A',
@@ -157,7 +157,7 @@ export const amberColors: MantineColorsTuple = [
   '#451A03',
   '#F59E0B'
 ]
-export const yellowColors: MantineColorsTuple = [
+const yellowColors: MantineColorsTuple = [
   '#fefce8',
   '#fef9c3',
   '#fef08a',
@@ -170,7 +170,7 @@ export const yellowColors: MantineColorsTuple = [
   '#3f2c06',
   '#F59E0B'
 ]
-export const limeColors: MantineColorsTuple = [
+const limeColors: MantineColorsTuple = [
   '#f7fee7',
   '#ecfccb',
   '#d9f99d',
@@ -183,7 +183,7 @@ export const limeColors: MantineColorsTuple = [
   '#0f1903',
   '#84CC16'
 ]
-export const greenColors: MantineColorsTuple = [
+const greenColors: MantineColorsTuple = [
   '#F0FDF4',
   '#DCFCE7',
   '#BBF7D0',
@@ -196,7 +196,7 @@ export const greenColors: MantineColorsTuple = [
   '#052E16',
   '#10B981'
 ]
-export const emeraldColors: MantineColorsTuple = [
+const emeraldColors: MantineColorsTuple = [
   '#ecfdf5',
   '#d1fae5',
   '#a7f3d0',
@@ -209,7 +209,7 @@ export const emeraldColors: MantineColorsTuple = [
   '#022c22',
   '#10B981'
 ]
-export const tealColors: MantineColorsTuple = [
+const tealColors: MantineColorsTuple = [
   '#f0fdfa',
   '#ccfbf1',
   '#99f6e4',
@@ -222,7 +222,7 @@ export const tealColors: MantineColorsTuple = [
   '#042f2e',
   '#14B8A6'
 ]
-export const cyanColors: MantineColorsTuple = [
+const cyanColors: MantineColorsTuple = [
   '#ecfeff',
   '#cffafe',
   '#a5f3fc',
@@ -235,7 +235,7 @@ export const cyanColors: MantineColorsTuple = [
   '#083344',
   '#06B6D4'
 ]
-export const skyColors: MantineColorsTuple = [
+const skyColors: MantineColorsTuple = [
   '#f0f9ff',
   '#e0f2fe',
   '#bae6fd',
@@ -248,7 +248,7 @@ export const skyColors: MantineColorsTuple = [
   '#082f49',
   '#0EA5E9'
 ]
-export const blueColors: MantineColorsTuple = [
+const blueColors: MantineColorsTuple = [
   '#eff6ff',
   '#dbeafe',
   '#bfdbfe',
@@ -261,7 +261,7 @@ export const blueColors: MantineColorsTuple = [
   '#172554',
   '#3B82F6'
 ]
-export const indigoColors: MantineColorsTuple = [
+const indigoColors: MantineColorsTuple = [
   '#eef2ff',
   '#e0e7ff',
   '#c7d2fe',
@@ -274,7 +274,7 @@ export const indigoColors: MantineColorsTuple = [
   '#1e1b4b',
   '#6366F1'
 ]
-export const violetColors: MantineColorsTuple = [
+const violetColors: MantineColorsTuple = [
   '#f5f3ff',
   '#ede9fe',
   '#ddd6fe',
@@ -287,7 +287,7 @@ export const violetColors: MantineColorsTuple = [
   '#1e1b4b',
   '#8B5CF6'
 ]
-export const purpleColors: MantineColorsTuple = [
+const purpleColors: MantineColorsTuple = [
   '#faf5ff',
   '#f3e8ff',
   '#e9d5ff',
@@ -300,7 +300,7 @@ export const purpleColors: MantineColorsTuple = [
   '#2e1065',
   '#A855F7'
 ]
-export const fuchsiaColors: MantineColorsTuple = [
+const fuchsiaColors: MantineColorsTuple = [
   '#fdf4ff',
   '#fae8ff',
   '#f5d0fe',
@@ -313,7 +313,7 @@ export const fuchsiaColors: MantineColorsTuple = [
   '#4a044e',
   '#D946EF'
 ]
-export const pinkColors: MantineColorsTuple = [
+const pinkColors: MantineColorsTuple = [
   '#fdf2f8',
   '#fce7f3',
   '#fbcfe8',
@@ -356,9 +356,9 @@ export const theme: MantineThemeOverride = createTheme({
     fuchsia: fuchsiaColors,
     pink: pinkColors,
 
-    primary: zincColors,
-    secondary: zincColors,
-    dark: zincColors,
+    primary: neutralColors,
+    secondary: neutralColors,
+    dark: neutralColors,
 
     error: redColors as MantineColorsTuple,
     success: greenColors,

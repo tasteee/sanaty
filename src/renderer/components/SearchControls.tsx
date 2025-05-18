@@ -1,7 +1,7 @@
 import { $search } from '#/stores/search.store'
 import { ActionIcon, Button, Checkbox, Flex, Group, Input, Space, Stack, Text, useMatches } from '@mantine/core'
 import { Select } from '@mantine/core'
-import { CuteIcon } from './ui/CuteIcon'
+import { CuteIcon } from './CuteIcon'
 import { toNumber } from '#/modules/number'
 import { NumberInput } from '@mantine/core'
 import { SCALE_LABELS } from '#/constants/scales'

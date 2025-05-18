@@ -26,3 +26,9 @@ export const findById = <DataT>(target: DataT[], id: string) => {
     return item.id === id
   }) as DataT[]
 }
+
+export const removeById = <DataT>(target: DataT[], id: string) => {
+  return target.filter((item: any) => {
+    return item.id !== id
+  }) as DataT[]
+}

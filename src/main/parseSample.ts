@@ -128,38 +128,50 @@ function getRandomScale(): string {
   return scales[Math.floor(Math.random() * scales.length)]
 }
 
-export const parseSample = async (filePath, folderId) => {
-  const stats = fs.statSync(filePath)
-  const extension = path.extname(filePath).toLowerCase()
-  const fileName = path.basename(filePath, extension)
-  const fullName = path.basename(filePath)
-  const metadata = await mm.parseFile(filePath)
-  const sampleRate = metadata.format.sampleRate || 44100
-  const buffer = fs.readFileSync(filePath)
-  //   const audioDecoded = await decode(buffer)
-  const tonic = 'C' // keyResult.key // e.g., "C", "F#"
-  const scale = 'Minor' // keyResult.scale
-  const bpm = 93
-  const isLoop = analyzeWaveformForLoopCharacteristics(buffer, sampleRate)
-  const duration = Math.ceil(metadata.format.duration || 0)
-  // console.log({ isLoop, duration, tonic, scale, sampleRate, bpm })
+export const parseSample = async (_filePath, folderId) => {
+  const data = {} as any
+  const filePath = path.resolve(_filePath)
+  try {
+    try {
+      data.stats = fs.statSync(filePath)
+      data.extension = path.extname(filePath).toLowerCase()
+      data.fileName = path.basename(filePath, data.extension)
+      data.fullName = path.basename(filePath)
+      data.metadata = await mm.parseFile(filePath)
+      data.sampleRate = data.metadata.format.sampleRate || 44100
+      data.buffer = fs.readFileSync(filePath)
+      //   const audioDecoded = await decode(buffer)
+      data.tonic = 'C' // keyResult.key // e.g., "C", "F#"
+      data.scale = 'Minor' // keyResult.scale
+      data.bpm = 93
+    } catch (error) {
+      console.error('parseSample ERROR', filePath, error)
+      return null
+    }
 
-  const sample: SampleT = {
-    id: filePath,
-    fullName,
-    name: fileName,
-    path: filePath,
-    size: stats.size,
-    extension: extension.substring(1),
-    folderId,
-    duration,
-    bpm,
-    tonic,
-    scale,
-    sampleType: isLoop ? 'loop' : 'shot',
-    tags: getRandomTags(),
-    dateAdded: Date.now()
+    data.isLoop = analyzeWaveformForLoopCharacteristics(data.buffer, data.sampleRate)
+    data.duration = Math.ceil(data.metadata.format.duration || 0)
+
+    const sample: SampleT = {
+      id: filePath,
+      fullName: data.fullName,
+      name: data.fileName,
+      path: filePath,
+      size: data.stats.size,
+      extension: data.extension.substring(1),
+      folderId,
+      duration: data.duration,
+      bpm: data.bpm,
+      tonic: data.tonic,
+      scale: data.scale,
+      sampleType: data.isLoop ? 'loop' : 'shot',
+      tags: getRandomTags(),
+      dateAdded: Date.now()
+    }
+
+    return sample
+  } catch (error) {
+    console.error(error)
+    return null
   }
-
-  return sample
 }

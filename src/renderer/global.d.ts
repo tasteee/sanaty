@@ -38,7 +38,7 @@ type CollectionT = {
   id: string
   name: string
   description: string
-  artworkPath: string
+  artwork: string
   sampleIds: string[]
   dateAdded: number
 }

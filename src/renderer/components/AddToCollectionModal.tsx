@@ -1,16 +1,21 @@
 import { Modal, Button, Flex, Text, Card } from '@mantine/core'
-import { $ui } from '#/stores/ui.store'
 import { $collections } from '#/stores/collections.store'
 
-export const AddToCollectionModal = () => {
-  const isAddToCollectionModalOpen = $ui.isAddToCollectionModalOpen.use()
+type PropsT = {
+  sampleId: string
+  onClose: () => void
+}
+
+export const AddToCollectionModal = (props: PropsT) => {
   const collections = $collections.store.use()
-  if (!isAddToCollectionModalOpen) return null
-  const close = () => $ui.isAddToCollectionModalOpen.set(false)
-  const add = (id) => $collections.addSampleToCollection(id)
+
+  const add = (collectionId) => {
+    $collections.addSampleToCollection(collectionId, props.sampleId)
+    props.onClose()
+  }
 
   return (
-    <Modal opened={true} onClose={close} title="Add to Collection" centered>
+    <Modal opened onClose={props.onClose} title="Add to collection" centered>
       <Flex gap="sm" direction="column">
         {collections.map((collection) => (
           <Card key={collection.id} shadow="sm" p="xs" withBorder>

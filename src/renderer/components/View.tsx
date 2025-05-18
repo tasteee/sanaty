@@ -1,4 +1,4 @@
-import { CuteIcon } from './ui/CuteIcon'
+import { CuteIcon } from './CuteIcon'
 import { Flex, Title } from '@mantine/core'
 import { motion } from 'framer-motion'
 import clsx from 'clsx'

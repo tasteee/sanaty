@@ -10,7 +10,7 @@
 // export { getAllFolders } from './api/getAllFolders'
 // export { getAllLikes } from './api/getAllLikes'
 // export { searchSamples } from './api/searchSamples'
-// export { updateCollection } from './api/updateCollection'
+// export { editCollection } from './api/editCollection'
 
 import * as fs from 'fs'
 import * as path from 'path'
@@ -98,6 +98,8 @@ export const addFolder = async () => {
   }
 
   folders.insert(newFolder)
+  console.log('Inserted folder', newFolder)
+
   const sampleCount = await processFolderSamples(newFolder)
   console.log('\n\n\ADDED FOLDER ', folderPath, ' and found ', sampleCount, ' samples')
   return newFolder
@@ -118,7 +120,7 @@ const processFolderSamples = async (folder: FolderT) => {
 
   for (const filePath of sampleFilePaths) {
     const sample = await parseSample(filePath, folder.id)
-    samples.insert(sample)
+    sample && samples.insert(sample)
   }
 
   folder.sampleCount = sampleFilePaths.length
@@ -260,12 +262,12 @@ export const searchSamples = (filters: {
 }
 
 // Create collection
-export const createCollection = (data: { name: string; description?: string; artworkPath?: string; sampleIds?: string[] }): CollectionT => {
+export const createCollection = (data: { name: string; description?: string; artwork?: string; sampleIds?: string[] }): CollectionT => {
   const newCollection: CollectionT = {
     id: crypto.randomUUID(),
     name: data.name,
     description: data.description || '',
-    artworkPath: data.artworkPath || '',
+    artwork: data.artwork || '',
     sampleIds: data.sampleIds || [],
     dateAdded: Date.now()
   }
@@ -279,21 +281,38 @@ export const getAllCollections = (): CollectionT[] => {
   return collections.chain().simplesort('name').data()
 }
 
-// Update collection
-export const updateCollection = (id: string, updates: Partial<CollectionT>): CollectionT => {
-  const collection = collections.findOne({ id })
+const BASE_SUCCESS_RESPONSE = { didPass: true, didFail: false, error: null }
+const BASE_ERROR_RESPONSE = { didPass: false, didFail: true, result: null }
+
+const createSuccessResponse = ({ name, input, result }) => {
+  return { name, input, result, ...BASE_SUCCESS_RESPONSE }
+}
+
+const createErrorResponse = ({ name, input, error }) => {
+  return { name, input, error, ...BASE_ERROR_RESPONSE }
+}
+
+export const editCollection = (updates: Partial<CollectionT>) => {
+  const collection = collections.findOne({ id: updates.id })
 
   if (!collection) {
-    throw new Error('Collection not found')
+    return createErrorResponse({
+      name: 'editCollection',
+      input: updates,
+      error: 'Collection with id not found.'
+    })
   }
 
-  // Prevent updating id and dateAdded
-  const { id: _, dateAdded: __, ...validUpdates } = updates
-
-  Object.assign(collection, validUpdates)
+  collection.name = updates.name
+  collection.description = updates.description
+  collection.artwork = updates.artwork
   collections.update(collection)
 
-  return collection
+  return createSuccessResponse({
+    name: 'editCollection',
+    input: updates,
+    result: collection
+  })
 }
 
 // Delete collection
@@ -360,7 +379,7 @@ export const database = {
   searchSamples,
   createCollection,
   getAllCollections,
-  updateCollection,
+  editCollection,
   deleteCollection,
   addToCollection,
   removeFromCollection,

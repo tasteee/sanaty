@@ -1,4 +1,3 @@
-import { makeGlobal } from '#/modules/_global'
 import { datass } from 'datass'
 
 class LikesStore {
@@ -20,4 +19,4 @@ class LikesStore {
 }
 
 export const $likes = new LikesStore()
-makeGlobal('likes', $likes)
+globalThis.$likes = $likes

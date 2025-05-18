@@ -1,1 +1,0 @@
-export { SearchFilterSection } from './SearchFilterSection'

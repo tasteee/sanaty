@@ -1,25 +1,21 @@
 import './index.css'
 import './styles/general.css'
-import '#/modules/_global'
 import '@mantine/notifications/styles.css'
 
 import { Provider } from '#/components/Provider'
 import { Flex, Toaster, VStack, Spinner, Text } from '#/components'
 import { $folders } from './stores/folders.store'
 import { NoFoldersView } from './components/NoFoldersView'
-import { EditCollectionDialog } from './components/Sidebar/EditCollectionDialog'
-import { CreateCollectionDialog } from './components/Sidebar/CreateCollectionDialog'
-import { Router } from './Router'
+import { Router } from './components/Router'
 import { $ui } from './stores/ui.store'
 import { useRoutingSync } from './modules/useRoutingSync'
 import { useMount } from '@siberiacancode/reactuse'
 import { setupAppData } from './modules/appSetup'
 import { LoadingOverlay } from './components/LoadingOverlay'
-import clsx from 'clsx'
 import { Notifications } from '@mantine/notifications'
 import { NavBar } from './components/NavBar'
 import { PlaybackHandler } from './components/PlaybackHandler'
-import { AddToCollectionModal } from './components/AddToCollectionModal'
+import clsx from 'clsx'
 
 export const App = () => {
   useMount(setupAppData)
@@ -29,30 +25,15 @@ export const App = () => {
       <AppFrame />
       <PlaybackHandler />
       <Toaster />
-      <Overlays />
       <LoadingOverlay />
       <Notifications />
     </Provider>
   )
 }
 
-const Overlays = () => {
-  const isCreateCollectionDialogOpen = $ui.isCreateCollectionDialogOpen.use()
-  const isEditCollectionDialogOpen = $ui.isEditCollectionDialogOpen.use()
-
-  return (
-    <>
-      {isEditCollectionDialogOpen && <EditCollectionDialog />}
-      {isCreateCollectionDialogOpen && <CreateCollectionDialog handleClose={() => $ui.isCreateCollectionDialogOpen.set(false)} />}
-      <AddToCollectionModal />
-    </>
-  )
-}
-
 const AppFrame = () => {
   useRoutingSync()
   const classNames = useAppFrameClassNames()
-  console.log({ classNames })
   const folders = $folders.list.use()
   const isSetupDone = $ui.isSetupDone.use()
   if (!isSetupDone) return <MainLoader />
@@ -69,11 +50,9 @@ const AppFrame = () => {
 const useAppFrameClassNames = () => {
   const isDragging = $ui.isDragging.use()
   const isCompactView = $ui.isCompactViewEnabled.use()
-  const isAddingAssetToCollection = $ui.isAddingToCollection.use()
-  const addingToCollectionClassName = isAddingAssetToCollection ? 'isAddingSampleToCollection' : ''
   const isCompactViewClassName = isCompactView ? 'isCompactView' : ''
   const isDraggingClassName = isDragging ? 'isDragging' : ''
-  return clsx('App', 'AppFrame', addingToCollectionClassName, isCompactViewClassName, isDraggingClassName)
+  return clsx('App', 'AppFrame', isCompactViewClassName, isDraggingClassName)
 }
 
 const MainLoader = () => {

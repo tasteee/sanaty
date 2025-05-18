@@ -1,4 +1,4 @@
-import { SampleResultsList } from './AssetResultsList/AssetResultsList'
+import { SampleResultsList } from './AssetResultsList'
 import { SearchControls } from './SearchControls'
 import { View } from './View'
 

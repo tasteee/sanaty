@@ -1,6 +1,4 @@
 import { datass } from 'datass'
-import { _store } from '#/modules/_stores'
-import { makeGlobal } from '#/modules/_global'
 
 type ErrorDataT = {
   id: string
@@ -27,4 +25,4 @@ class ErrorsStore {
 }
 
 export const $errors = new ErrorsStore()
-makeGlobal('errors', $errors)
+globalThis.$errors = $errors

@@ -1,5 +1,5 @@
 import { Flex, Button, ButtonGroup, EmptyState, VStack } from '@chakra-ui/react'
-import { CuteIcon } from './ui/CuteIcon'
+import { CuteIcon } from './CuteIcon'
 import { $folders } from '#/stores/folders.store'
 
 export const NoFoldersView = () => {

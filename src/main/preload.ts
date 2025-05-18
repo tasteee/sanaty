@@ -13,12 +13,11 @@ const electronHandler = {
   searchSamples: (filters) => ipcRenderer.invoke('searchSamples', filters),
   createCollection: (data) => ipcRenderer.invoke('createCollection', data),
   getAllCollections: () => ipcRenderer.invoke('getAllCollections'),
-  updateCollection: (id, updates) => ipcRenderer.invoke('updateCollection', id, updates),
+  editCollection: (collection) => ipcRenderer.invoke('editCollection', collection),
   deleteCollection: (id) => ipcRenderer.invoke('deleteCollection', id),
   addToCollection: (id, sampleId) => ipcRenderer.invoke('addToCollection', id, sampleId),
   removeFromCollection: (id, sampleId) => ipcRenderer.invoke('removeFromCollection', id, sampleId),
   getAudioData: (filePath) => ipcRenderer.invoke('getAudioData', filePath),
-  copySampleToClipboard: (filePath) => ipcRenderer.invoke('copySampleToClipboard', filePath),
   startDrag: (filePath: string) => ipcRenderer.invoke('startDrag', filePath)
 }
 

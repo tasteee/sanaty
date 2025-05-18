@@ -76,7 +76,7 @@ export type CollectionT = {
   name: string
   description: string
   sampleIds: string[]
-  artworkPath: string
+  artwork: string
   createdDate: number
 }
 

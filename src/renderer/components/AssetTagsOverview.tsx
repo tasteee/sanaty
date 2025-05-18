@@ -1,7 +1,7 @@
 import React from 'react'
 import { _tags } from '#/modules/tags'
 import { Flex } from '@mantine/core'
-import { SanatyTag } from './ui/SanatyTag'
+import { SanatyTag } from './SanatyTag'
 
 type PropsT = {
   tags: string[]

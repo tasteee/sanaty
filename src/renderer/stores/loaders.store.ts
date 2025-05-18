@@ -1,8 +1,4 @@
-// src/renderer/stores/ui.ts
-import { makeGlobal } from '#/modules/_global'
-import { _store } from '#/modules/_stores'
 import { datass } from 'datass'
-import { $search } from './search.store'
 
 type LoaderConfigT = {
   id: string
@@ -48,7 +44,7 @@ class LoadersStore {
 }
 
 export const $loaders = new LoadersStore()
-makeGlobal('loaders', $loaders)
+globalThis.$loaders = $loaders
 
 // When activeLoaders updates, set isLoading accordingly.
 $loaders.activeLoaders.watch(() => {

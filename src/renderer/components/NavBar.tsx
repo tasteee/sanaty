@@ -1,7 +1,6 @@
 import './NavBar.css'
 import { Center, Flex, Popover, Slider, Stack, Tooltip, UnstyledButton } from '@mantine/core'
-import { MantineLogo } from '@mantinex/mantine-logo'
-import { CuteIcon } from './ui/CuteIcon'
+import { CuteIcon } from './CuteIcon'
 import { navigateTo } from '#/modules/routing'
 import { $playback } from '#/stores/playback.store'
 import { Icon } from '@iconify/react'
@@ -42,7 +41,7 @@ export const NavBar = () => {
         </Stack>
       </div>
 
-      <Flex className="VolumeController" mb="md">
+      <Flex className="VolumeController" mb="md" justify="center">
         <Popover width={240} withArrow shadow="md" position="right">
           <Popover.Target>
             <Icon icon="mingcute:volume-line" width={24} height={24} />

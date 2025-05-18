@@ -1,7 +1,7 @@
-import { makeGlobal } from '#/modules/_global'
 import { datass } from 'datass'
-import { toaster } from '#/components/ui/toaster'
+import { toaster } from '#/components/toaster'
 import { $ui } from './ui.store'
+import { $toasts } from './toasts.store'
 
 class CollectionsStore {
   store = datass.array<CollectionT>([])
@@ -12,10 +12,31 @@ class CollectionsStore {
     this.store.set(allCollections)
   }
 
-  create = async (data: Partial<CollectionT>) => {
-    const collection = await window.electron.createCollection(data)
+  create = async (data) => {
+    const response = await window.electron.createCollection(data)
+
+    if (response.didFail) {
+      console.error('$collections.create failed:', response)
+      $toasts.open('createCollectionFail')
+      return response
+    }
+
+    $toasts.open('createCollectionPass')
     await this.load()
-    return collection
+    return response
+  }
+
+  edit = async (collection) => {
+    const response = await window.electron.editCollection(collection)
+
+    if (response.didFail) {
+      console.error('$collections.edit failed:', response)
+      $toasts.open('editCollectionFail')
+      return response
+    }
+
+    await this.load()
+    return response
   }
 
   delete = async (id) => {
@@ -23,29 +44,8 @@ class CollectionsStore {
     await this.load()
   }
 
-  update = async (id, updates) => {
-    const { result, error } = await window.electron.updateCollection(id, updates)
-    if (error) console.error('updateCollection error', error)
-    if (error) return error
-    console.log('updateCollection success', result)
-    await this.load()
-    return null
-  }
-
-  addSampleToCollection = async (id) => {
-    const sampleId = $ui.collectionAdditionSampleId.state
-    const success = await window.electron.addToCollection(id, sampleId)
-    if (!success) return
-    $ui.isAddToCollectionModalOpen.set(false)
-    $ui.isAddingToCollection.set(false)
-    $ui.collectionAdditionSampleId.set('')
-
-    toaster.create({
-      title: `Added to collection.`,
-      type: 'success',
-      duration: 2000
-    })
-
+  addSampleToCollection = async (collectionId, sampleId) => {
+    const response = await window.electron.addToCollection(collectionId, sampleId)
     await this.load()
   }
 
@@ -61,4 +61,4 @@ class CollectionsStore {
 }
 
 export const $collections = new CollectionsStore()
-makeGlobal('collections', $collections)
+globalThis.$collections = $collections
